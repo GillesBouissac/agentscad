@@ -4,6 +4,7 @@ My utilities for OpenSCAD
 # Hexagonal metric screws modelisation
 
 * The screw
+
     use <screw.scad>
     $fn=100;
 
@@ -12,6 +13,7 @@ My utilities for OpenSCAD
 ![M4 screw](https://github.com/GillesBouissac/agentscad/blob/master/img/M4-screw.png)
 
 * The screwing hole
+
     use <screw.scad>
     $fn=100;
     %screwHexa ( M4() );
@@ -21,6 +23,7 @@ My utilities for OpenSCAD
 ![M4 hole](https://github.com/GillesBouissac/agentscad/blob/master/img/M4-hole.png)
 
 * The screw passage
+
     $fn=100;
     color( "silver", 0.5 )
     screwHexa ( M4() );
