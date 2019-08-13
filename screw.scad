@@ -24,7 +24,7 @@
 //   screw thread starts at [0,0,0] and goes on Z+
 //   screw head   starts at [0,0,0] and goes on Z-
 //
-module screwHexa( p=M2(), l=-1 ) {
+module screwAllen( p=M2(), l=-1 ) {
     tool_r  = p[I_TOOL]/(2*cos(30));
     tool_l = 0.8*p[I_HEADL];
     length = l==-1 ? p[I_LENGTH]: l ;
@@ -257,7 +257,7 @@ module screwShowcase ( t ) {
         color( "green", 0.3 )
             screwHole ( t, $fn=100 );
         color( "yellow", 0.3 )
-            screwHexa ( t, $fn=100 );
+            screwAllen ( t, $fn=100 );
         color( "blue", 0.1 )
             screwPassage ( t, $fn=100 );
         color( "gold" )
