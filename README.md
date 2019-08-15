@@ -54,7 +54,7 @@ My utilities for OpenSCAD
     $fn=100;
 
     // Radius: 10 mm, Nb Tooth: 21, Tooth height: 1 mm
-    hirthJointSin( 10, 21, 1 );
+    hirthJointSinus( 10, 21, 1 );
     ```
 
 * Triangle profile

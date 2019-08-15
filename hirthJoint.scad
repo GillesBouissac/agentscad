@@ -15,18 +15,19 @@
 //    API
 //
 // ----------------------------------------
-VGG    = 1;   // Visual Glich Guard
+MFG    = 0.01;  // ManiFold Guard
+VGG    = 1;     // Visual Glich Guard
 MARGIN = 0.2;
 NOZZLE = 0.4;
 R1_MIN_NOZZLE = 5;
 
-module hirthJointSin ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+module hirthJointSinus ( rmax, tooth, height, shoulder=0, inlay=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/tooth;
 
     hirthJoint ( rmax, tooth, height, shoulder, inlay )
-        hirthJointProfileSin ( width, th );
+        hirthJointProfileSinus ( width, th );
 }
 
 module hirthJointTriangle ( rmax, tooth, height, shoulder=0, inlay=0 ) {
@@ -86,7 +87,7 @@ module hirthJoint ( rmax, tooth, height, shoulder=0, inlay=0 ) {
                     alpha = atan( (height/2)/rmax );
                     th = (rmax*tan(2*alpha)/cos(alpha))/2;
                     hirthJointTooth( rmax, width, height )
-                        hirthJointProfileSin(width,th);
+                        hirthJointProfileSinus(width,th);
                 }
         }
     }
@@ -99,9 +100,9 @@ module hirthJoint ( rmax, tooth, height, shoulder=0, inlay=0 ) {
         cylinder( r=rmax/cos(30), h=inlay, center=true, $fn=6 );
 }
 
-module hirthJointProfileSin ( width, height ) {
+module hirthJointProfileSinus ( width, height ) {
     polygon ([
-        for ( i=[-width/2:+width/30:+width/2+0.1] )
+        for ( i=[-width/2-MFG:+width/30:+width/2+MFG] )
             [height/2*cos(i*360/width)+height/2,i]
     ]);
 }
@@ -166,8 +167,8 @@ module hirthJointShow( part=0 ) {
 
     RADIUS   = 10;
     TOOTH    = 21;
-    HEIGHT   = 1;
-    SHOULDER = 1;
+    HEIGHT   = 1.2;
+    SHOULDER = 0;
     INLAY    = 2;
 
     if ( part==0 || part==1 ) {
@@ -175,13 +176,13 @@ module hirthJointShow( part=0 ) {
         translate( [0,0,+SHOULDER+HEIGHT/2+INTER/2] )
         rotate( [180,0,0] )
         rotate( [0,0,180] )
-        hirthJointSin( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
+        hirthJointSinus( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
     }
 
     if ( part==0 || part==2 ) {
         color( "Lime" )
         translate( [0,0,-SHOULDER-HEIGHT/2-INTER/2] )
-        hirthJointSin( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
+        hirthJointSinus( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
     }
 
     if ( part==0 || part==3 ) {
