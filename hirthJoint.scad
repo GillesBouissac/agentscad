@@ -20,45 +20,36 @@ MARGIN = 0.2;
 NOZZLE = 0.4;
 R1_MIN_NOZZLE = 5;
 
-module hirthJoint ( r1, r2, tooth_w, height, shoulder=0, inlay=0 ) {
+module hirthJointSin ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+    alpha = atan( (height/2)/rmax );
+    th = (rmax*tan(2*alpha)/cos(alpha));
+    width = 2*PI*rmax/tooth;
 
-    tooth = floor(2*PI*r2/tooth_w);
-    w1    = 2*PI*r1/tooth;
-    rmin  = R1_MIN_NOZZLE*NOZZLE>w1 ? R1_MIN_NOZZLE*NOZZLE*tooth/(2*PI) : r1;
-    h1    = height*rmin/r2;
-
-    width = 2*PI*r2/tooth;
-
-    echo ( "hirthJoint tooth nb: ", tooth );
-    echo ( "hirthJoint r1: ",       r1 );
-    echo ( "hirthJoint rmin: ",     rmin );
-    echo ( "hirthJoint rmax: ",     r2 );
-
-    translate( [0,0,+shoulder] )
-    intersection() {
-        translate( [0,0,+height/2] )
-        difference () {
-            cylinder( r=r2, h=height,     center=true );
-            cylinder( r=rmin, h=height+VGG, center=true );
-        }
-
-        for ( a=[0:360/tooth:359] ) {
-            rotate( [0,0,a] )
-                hirthJointTooth( r2, width, height );
-        }
-    }
-    translate( [0,0,+shoulder/2] )
-    difference () {
-        cylinder( r=r2, h=shoulder,     center=true );
-        cylinder( r=rmin, h=shoulder+VGG, center=true );
-    }
-    translate( [0,0,-inlay/2] )
-        cylinder( r=r2/cos(30), h=inlay, center=true, $fn=6 );
+    hirthJoint ( rmax, tooth, height, shoulder, inlay )
+        hirthJointProfileSin ( width, th );
 }
 
-module hirthJointPassage ( r2, inlay=0 ) {
+module hirthJointTriangle ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+    alpha = atan( (height/2)/rmax );
+    th = (rmax*tan(2*alpha)/cos(alpha));
+    width = 2*PI*rmax/tooth;
+
+    hirthJoint ( rmax, tooth, height, shoulder, inlay )
+        hirthJointProfileTriangle ( width, th );
+}
+
+module hirthJointRectangle ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+    alpha = atan( (height/2)/rmax );
+    th = (rmax*tan(2*alpha)/cos(alpha));
+    width = 2*PI*rmax/tooth;
+
+    hirthJoint ( rmax, tooth, height, shoulder, inlay )
+        hirthJointProfileRectangle ( width, th );
+}
+
+module hirthJointPassage ( rmax, inlay=0 ) {
     translate( [0,0,-inlay/2] )
-        cylinder( r=(r2+MARGIN)/cos(30), h=inlay+2*MARGIN, center=true, $fn=6 );
+        cylinder( r=(rmax+MARGIN)/cos(30), h=inlay+2*MARGIN, center=true, $fn=6 );
 }
 
 
@@ -67,6 +58,72 @@ module hirthJointPassage ( r2, inlay=0 ) {
 //    Implementation
 //
 // ----------------------------------------
+module hirthJoint ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+
+    rmin  = R1_MIN_NOZZLE*NOZZLE*tooth/(2*PI);
+    angle = 360/tooth;
+    width = 2*PI*rmax/tooth;
+
+    echo ( "hirthJoint rmin: ",                rmin );
+    echo ( "hirthJoint tooth angle (degre): ", angle );
+    echo ( "hirthJoint tooth width: ",         width );
+
+    translate( [0,0,+shoulder] )
+    intersection() {
+        translate( [0,0,+height/2] )
+        difference () {
+            cylinder( r=rmax, h=height,     center=true );
+            cylinder( r=rmin, h=height+VGG, center=true );
+        }
+
+        for ( a=[0:360/tooth:359] ) {
+            rotate( [0,0,a] )
+                if ( $children>0 ) {
+                    hirthJointTooth( rmax, width, height )
+                        children(0);
+                }
+                else {
+                    alpha = atan( (height/2)/rmax );
+                    th = (rmax*tan(2*alpha)/cos(alpha))/2;
+                    hirthJointTooth( rmax, width, height )
+                        hirthJointProfileSin(width,th);
+                }
+        }
+    }
+    translate( [0,0,+shoulder/2] )
+    difference () {
+        cylinder( r=rmax, h=shoulder,     center=true );
+        cylinder( r=rmin, h=shoulder+VGG, center=true );
+    }
+    translate( [0,0,-inlay/2] )
+        cylinder( r=rmax/cos(30), h=inlay, center=true, $fn=6 );
+}
+
+module hirthJointProfileSin ( width, height ) {
+    polygon ([
+        for ( i=[-width/2:+width/30:+width/2+0.1] )
+            [height/2*cos(i*360/width)+height/2,i]
+    ]);
+}
+
+module hirthJointProfileTriangle ( width, height ) {
+    polygon ([
+        [0,-width/2],
+        [0,+width/2],
+        [height,0],
+    ]);
+}
+
+module hirthJointProfileRectangle ( width, height ) {
+    polygon ([
+        [0,-width/2],
+        [0,-width/4+MARGIN/2],
+        [height,-width/4+MARGIN/2],
+        [height,+width/4-MARGIN/2],
+        [0,+width/4-MARGIN/2],
+        [0,+width/2],
+    ]);
+}
 
 module hirthJointTooth ( radius, width, height ) {
     alpha = atan( (height/2)/radius );
@@ -96,20 +153,7 @@ module hirthJointTooth ( radius, width, height ) {
     rotate( [0,-90,0] )
     rotate( [0,alpha,0] )
     linear_extrude( height=radius/cos(alpha), scale=0 )
-        // Sinusoidal profile
-        polygon ([
-            for ( i=[-width/2:+width/30:+width/2+0.1] )
-                [th*cos(i*360/width)+th,i]
-        ]);
-
-/*
-        // Triangle profile
-        polygon ([
-            [0,-width/2],
-            [0,+width/2],
-            [th,0],
-        ]);
-*/
+        children();
 }
 
 // ----------------------------------------
@@ -118,36 +162,48 @@ module hirthJointTooth ( radius, width, height ) {
 //
 // ----------------------------------------
 module hirthJointShow( part=0 ) {
-    TOOTH_NB = 15;
     INTER    = 10;
-    HEIGHT   = 2;
-    SHOULDER = 0;
-    R1       = 0;
-    R2       = 10;
-    TOOTH_W  = 2*PI*R2/TOOTH_NB;
+
+    RADIUS   = 10;
+    TOOTH    = 21;
+    HEIGHT   = 1;
+    SHOULDER = 1;
+    INLAY    = 2;
 
     if ( part==0 || part==1 ) {
-        color( "Yellow" )
+        color( "YellowGreen" )
         translate( [0,0,+SHOULDER+HEIGHT/2+INTER/2] )
         rotate( [180,0,0] )
         rotate( [0,0,180] )
-        hirthJoint( R1, R2, TOOTH_W, HEIGHT, SHOULDER, 2 );
+        hirthJointSin( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
     }
 
     if ( part==0 || part==2 ) {
         color( "Lime" )
         translate( [0,0,-SHOULDER-HEIGHT/2-INTER/2] )
-        hirthJoint( R1, R2, TOOTH_W, HEIGHT, SHOULDER, 2 );
+        hirthJointSin( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
     }
 
     if ( part==0 || part==3 ) {
+        color( "SkyBlue" )
+        translate( [0,3*RADIUS,-SHOULDER-HEIGHT/2-INTER/2] )
+        hirthJointTriangle( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
+    }
+
+    if ( part==0 || part==4 ) {
+        color( "Khaki" )
+        translate( [2.5*RADIUS,1.5*RADIUS,-SHOULDER-HEIGHT/2-INTER/2] )
+        hirthJointRectangle( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
+    }
+
+    if ( part==0 || part==5 ) {
         translate( [0,0,-1.5*INTER-SHOULDER-HEIGHT] ) {
             difference() {
                 color( "DarkGreen" )
                 translate( [0,0,-2] )
-                    cylinder( r=(R2+2)/cos(30), h=4, center=true );
+                    cylinder( r=(RADIUS+2)/cos(30), h=4, center=true );
                 color( "ForestGreen" )
-                    hirthJointPassage( R2, 2 );
+                    hirthJointPassage( RADIUS, INLAY );
             }
         }
     }

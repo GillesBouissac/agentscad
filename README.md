@@ -3,45 +3,89 @@ My utilities for OpenSCAD
 
 # Hexagonal metric screws modelisation
 
-* The screw
-	```
+* Panel from M1.6 to M12
+
+![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/M1_6-M12_hexa.png)
+
+* Samples
+
+** The screw
+    ```
     use <screw.scad>
     $fn=100;
 
     screwHexa ( M4() );
-	```
+    ```
 
-![M4 screw](https://github.com/GillesBouissac/agentscad/blob/master/img/M4-screw.png)
-
-* The screwing hole
-	```
+** The screwing hole
+    ```
     use <screw.scad>
     $fn=100;
     %screwHexa ( M4() );
 
     screwHole ( M4() );
-	```
+    ```
 
-![M4 hole](https://github.com/GillesBouissac/agentscad/blob/master/img/M4-hole.png)
-
-* The screw passage
-	```
+** The screw passage
+    ```
     $fn=100;
     color( "silver", 0.5 )
     screwHexa ( M4() );
 
     color( "yellow", 0.2 )
     screwPassage ( M4() );
-	```
+    ```
 
-![M4 passage](https://github.com/GillesBouissac/agentscad/blob/master/img/M4-passage.png)
+# Hirth Joint
 
-* Panel from M1.6 to M12
+* Panel of all possibilities
 
-![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/M1_6-M12_hexa.png)
+![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJoint)
 
+* Samples
 
+** Sinusoidal profile
+    ```
+    use <hirthJoint.scad>
+    $fn=100;
 
+    // Radius: 10 mm, Nb Tooth: 21, Tooth height: 1 mm
+    hirthJointSin( 10, 21, 1 );
+    ```
+
+** Triangle profile
+    ```
+    use <hirthJoint.scad>
+    $fn=100;
+
+    // Radius: 20 mm, Nb Tooth: 21, Tooth height: 1 mm, Shoulder: 2
+    hirthJointTriangle( 20, 21, 1, 2 );
+    ```
+
+** Rectangle profile
+    ```
+    use <hirthJoint.scad>
+    $fn=100;
+
+    // Radius: 20 mm, Nb Tooth: 21, Tooth height: 1 mm, Shoulder: 2, Inlay: 3
+    hirthJointRectangle( 20, 21, 1, 2, 3 );
+    ```
+
+** Passage for inlay insertion in other parts of your design
+    ```
+    use <hirthJoint.scad>
+    $fn=100;
+
+    RADIUS = 20;
+    INLAY = 2;
+    difference() {
+        // The part that will receive the inlay
+        translate( [0,0,-INLAY] )
+            cylinder( r=2*RADIUS, h=2*INLAY, center=true );
+        // Inlay passage with little margin
+        #hirthJointPassage( RADIUS, INLAY );
+    }
+    ```
 
 
 
