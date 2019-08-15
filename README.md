@@ -10,6 +10,7 @@ My utilities for OpenSCAD
 * Samples
 
 ** The screw
+
     ```
     use <screw.scad>
     $fn=100;
@@ -18,6 +19,7 @@ My utilities for OpenSCAD
     ```
 
 ** The screwing hole
+
     ```
     use <screw.scad>
     $fn=100;
@@ -27,6 +29,7 @@ My utilities for OpenSCAD
     ```
 
 ** The screw passage
+
     ```
     $fn=100;
     color( "silver", 0.5 )
@@ -40,11 +43,12 @@ My utilities for OpenSCAD
 
 * Panel of all possibilities
 
-![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJoint)
+![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJoint.png)
 
 * Samples
 
 ** Sinusoidal profile
+
     ```
     use <hirthJoint.scad>
     $fn=100;
@@ -54,6 +58,7 @@ My utilities for OpenSCAD
     ```
 
 ** Triangle profile
+
     ```
     use <hirthJoint.scad>
     $fn=100;
@@ -63,6 +68,7 @@ My utilities for OpenSCAD
     ```
 
 ** Rectangle profile
+
     ```
     use <hirthJoint.scad>
     $fn=100;
@@ -72,6 +78,7 @@ My utilities for OpenSCAD
     ```
 
 ** Passage for inlay insertion in other parts of your design
+
     ```
     use <hirthJoint.scad>
     $fn=100;
