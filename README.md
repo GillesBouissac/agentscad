@@ -3,13 +3,13 @@ My utilities for OpenSCAD
 
 # Hexagonal metric screws modelisation
 
-* Panel from M1.6 to M12
+## Panel from M1.6 to M12
 
 ![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/M1_6-M12_hexa.png)
 
-* Samples
+## Samples
 
-** The screw
+* The screw
 
     ```
     use <screw.scad>
@@ -18,7 +18,7 @@ My utilities for OpenSCAD
     screwHexa ( M4() );
     ```
 
-** The screwing hole
+* The screwing hole
 
     ```
     use <screw.scad>
@@ -28,7 +28,7 @@ My utilities for OpenSCAD
     screwHole ( M4() );
     ```
 
-** The screw passage
+* The screw passage
 
     ```
     $fn=100;
@@ -41,13 +41,13 @@ My utilities for OpenSCAD
 
 # Hirth Joint
 
-* Panel of all possibilities
+## Panel of all possibilities
 
 ![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJoint.png)
 
-* Samples
+## Samples
 
-** Sinusoidal profile
+* Sinusoidal profile
 
     ```
     use <hirthJoint.scad>
@@ -57,7 +57,7 @@ My utilities for OpenSCAD
     hirthJointSin( 10, 21, 1 );
     ```
 
-** Triangle profile
+* Triangle profile
 
     ```
     use <hirthJoint.scad>
@@ -67,7 +67,7 @@ My utilities for OpenSCAD
     hirthJointTriangle( 20, 21, 1, 2 );
     ```
 
-** Rectangle profile
+* Rectangle profile
 
     ```
     use <hirthJoint.scad>
@@ -77,7 +77,7 @@ My utilities for OpenSCAD
     hirthJointRectangle( 20, 21, 1, 2, 3 );
     ```
 
-** Passage for inlay insertion in other parts of your design
+* Passage for inlay insertion in other parts of your design
 
     ```
     use <hirthJoint.scad>
