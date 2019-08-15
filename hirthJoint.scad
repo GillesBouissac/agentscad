@@ -202,7 +202,7 @@ module hirthJointShow( part=0 ) {
                 color( "DarkGreen" )
                 translate( [0,0,-2] )
                     cylinder( r=(RADIUS+2)/cos(30), h=4, center=true );
-                color( "ForestGreen" )
+                color( "Salmon" )
                     hirthJointPassage( RADIUS, INLAY );
             }
         }
