@@ -90,22 +90,46 @@ module showcaseBigWall() {
 
 module showcaseSmallWall() {
     screw = M3(10);
-    translate ( [-20,0,40] ) {
+    translate ( [-60,0,40] ) {
         showcaseWalls (3,10,15);
     }
-    translate ( [0,0,40] ) {
+    translate ( [-40,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
             screwPassage( screw, 3 );
         }
     }
-    translate ( [+20,0,40] ) {
+    translate ( [-20,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
             screwPassage( screw, 3 );
         }
         color( "silver", 0.7 )
         screwAllen( screw );
+    }
+    translate ( [+0,0,40] ) {
+        difference() {
+            showcaseWalls (3,10,15);
+            screwPassage( screw, 3 );
+        }
+        color( "silver", 0.7 )
+        screwHexagonal( screw );
+    }
+    translate ( [+20,0,40] ) {
+        difference() {
+            showcaseWalls (3,10,15);
+            screwAllenPassage( screw, 3 );
+        }
+        color( "silver", 0.7 )
+        screwAllen( screw );
+    }
+!    translate ( [+40,0,40] ) {
+        difference() {
+            showcaseWalls (3,10,15);
+            screwHexagonalPassage( screw, 3 );
+        }
+        color( "silver", 0.7 )
+        screwHexagonal( screw );
     }
 }
 

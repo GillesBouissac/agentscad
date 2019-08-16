@@ -1,7 +1,7 @@
 # agentscad
 My utilities for OpenSCAD
 
-# Hexagonal metric screws modelisation
+# Metric screws
 
 ## Panel from M1.6 to M12
 
@@ -34,7 +34,7 @@ showcaseWalls (3,10,15);
 <td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-block.png" width="200"/></td>
 </tr>
 <tr>
-<td>M3 passage</td>
+<td>Passage</td>
 <td><pre>
 use &lt;screw.scad&gt;
 $fn=100;
@@ -50,17 +50,48 @@ difference() {
 <td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-passage.png" width="200"/></td>
 </tr>
 <tr>
-<td>M3  screw</td>
+<td>Allen</td>
 <td><pre>
 #screwAllen  (screw);
 </pre></td>
 <td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-in-place.png" width="200"/></td>
 </tr>
+<tr>
+<td>Hexagonal</td>
+<td><pre>
+#screwHexagonal  (screw);
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-in-place-hexa.png" width="200"/></td>
+</tr>
+<tr>
+<td>Tight passage<br>allen</td>
+<td><pre>
+...
+screw = M3(10);
+difference() {
+    showcaseWalls (3,10,15);
+    screwAllenPassage  (screw,3);
+}
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-tight-allen.png" width="200"/></td>
+</tr>
+<tr>
+<td>Tight passage<br>hexagonal</td>
+<td><pre>
+...
+screw = M3(10);
+difference() {
+    showcaseWalls (3,10,15);
+    screwHexagonalPassage  (screw,3);
+}
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-tight-hexa.png" width="200"/></td>
+</tr>
 </table>
 
 # Hirth Joint
 
-## Panel of all possibilities
+## Panel
 
 ![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJoint.png)
 
@@ -75,6 +106,7 @@ difference() {
 <tr>
 <td>Sinusoidal</td>
 <td><pre>
+use &lt;hirthJoint.scad&gt;
 $fn=100;
 // Sinusoidal profile
 //   Radius:       10 mm
@@ -87,6 +119,7 @@ hirthJointSinus( 10, 21, 1.2 );
 <tr>
 <td>Shoulder</td>
 <td><pre>
+use &lt;hirthJoint.scad&gt;
 $fn=100;
 // Sinusoidal profile with shoulder
 //   Radius:          10 mm
@@ -100,6 +133,7 @@ hirthJointSinus( 10, 21, 1.2, 2 );
 <tr>
 <td>Inlay</td>
 <td><pre>
+use &lt;hirthJoint.scad&gt;
 $fn=100;
 // Sinusoidal profile with shoulder and inlay
 //   Radius:          10 mm
@@ -114,12 +148,13 @@ hirthJointSinus( 10, 21, 1.2, 2, 1 );
 <tr>
 <td>Triangle</td>
 <td><pre>
+use &lt;hirthJoint.scad&gt;
 $fn=100;
 // Triangle profile
 //   Radius:          10 mm
 //   Nb tooth:        21
 //   Tooth height:    1.2 mm
-//   Shoulder height: 2 mm
+//   Shoulder height: 1 mm
 //   Inlay height:    1 mm
 hirthJointTriangle( 10, 21, 1.2, 1, 1 );
 </pre></td>
@@ -128,12 +163,13 @@ hirthJointTriangle( 10, 21, 1.2, 1, 1 );
 <tr>
 <td>Rectangle</td>
 <td><pre>
+use &lt;hirthJoint.scad&gt;
 $fn=100;
 // Rectangle profile
 //   Radius:          10 mm
 //   Nb tooth:        21
 //   Tooth height:    1.2 mm
-//   Shoulder height: 2 mm
+//   Shoulder height: 1 mm
 //   Inlay height:    1 mm
 hirthJointRectangle( 10, 21, 1.2, 1, 1 );
 </pre></td>
@@ -142,6 +178,7 @@ hirthJointRectangle( 10, 21, 1.2, 1, 1 );
 <tr>
 <td>Passage</td>
 <td><pre>
+use &lt;hirthJoint.scad&gt;
 $fn=100;
 // Inlay passage
 //   Radius:          10 mm
