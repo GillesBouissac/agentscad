@@ -16,64 +16,79 @@
 //
 // ----------------------------------------
 
+VGG = 0.01; // Visual Glich Guard
+MFG = 0.01; // Manifold Guard
+GAP = 0.4;  // Screw passage is deeper than screw by this amount
+
+//
+// Actually this API is just for fun,
+//   not useful to desing part that receive screw
+//   because this really draw the screw with 0 margin
+//
 // Draw a screw with hexagonal head
-// p: screw params (M1_6(), M2(), M2_5(), M3(), etc...)
-// l: screw thread length (0=use default)
+// p:   screw params (M1_6(), M2(), M2_5(), M3(), etc...)
+// tl:  screw thread length, <0 means use default from p
+// tlp: screw thread passage length, <0 means use default from p
 //
 // Notes:
-//   screw thread starts at [0,0,0] and goes on Z+
-//   screw head   starts at [0,0,0] and goes on Z-
+//   screw thread starts at [0,0,0] and goes on Z-
+//   screw head   starts at [0,0,0] and goes on Z+
 //
-module screwAllen( p=M2(), l=-1 ) {
+module screwAllen( p=M2(), tl=-1, tlp=-1 ) {
     tool_r  = p[I_TOOL]/(2*cos(30));
-    tool_l = 0.8*p[I_HEADL];
-    length = l==-1 ? p[I_LENGTH]: l ;
+    tool_l = 0.8*p[I_HL];
+    local_tl  = tl<0  ? p[I_TL]   : tl ;
+    local_tlp = tlp<0 ? p[I_TL_P] : tlp ;
     difference() {
         screwImpl (
-            p[I_DIAM],
-            length,
-            p[I_HEADD],
-            p[I_HEADL] );
-        translate( [0,0,-p[I_HEADL]-0.01] )
-            cylinder( r=tool_r, h=tool_l, $fn=6 );
+            p[I_TD],
+            local_tl,
+            p[I_TD],
+            0,
+            p[I_HD],
+            p[I_HL] );
+        translate( [0,0,p[I_HL]+0.01] )
+            cylinder( r=tool_r, h=tool_l, $fn=6, center=true );
     }
 }
 
-// Draw a hole for screwing a screw
-// p: screw params (M1_6(), M2(), M2_5(), M3(), etc...)
-// l: hole depth (0=use default)
-module screwHole( p=M2(), l=-1 ) {
-    length = l==-1 ? p[I_LENGTH]: l ;
-    screwImpl (
-        p[I_DIAM]-p[I_PITCH],
-        length+PRINT_GAP,
-        p[I_DIAM]-p[I_PITCH],
-        PRINT_GAP );
-}
-
+//
+// This is the useful API to drill screw passages
+//
 // Draw a screw passage for thread AND head
 // p: screw params (M1_6(), M2(), M2_5(), M3(), etc...)
-// l: screw thread length (0=use default)
-module screwPassage( p=M2(), l=-1 ) {
-    length = l==-1 ? p[I_LENGTH]: l ;
-    screwImpl (
-        p[I_DIAMP],
-        length+PRINT_GAP,
-        p[I_HEADDP],
-        p[I_HEADLP] );
+// tl:  screw thread length, <0 means use default from p
+// tlp: screw thread passage length, <0 means use default from p
+//
+// Notes:
+//   screw thread starts at [0,0,0] and goes on Z-
+//   screw head   starts at [0,0,0] and goes on Z+
+//
+module screwPassage( p=M2(), tlp=-1 ) {
+    local_tl  = p[I_TL] ;
+    local_tlp = tlp<0 ? p[I_TL_P] : tlp ;
+    difference() {
+        screwImpl (
+            p[I_TD]-p[I_TP],
+            local_tl+GAP,
+            p[I_TD_P],
+            local_tlp,
+            p[I_HD_P],
+            p[I_HL_P] );
+    }
 }
 
 // Screw types
-function M1_6(length=-1) = screwParams(0,length);
-function M2(length=-1)   = screwParams(1,length);
-function M2_5(length=-1) = screwParams(2,length);
-function M3(length=-1)   = screwParams(3,length);
-function M4(length=-1)   = screwParams(4,length);
-function M5(length=-1)   = screwParams(5,length);
-function M6(length=-1)   = screwParams(6,length);
-function M8(length=-1)   = screwParams(7,length);
-function M10(length=-1)  = screwParams(8,length);
-function M12(length=-1)  = screwParams(9,length);
+function M1_6(tl=-1,tlp=-1,hlp=-1) = screwParams(0,tl,tlp,hlp);
+function M2(tl=-1,tlp=-1,hlp=-1)   = screwParams(1,tl,tlp,hlp);
+function M2_5(tl=-1,tlp=-1,hlp=-1) = screwParams(2,tl,tlp,hlp);
+function M3(tl=-1,tlp=-1,hlp=-1)   = screwParams(3,tl,tlp,hlp);
+function M4(tl=-1,tlp=-1,hlp=-1)   = screwParams(4,tl,tlp,hlp);
+function M5(tl=-1,tlp=-1,hlp=-1)   = screwParams(5,tl,tlp,hlp);
+function M6(tl=-1,tlp=-1,hlp=-1)   = screwParams(6,tl,tlp,hlp);
+function M8(tl=-1,tlp=-1,hlp=-1)   = screwParams(7,tl,tlp,hlp);
+function M10(tl=-1,tlp=-1,hlp=-1)  = screwParams(8,tl,tlp,hlp);
+function M12(tl=-1,tlp=-1,hlp=-1)  = screwParams(9,tl,tlp,hlp);
 
 // ----------------------------------------
 //
@@ -82,26 +97,32 @@ function M12(length=-1)  = screwParams(9,length);
 // ----------------------------------------
 I_IDX    =  0;
 I_NAME   =  1;
-I_DIAM   =  2;
-I_DIAMP  =  3; // Passage
-I_PITCH  =  4;
-I_LENGTH =  5;
-I_HEADD  =  6;
-I_HEADDP =  7; // Passage
-I_HEADL  =  8;
-I_HEADLP =  9; // Passage
-I_TOOL   = 10;
-function screwParams( idx, length ) = [
+I_TP     =  2; // Thread Pitch: Distance between threads
+I_TD     =  3; // Thread Diameter
+I_TD_P   =  4; // Thread Passage Diameter
+I_TL     =  5; // Thread Length
+I_TL_P   =  6; // Thread Passage Length
+I_HD     =  7; // Head Diameter
+I_HD_P   =  8; // Head Passage Diameter
+I_HL     =  9; // Head Length
+I_HL_P   = 10; // Head Passage Length
+I_TOOL   = 11; // Tool size to turn the screw
+function screwParams( idx, tl=-1, tlp=-1, hlp=-1 ) = let (
+    local_tl  = tl<0 ? SCREWS_L[idx] : tl,
+    local_tlp = (tlp<0 || tlp>local_tl) ? local_tl*20/100 : tlp,
+    local_hlp = hlp<0 ? SCREWS_HLP[idx] : hlp
+) [
     idx,
     SCREWS_N[idx],
+    SCREWS_P[idx],
     SCREWS_D[idx],
     SCREWS_D[idx]+PRINT_GAP*2,
-    SCREWS_P[idx],
-    length==-1 ? SCREWS_L[idx] : length,
+    local_tl,
+    local_tlp,
     SCREWS_HD[idx],
     SCREWS_HDP[idx],
     SCREWS_HL[idx],
-    SCREWS_HLP[idx],
+    local_hlp,
     SCREWS_TOOL[idx]
 ];
 
@@ -231,50 +252,26 @@ SCREWS_TOOL = [
    10.0
 ];
 
-module screwImpl( d, l, hd, hl ) {
-    cylinder( r=d/2, h=l );
-    if ( hd>0 ) {
-        translate( [0,0,-hl ] )
-        cylinder( r=hd/2, h=hl );
+module screwImpl( td, tl, tdp, tlp, hd, hl ) {
+    translate( [0,0,-(tl+tlp)/2 ] )
+        cylinder( r=td/2, h=tl-tlp, center=true );
+    translate( [0,0,-tlp/2 ] )
+        cylinder( r=tdp/2, h=tlp+VGG, center=true );
+    if ( hl>0 ) {
+        translate( [0,0,+hl/2 ] )
+            cylinder( r=hd/2, h=hl, center=true );
     }
 }
 
 // ----------------------------------------
 //
-//    ALL above is for Testing/Demo
+//                  Showcase
 //
 // ----------------------------------------
-function cumulate ( vect, end=-1, nexti=0, current=-1 ) =
-let(
-    endIdx   = end==-1 ? len(vect)-1 : end,
-    curCumul = current==-1 ? 0 : current,
-    res = nexti>endIdx ? curCumul : vect[nexti]+cumulate(vect,endIdx,nexti+1,curCumul)
-)res;
 
-SCREW_DISTANCE=3;
-module screwShowcase ( t ) {
-    translate( [ t[I_IDX]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[I_IDX] )-70,0,0] ) {
-        color( "green", 0.3 )
-            screwHole ( t, $fn=100 );
-        color( "yellow", 0.3 )
-            screwAllen ( t, $fn=100 );
-        color( "blue", 0.1 )
-            screwPassage ( t, $fn=100 );
-        color( "gold" )
-            translate( [0,-t[I_HEADDP]/2-1.5,-t[I_HEADL]/2] )
-            rotate ( [90,0,0] )
-            linear_extrude(1)
-            text( t[I_NAME], halign="center", valign="center", size=2, $fn=100 );
-    }
-}
+screw = M3(10);
+translate( [10,0,0] )
+#screwPassage( screw, 3, $fn=100 );
+screwAllen( screw, $fn=100 );
 
-screwShowcase( M1_6() );
-screwShowcase( M2() );
-screwShowcase( M2_5() );
-screwShowcase( M3() );
-screwShowcase( M4() );
-screwShowcase( M5() );
-screwShowcase( M6() );
-screwShowcase( M8() );
-screwShowcase( M10() );
-screwShowcase( M12() );
+

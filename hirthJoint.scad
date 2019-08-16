@@ -211,5 +211,5 @@ module hirthJointShow( part=0 ) {
 }
 difference() {
     hirthJointShow( 0, $fn=200 );
-    cylinder( r=1.52, h=100, center=true, $fn=200 );
+    cylinder( r=1.5+MARGIN/2, h=100, center=true, $fn=200 );
 }
