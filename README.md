@@ -10,18 +10,16 @@ My utilities for OpenSCAD
 ## Examples
 
 <table>
-
 <tr>
 <th>Step</th>
 <th>Code</th>
 <th>Result</th>
 </tr>
-
 <tr>
-<td>The walls</td>
+<td>Some walls</td>
 <td><pre>
-use <screw.scad>
-module showcaseBlocks( wh1, wh2, ww=200, wp=20 ) {
+use &lt;screw.scad&gt;
+module showcaseWalls( wh1, wh2, ww=200, wp=20 ) {
     translate ( [0,wp/2,0] )  {
         color( "LightSkyBlue" )
         translate ( [0,0,-(wh2+wh1)/2] )
@@ -35,11 +33,14 @@ showcaseWalls (3,10,15);
 </pre></td>
 <td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-block.png" width="100"/></td>
 </tr>
-
 <tr>
-<td>Then the screw passage</td>
+<td>M3 passage</td>
 <td><pre>
+use &lt;screw.scad&gt;
 $fn=100;
+module showcaseWalls( wh1, wh2, ww=200, wp=20 ) {
+   ...
+}
 screw = M3(10);
 difference() {
     showcaseWalls (3,10,15);
@@ -48,15 +49,13 @@ difference() {
 </pre></td>
 <td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-passage.png" width="100"/></td>
 </tr>
-
 <tr>
-<td>Finaly the screw just for fun</td>
+<td>M3  screw</td>
 <td><pre>
-#screwAllen  (screw,$fn=100);
+#screwAllen  (screw);
 </pre></td>
 <td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-in-place.png" width="100"/></td>
 </tr>
-
 </table>
 
 # Hirth Joint
@@ -67,52 +66,93 @@ difference() {
 
 ## Examples
 
-* Sinusoidal profile
-
-    ```
-    use <hirthJoint.scad>
-    $fn=100;
-
-    // Radius: 10 mm, Nb Tooth: 21, Tooth height: 1 mm
-    hirthJointSinus( 10, 21, 1 );
-    ```
-
-* Triangle profile
-
-    ```
-    use <hirthJoint.scad>
-    $fn=100;
-
-    // Radius: 20 mm, Nb Tooth: 21, Tooth height: 1 mm, Shoulder: 2
-    hirthJointTriangle( 20, 21, 1, 2 );
-    ```
-
-* Rectangle profile
-
-    ```
-    use <hirthJoint.scad>
-    $fn=100;
-
-    // Radius: 20 mm, Nb Tooth: 21, Tooth height: 1 mm, Shoulder: 2, Inlay: 3
-    hirthJointRectangle( 20, 21, 1, 2, 3 );
-    ```
-
-* Passage for inlay insertion in other parts of your design
-
-    ```
-    use <hirthJoint.scad>
-    $fn=100;
-
-    RADIUS = 20;
-    INLAY = 2;
-    difference() {
-        // The part that will receive the inlay
-        translate( [0,0,-INLAY] )
-            cylinder( r=2*RADIUS, h=2*INLAY, center=true );
-        // Inlay passage with little margin
-        #hirthJointPassage( RADIUS, INLAY );
-    }
-    ```
-
-
+<table>
+<tr>
+<th>Step</th>
+<th>Code</th>
+<th>Result</th>
+</tr>
+<tr>
+<td>Sinusoidal</td>
+<td><pre>
+$fn=100;
+// Sinusoidal profile
+//   Radius:       10 mm
+//   Nb tooth:     20
+//   Tooth height: 1.2 mm
+hirthJointSinus( 10, 21, 1.2 );
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointSinus.png" width="100"/></td>
+</tr>
+<tr>
+<td>Shoulder</td>
+<td><pre>
+$fn=100;
+// Sinusoidal profile with shoulder
+//   Radius:          10 mm
+//   Nb tooth:        20
+//   Tooth height:    1.2 mm
+//   Shoulder height: 2 mm
+hirthJointSinus( 10, 21, 1.2, 2 );
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointShoulder.png" width="100"/></td>
+</tr>
+<tr>
+<td>Inlay</td>
+<td><pre>
+$fn=100;
+// Sinusoidal profile with shoulder and inlay
+//   Radius:          10 mm
+//   Nb tooth:        20
+//   Tooth height:    1.2 mm
+//   Shoulder height: 2 mm
+//   Inlay height:    1 mm
+hirthJointSinus( 10, 21, 1.2, 2, 1 );
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointInlay.png" width="100"/></td>
+</tr>
+<tr>
+<td>Triangle</td>
+<td><pre>
+$fn=100;
+// Triangle profile
+//   Radius:          10 mm
+//   Nb tooth:        20
+//   Tooth height:    1.2 mm
+//   Shoulder height: 2 mm
+//   Inlay height:    1 mm
+hirthJointTriangle( 10, 21, 1.2, 1, 1 );
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointTriangle.png" width="100"/></td>
+</tr>
+<tr>
+<td>Rectangle</td>
+<td><pre>
+$fn=100;
+// Rectangle profile
+//   Radius:          10 mm
+//   Nb tooth:        20
+//   Tooth height:    1.2 mm
+//   Shoulder height: 2 mm
+//   Inlay height:    1 mm
+hirthJointRectangle( 10, 21, 1.2, 1, 1 );
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointRectangle.png" width="100"/></td>
+</tr>
+<tr>
+<td>Passage</td>
+<td><pre>
+$fn=100;
+// Inlay passage
+//   Radius:          10 mm
+//   Inlay height:    1 mm
+difference() {
+    translate( [0,0,-2] )
+        cylinder( r=15, h=4, center=true );
+    hirthJointPassage( 10, 1 );
+}
+</pre></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointPassage.png" width="100"/></td>
+</tr>
+</table>
 

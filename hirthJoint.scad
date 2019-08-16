@@ -162,54 +162,5 @@ module hirthJointTooth ( radius, width, height ) {
 //    Showcase
 //
 // ----------------------------------------
-module hirthJointShow( part=0 ) {
-    INTER    = 10;
 
-    RADIUS   = 10;
-    TOOTH    = 21;
-    HEIGHT   = 1.2;
-    SHOULDER = 0;
-    INLAY    = 2;
-
-    if ( part==0 || part==1 ) {
-        color( "YellowGreen" )
-        translate( [0,0,+SHOULDER+HEIGHT/2+INTER/2] )
-        rotate( [180,0,0] )
-        rotate( [0,0,180] )
-        hirthJointSinus( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
-    }
-
-    if ( part==0 || part==2 ) {
-        color( "Lime" )
-        translate( [0,0,-SHOULDER-HEIGHT/2-INTER/2] )
-        hirthJointSinus( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
-    }
-
-    if ( part==0 || part==3 ) {
-        color( "SkyBlue" )
-        translate( [0,3*RADIUS,-SHOULDER-HEIGHT/2-INTER/2] )
-        hirthJointTriangle( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
-    }
-
-    if ( part==0 || part==4 ) {
-        color( "Khaki" )
-        translate( [2.5*RADIUS,1.5*RADIUS,-SHOULDER-HEIGHT/2-INTER/2] )
-        hirthJointRectangle( RADIUS, TOOTH, HEIGHT, SHOULDER, INLAY );
-    }
-
-    if ( part==0 || part==5 ) {
-        translate( [0,0,-1.5*INTER-SHOULDER-HEIGHT] ) {
-            difference() {
-                color( "DarkGreen" )
-                translate( [0,0,-2] )
-                    cylinder( r=(RADIUS+2)/cos(30), h=4, center=true );
-                color( "Salmon" )
-                    hirthJointPassage( RADIUS, INLAY );
-            }
-        }
-    }
-}
-difference() {
-    hirthJointShow( 0, $fn=200 );
-    cylinder( r=1.5+MARGIN/2, h=100, center=true, $fn=200 );
-}
+hirthJointSinus( 10, 21, 1.2, 2, 1, $fn=100 );

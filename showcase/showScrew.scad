@@ -44,7 +44,6 @@ SCREWS_HDP = [
 ];
 module showcaseScrewPassage ( t, tlp ) {
     translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-70,0,0] ) {
-        color( "green", 0.6 )
             screwPassage ( t, tlp=tlp, $fn=100 );
     }
 }
