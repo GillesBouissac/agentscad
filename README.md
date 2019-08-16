@@ -31,7 +31,7 @@ module showcaseWalls( wh1, wh2, ww=200, wp=20 ) {
 }
 showcaseWalls (3,10,15);
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-block.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-block.png" width="200"/></td>
 </tr>
 <tr>
 <td>M3 passage</td>
@@ -47,14 +47,14 @@ difference() {
     screwPassage  (screw,3);
 }
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-passage.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-passage.png" width="200"/></td>
 </tr>
 <tr>
 <td>M3  screw</td>
 <td><pre>
 #screwAllen  (screw);
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-in-place.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/screw-in-place.png" width="200"/></td>
 </tr>
 </table>
 
@@ -78,11 +78,11 @@ difference() {
 $fn=100;
 // Sinusoidal profile
 //   Radius:       10 mm
-//   Nb tooth:     20
+//   Nb tooth:     21
 //   Tooth height: 1.2 mm
 hirthJointSinus( 10, 21, 1.2 );
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointSinus.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointSinus.png" width="200"/></td>
 </tr>
 <tr>
 <td>Shoulder</td>
@@ -90,12 +90,12 @@ hirthJointSinus( 10, 21, 1.2 );
 $fn=100;
 // Sinusoidal profile with shoulder
 //   Radius:          10 mm
-//   Nb tooth:        20
+//   Nb tooth:        21
 //   Tooth height:    1.2 mm
 //   Shoulder height: 2 mm
 hirthJointSinus( 10, 21, 1.2, 2 );
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointShoulder.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointShoulder.png" width="200"/></td>
 </tr>
 <tr>
 <td>Inlay</td>
@@ -103,13 +103,13 @@ hirthJointSinus( 10, 21, 1.2, 2 );
 $fn=100;
 // Sinusoidal profile with shoulder and inlay
 //   Radius:          10 mm
-//   Nb tooth:        20
+//   Nb tooth:        21
 //   Tooth height:    1.2 mm
 //   Shoulder height: 2 mm
 //   Inlay height:    1 mm
 hirthJointSinus( 10, 21, 1.2, 2, 1 );
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointInlay.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointInlay.png" width="200"/></td>
 </tr>
 <tr>
 <td>Triangle</td>
@@ -117,13 +117,13 @@ hirthJointSinus( 10, 21, 1.2, 2, 1 );
 $fn=100;
 // Triangle profile
 //   Radius:          10 mm
-//   Nb tooth:        20
+//   Nb tooth:        21
 //   Tooth height:    1.2 mm
 //   Shoulder height: 2 mm
 //   Inlay height:    1 mm
 hirthJointTriangle( 10, 21, 1.2, 1, 1 );
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointTriangle.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointTriangle.png" width="200"/></td>
 </tr>
 <tr>
 <td>Rectangle</td>
@@ -131,13 +131,13 @@ hirthJointTriangle( 10, 21, 1.2, 1, 1 );
 $fn=100;
 // Rectangle profile
 //   Radius:          10 mm
-//   Nb tooth:        20
+//   Nb tooth:        21
 //   Tooth height:    1.2 mm
 //   Shoulder height: 2 mm
 //   Inlay height:    1 mm
 hirthJointRectangle( 10, 21, 1.2, 1, 1 );
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointRectangle.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointRectangle.png" width="200"/></td>
 </tr>
 <tr>
 <td>Passage</td>
@@ -152,7 +152,7 @@ difference() {
     hirthJointPassage( 10, 1 );
 }
 </pre></td>
-<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointPassage.png" width="100"/></td>
+<td><img src="https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJointPassage.png" width="200"/></td>
 </tr>
 </table>
 
