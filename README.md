@@ -7,7 +7,7 @@ My utilities for OpenSCAD
 
 ![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/screw-panel.png)
 
-## [[Tutorial for screws|Screws]]
+## [Tutorial for screws](https://github.com/GillesBouissac/agentscad/wiki/Screws)
 
 # Hirth Joint
 
@@ -15,4 +15,4 @@ My utilities for OpenSCAD
 
 ![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/hirthJoint.png)
 
-## [[Tutorial for hirthJoint|Hirth Joint]]
+## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Hirth-Joint)
