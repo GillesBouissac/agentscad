@@ -19,8 +19,8 @@ use <../screw.scad>
 
 SCREW_DISTANCE=3;
 WALL1_H=4;
-WALL2_H=100;
-WALL_W=200;
+WALL2_H=80;
+WALL_W=170;
 WALL_P=20;
 
 function cumulate ( vect, end=-1, nexti=0, current=-1 ) =
@@ -43,12 +43,12 @@ SCREWS_HDP = [
    22.0
 ];
 module showcaseScrewPassage ( t, tlp ) {
-    translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-70,0,0] ) {
+    translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-80,0,0] ) {
             screwPassage ( t, tlp=tlp, $fn=100 );
     }
 }
 module showcaseScrew ( t ) {
-    translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-70,0,0] ) {
+    translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-80,0,0] ) {
         color( "silver", 0.7 )
             screwAllen   ( t, $fn=100 );
         color( "gold" )
@@ -110,20 +110,20 @@ module showcaseSmallWall() {
     translate ( [+0,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
-            screwPassage( screw, 3 );
-        }
-        color( "silver", 0.7 )
-        screwHexagonal( screw );
-    }
-    translate ( [+20,0,40] ) {
-        difference() {
-            showcaseWalls (3,10,15);
             screwAllenPassage( screw, 3 );
         }
         color( "silver", 0.7 )
         screwAllen( screw );
     }
-!    translate ( [+40,0,40] ) {
+    translate ( [+20,0,40] ) {
+        difference() {
+            showcaseWalls (3,10,15);
+            screwPassage( screw, 3 );
+        }
+        color( "silver", 0.7 )
+        screwHexagonal( screw );
+    }
+    translate ( [+40,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
             screwHexagonalPassage( screw, 3 );

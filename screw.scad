@@ -85,7 +85,7 @@ module screwHexagonalPassage( p=M2(), tlp=-1 ) {
             0,       0
         );
         translate( [0,0,+p[I_HL_P]/2 ] )
-            cylinder( r=p[I_HD_H]/2+GAP, h=p[I_HL_P], center=true, $fn=6 );
+            cylinder( r=p[I_HD_H]/2+GAP/2, h=p[I_HL_P], center=true, $fn=6 );
     }
 }
 
