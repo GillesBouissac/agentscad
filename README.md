@@ -3,33 +3,33 @@ My utilities for OpenSCAD
 
 # Metric screws
 
-## Panel from M1.6 to M12
-
 ![MX screw panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-screw.png)
 
-## [Tutorial for screws](https://github.com/GillesBouissac/agentscad/wiki/Screws)
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Screws">Tutorial for screws here</a>
+</p>
 
 # Hirth Joint
 
-## Panel
-
 ![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-hirth-joint.png)
 
-## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Hirth-Joint)
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Hirth-Joint">Tutorial for Hirth Joint here</a>
+</p>
 
 # Metric screw knobs
 
-## Panel
-
 ![Screw Knobs panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-knob.png)
 
-## [Tutorial for screw knobs](https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs)
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs">Tutorial for screw knobs here</a>
+</p>
 
 # Beveling library
 
-## Panel
-
 ![Beveling panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-bevel.png)
 
-## [Tutorial for beveling](https://github.com/GillesBouissac/agentscad/wiki/Cut-and-Bevel)
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Cut-and-Bevel">Tutorial for beveling here</a>
+</p>
 
