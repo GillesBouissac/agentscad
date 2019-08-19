@@ -5,7 +5,7 @@ My utilities for OpenSCAD
 
 ## Panel from M1.6 to M12
 
-![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-screw.png)
+![MX screw panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-screw.png)
 
 ## [Tutorial for screws](https://github.com/GillesBouissac/agentscad/wiki/Screws)
 
@@ -21,15 +21,15 @@ My utilities for OpenSCAD
 
 ## Panel
 
-![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-knob.png)
+![Screw Knobs panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-knob.png)
 
-## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs)
+## [Tutorial for screw knobs](https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs)
 
 # Beveling library
 
 ## Panel
 
-![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-bevel.png)
+![Beveling panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-bevel.png)
 
-## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Cut-and-Bevel)
+## [Tutorial for beveling](https://github.com/GillesBouissac/agentscad/wiki/Cut-and-Bevel)
 
