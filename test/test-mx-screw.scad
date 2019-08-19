@@ -9,7 +9,7 @@
  * Description: Metric screw modelisation
  * Author:      Gilles Bouissac
  */
-use <../screw.scad>
+use <../mx-screw.scad>
 
 // ----------------------------------------
 //
@@ -44,13 +44,13 @@ SCREWS_HDP = [
 ];
 module showcaseScrewPassage ( t, tlp ) {
     translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-80,0,0] ) {
-            screwPassage ( t, tlp=tlp, $fn=100 );
+        mxScrewPassage ( t, tlp=tlp, $fn=100 );
     }
 }
 module showcaseScrew ( t ) {
     translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-80,0,0] ) {
         color( "silver", 0.7 )
-            screwAllen   ( t, $fn=100 );
+            mxScrewAllen   ( t, $fn=100 );
         color( "gold" )
             translate( [0,-t[8]/2-1.5,-t[9]/2] )
             rotate ( [90,0,0] )
@@ -96,42 +96,76 @@ module showcaseSmallWall() {
     translate ( [-40,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
-            screwPassage( screw, 3 );
+            mxScrewPassage( screw, 3 );
         }
     }
     translate ( [-20,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
-            screwPassage( screw, 3 );
+            mxScrewPassage( screw, 3 );
         }
         color( "silver", 0.7 )
-        screwAllen( screw );
+        mxScrewAllen( screw );
     }
     translate ( [+0,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
-            screwAllenPassage( screw, 3 );
+            mxScrewAllenPassage( screw, 3 );
         }
         color( "silver", 0.7 )
-        screwAllen( screw );
+        mxScrewAllen( screw );
     }
     translate ( [+20,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
-            screwPassage( screw, 3 );
+            mxScrewPassage( screw, 3 );
         }
         color( "silver", 0.7 )
-        screwHexagonal( screw );
+        mxScrewHexagonal( screw );
     }
     translate ( [+40,0,40] ) {
         difference() {
             showcaseWalls (3,10,15);
-            screwHexagonalPassage( screw, 3 );
+            mxScrewHexagonalPassage( screw, 3 );
         }
         color( "silver", 0.7 )
-        screwHexagonal( screw );
+        mxScrewHexagonal( screw );
+    }
+}
+
+
+// Modulo
+function mod(a,m) = a - m*floor(a/m);
+module showcaseAnimated() {
+
+    allScrews= [
+        M1_6(),M2(),M2_5(),M3(),
+        M4(),M5(),M6(),M8(),
+        M10(),M12()
+    ];
+    idx=floor($t*len(allScrews));
+    screw = allScrews[idx];
+    color( "blue" )
+    translate( [-2*mxHeadDiameterPassage(screw),0,140] )
+        rotate( $vpr )
+        linear_extrude(1)
+        text( mxName(screw), halign="center", valign="center", size=5, $fn=100 );
+    translate( [0,mxHeadDiameterPassage(screw)/1.5,140] ) {
+        translate( [3*mxHeadDiameterPassage(screw),0,0] )
+        #mxScrewPassage( screw, 3, $fn=100 );
+        translate( [1.5*mxHeadDiameterPassage(screw),0,0] )
+        #mxScrewAllenPassage( screw, 3, $fn=100 );
+        mxScrewAllen( screw, $fn=100 );
+    }
+    translate( [0,-mxHeadDiameterPassage(screw)/1.5,140] ) {
+        translate( [3*mxHeadDiameterPassage(screw),0,0] )
+        #mxScrewPassage( screw, 3, $fn=100 );
+        translate( [1.5*mxHeadDiameterPassage(screw),0,0] )
+        #mxScrewHexagonalPassage( screw, 3, $fn=100 );
+        mxScrewHexagonal( screw, $fn=100 );
     }
 }
 
 showcaseBigWall ($fn=100);
 showcaseSmallWall ($fn=100);
+showcaseAnimated ($fn=100);

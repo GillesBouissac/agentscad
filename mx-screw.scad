@@ -31,7 +31,7 @@ GAP = 0.4;  // Screw passage is deeper than screw by this amount
 //   screw thread starts at [0,0,0] and goes on Z-
 //   screw head   starts at [0,0,0] and goes on Z+
 //
-module screwPassage( p=M2(), tlp=-1 ) {
+module mxScrewPassage( p=M2(), tlp=-1 ) {
     local_tl  = p[I_TL] ;
     local_tlp = tlp<0 ? p[I_TL_P] : tlp ;
     difference() {
@@ -53,7 +53,7 @@ module screwPassage( p=M2(), tlp=-1 ) {
 //   screw thread starts at [0,0,0] and goes on Z-
 //   screw head   starts at [0,0,0] and goes on Z+
 //
-module screwAllenPassage( p=M2(), tlp=-1 ) {
+module mxScrewAllenPassage( p=M2(), tlp=-1 ) {
     local_tl  = p[I_TL] ;
     local_tlp = tlp<0 ? p[I_TL_P] : tlp ;
     difference() {
@@ -75,7 +75,7 @@ module screwAllenPassage( p=M2(), tlp=-1 ) {
 //   screw thread starts at [0,0,0] and goes on Z-
 //   screw head   starts at [0,0,0] and goes on Z+
 //
-module screwHexagonalPassage( p=M2(), tlp=-1 ) {
+module mxScrewHexagonalPassage( p=M2(), tlp=-1 ) {
     local_tl  = p[I_TL] ;
     local_tlp = tlp<0 ? p[I_TL_P] : tlp ;
     union() {
@@ -99,7 +99,7 @@ module screwHexagonalPassage( p=M2(), tlp=-1 ) {
 //   screw thread starts at [0,0,0] and goes on Z-
 //   screw head   starts at [0,0,0] and goes on Z+
 //
-module screwAllen( p=M2(), tl=-1 ) {
+module mxScrewAllen( p=M2(), tl=-1 ) {
     tool_r  = p[I_TOOL]/(2*cos(30));
     tool_l = 0.8*p[I_HL_A];
     local_tl  = tl<0  ? p[I_TL]   : tl ;
@@ -124,7 +124,7 @@ module screwAllen( p=M2(), tl=-1 ) {
 //   screw thread starts at [0,0,0] and goes on Z-
 //   screw head   starts at [0,0,0] and goes on Z+
 //
-module screwHexagonal( p=M2(), tl=-1 ) {
+module mxScrewHexagonal( p=M2(), tl=-1 ) {
     tool_r  = p[I_TOOL]/(2*cos(30));
     tool_l = 0.8*p[I_HL_H];
     local_tl  = tl<0  ? p[I_TL]   : tl ;
@@ -150,6 +150,19 @@ function M6(tl=-1,tlp=-1,hlp=-1)   = screwParams(6,tl,tlp,hlp);
 function M8(tl=-1,tlp=-1,hlp=-1)   = screwParams(7,tl,tlp,hlp);
 function M10(tl=-1,tlp=-1,hlp=-1)  = screwParams(8,tl,tlp,hlp);
 function M12(tl=-1,tlp=-1,hlp=-1)  = screwParams(9,tl,tlp,hlp);
+
+function mxName(s)                  = s[I_NAME];
+function mxThreadPitch(s)           = s[I_TP];
+function mxThreadDiameter(s)        = s[I_TD];
+function mxThreadDiameterPassage(s) = s[I_TD_P];
+function mxThreadLength(s)          = s[I_TL];
+function mxThreadLengthPassage(s)   = s[I_TL_P];
+function mxHeadDiameterPassage(s)   = s[I_HD_P];
+function mxHeadLengthPassage(s)     = s[I_HL_P];
+function mxHeadDiameterAllen(s)     = s[I_HD_A];
+function mxHeadLengthAllen(s)       = s[I_HL_A];
+function mxHeadDiameterHexa(s)      = s[I_HD_H];
+function mxHeadLengthHexa(s)        = s[I_HL_H];
 
 // ----------------------------------------
 //
@@ -369,33 +382,5 @@ module screwImpl( td, tl, tdp, tlp, hd, hl ) {
 //
 // ----------------------------------------
 
-// Modulo
-function mod(a,m) = a - m*floor(a/m);
-
-allScrews= [
-    M1_6(),M2(),M2_5(),M3(),
-    M4(),M5(),M6(),M8(),
-    M10(),M12()
-];
-idx=floor($t*len(allScrews));
-screw = allScrews[idx];
-color( "blue" )
-    translate( [-2*screw[I_HD_P],0,0] )
-    rotate( $vpr )
-    linear_extrude(1)
-    text( screw[I_NAME], halign="center", valign="center", size=5, $fn=100 );
-translate( [0,screw[I_HD_P]/1.5,0] ) {
-    translate( [3*screw[I_HD_P],0,0] )
-    #screwPassage( screw, 3, $fn=100 );
-    translate( [1.5*screw[I_HD_P],0,0] )
-    #screwAllenPassage( screw, 3, $fn=100 );
-    screwAllen( screw, $fn=100 );
-}
-translate( [0,-screw[I_HD_P]/1.5,0] ) {
-    translate( [3*screw[I_HD_P],0,0] )
-    #screwPassage( screw, 3, $fn=100 );
-    translate( [1.5*screw[I_HD_P],0,0] )
-    #screwHexagonalPassage( screw, 3, $fn=100 );
-    screwHexagonal( screw, $fn=100 );
-}
+//mxScrewHexagonalPassage( M3(), $fn=100 );
 

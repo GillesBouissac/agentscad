@@ -10,7 +10,9 @@
  * Author:      Gilles Bouissac
  */
 
-use <../hirthJoint.scad>
+use <../hirth-joint.scad>
+
+MARGIN = 0.2;
 
 // ----------------------------------------
 //
