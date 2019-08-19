@@ -5,7 +5,7 @@ My utilities for OpenSCAD
 
 ## Panel from M1.6 to M12
 
-![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-screw.png)
+![M1.6 to M12](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-screw.png)
 
 ## [Tutorial for screws](https://github.com/GillesBouissac/agentscad/wiki/Screws)
 
