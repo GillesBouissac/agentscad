@@ -16,3 +16,20 @@ My utilities for OpenSCAD
 ![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-hirth-joint.png)
 
 ## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Hirth-Joint)
+
+# Metric screw knobs
+
+## Panel
+
+![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-mx-knob.png)
+
+## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs)
+
+# Beveling library
+
+## Panel
+
+![Hirth Joint panel](https://github.com/GillesBouissac/agentscad/blob/master/img/panel-bevel.png)
+
+## [Tutorial for hirthJoint](https://github.com/GillesBouissac/agentscad/wiki/Cut-and-Bevel)
+
