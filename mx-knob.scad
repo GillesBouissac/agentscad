@@ -30,14 +30,14 @@ NOZZLE = 0.4;
 // - height:   required total height, can be larger if the screw don't fit
 //             computed from screw dimensions if -1
 module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
-    bottom_t    = mxHeadDiameterPassage(screw)/3;
-    wall_t      = mxHeadDiameterPassage(screw)/4;
+    bottom_t    = mxHeadDP(screw)/3;
+    wall_t      = mxHeadDP(screw)/4;
 
-    base_h      = mxHeadLengthHexa(screw)+bottom_t;
-    base_r      = mxHeadDiameterPassage(screw)/2+wall_t/2;
+    base_h      = mxHexagonalHeadL(screw)+bottom_t;
+    base_r      = mxHeadDP(screw)/2+wall_t/2;
 
-    knob_h_min  = mxHeadDiameterPassage(screw) + wall_t;
-    knob_r_min  = mxHeadDiameterPassage(screw)/2+2*wall_t/2;
+    knob_h_min  = mxHeadDP(screw) + wall_t;
+    knob_r_min  = mxHeadDP(screw)/2+2*wall_t/2;
 
     knob_h    = height>knob_h_min     ? height : knob_h_min;
     knob_r    = diameter/2>knob_r_min ? diameter/2 : knob_r_min;
@@ -80,7 +80,7 @@ module mxKnobBase ( base_r, base_h, screw, bottom_t, wall_t ) {
     difference() {
         cylinder( r=base_r, h=base_h );
         translate( [0,0,bottom_t+MFG] )
-            mxScrewHexagonalPassage( screw );
+            mxBoltHexagonalPassage( screw );
         translate( [base_r,base_r,+base_h] )
             bevelCutArc( base_r-MFG, 2*base_h, 360 ) ;
     }
@@ -91,7 +91,7 @@ module mxKnobHandle ( knob_r, knob_h, cap_r, screw, thickness ) {
     sphere_r = knob_r*1.2;
 
     knob_c   = 2*PI*knob_r;
-    grip_d   = mxThreadDiameter(screw);
+    grip_d   = mxThreadD(screw);
     grip_nb  = 9;
 
     echo( "mxKnobHandle: grip_nb=", grip_nb );
@@ -151,7 +151,7 @@ module mxKnobCap ( cap_r, cap_h, screw, thickness ) {
 
     // Pole to keep the screw in place
     // This allow as well to pull up the cap by pushing back the screw
-    cylinder( r=mxThreadDiameter(screw)/2, h=cap_h );
+    cylinder( r=mxThreadD(screw)/2, h=cap_h );
 }
 
 module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
@@ -171,4 +171,4 @@ module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
 //    Showcase
 //
 // ----------------------------------------
-// mxKnob ( M6(), $fn=100 );
+mxKnob ( M6(), $fn=100 );

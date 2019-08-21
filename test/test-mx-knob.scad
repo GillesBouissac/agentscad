@@ -22,30 +22,30 @@ use <../mx-screw.scad>
 module mxKnobTest() {
     translate([+60,+30,0]) {
         mxKnob ( M12(), 50, 30 );
-        %mxScrewHexagonal ( M12() );
+        %mxBoltHexagonal ( M12() );
     }
     translate([+15,+50,0])
     rotate( [90,0,0] ) {
         mxKnob ( M6(), 25, 20, part=0 );
-        #mxScrewHexagonal ( M6() );
+        #mxBoltHexagonal ( M6() );
     }
     translate([-15,+30,0]) {
         mxKnob ( M1_6(tlp=3), 15, 15, part=0 );
-        %mxScrewHexagonal ( M1_6() );
+        %mxBoltHexagonal ( M1_6() );
     }
 
     translate([+60,-30,0]) {
         mxKnob ( M12() );
-        %mxScrewHexagonal ( M12() );
+        %mxBoltHexagonal ( M12() );
     }
     translate([+15,-30,0]) {
         mxKnob ( M6(), part=1 );
         mxKnob ( M6(), part=3 );
-        %mxScrewHexagonal ( M6() );
+        %mxBoltHexagonal ( M6() );
     }
     translate([-15,-30,0]) {
         mxKnob ( M1_6(tlp=3) );
-        %mxScrewHexagonal ( M1_6() );
+        %mxBoltHexagonal ( M1_6() );
     }
 }
 mxKnobTest($fn=100);
