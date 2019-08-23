@@ -17,7 +17,7 @@ use <../mx-screw.scad>
 //            steps: 100
 // ----------------------------------------
 
-ALL_SCREW  = [for ( idx=[0:mxDataLength()-1] ) mxData( idx ) ];
+ALL_SCREW  = [for ( idx=[0:mxGetDataLength()-1] ) mxData( idx ) ];
 
 // Modulo
 function mod(a,m) = a - m*floor(a/m);
@@ -28,48 +28,50 @@ module showcaseAnimated() {
         idx=floor($t*len(ALL_SCREW));
         screw = ALL_SCREW[idx];
 
-        translate( [-2*mxHeadDP(screw),0,0] )
+        translate( [-2*mxGetHeadDP(screw),0,0] )
             color( "blue" )
             rotate( $vpr )
             linear_extrude(1)
-            text( mxName(screw), halign="center", valign="center", size=5 );
-        translate( [0,mxHeadDP(screw)/1.5,0] ) {
-            translate( [3*mxHeadDP(screw),0,0] ) {
+            text( mxGetName(screw), halign="center", valign="center", size=5 );
+        rotate( [180,0,0] )
+        translate( [0,mxGetHeadDP(screw)/1.5,0] ) {
+            translate( [3*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
                     mxBoltPassage( screw, 3 );
-                translate( [0,0,-mxThreadL(screw)+mxHeadLP(screw)/2] )
+                translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
             }
-            translate( [1.5*mxHeadDP(screw),0,0] ) {
+            translate( [1.5*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
                     mxBoltAllenPassage( screw, 3 );
-                translate( [0,0,-mxThreadL(screw)+mxHeadLP(screw)/2] )
+                translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
             }
             mxBoltAllen( screw );
-            translate( [0,0,-mxThreadL(screw)+mxSquareHeadL(screw)/2] )
+            translate( [0,0,+mxGetThreadL(screw)-mxGetSquareHeadL(screw)/2] )
                 color( "cyan", 0.5 )
                 mxNutSquare( screw );
         }
-        translate( [0,-mxHeadDP(screw)/1.5,0] ) {
-            translate( [3*mxHeadDP(screw),0,0] ) {
+        rotate( [180,0,0] )
+        translate( [0,-mxGetHeadDP(screw)/1.5,0] ) {
+            translate( [3*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
                     mxBoltPassage( screw, 3 );
-                translate( [0,0,-mxThreadL(screw)+mxHeadLP(screw)/2] )
+                translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
             }
-            translate( [1.5*mxHeadDP(screw),0,0] ) {
+            translate( [1.5*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
                     mxBoltHexagonalPassage( screw, 3 );
-                translate( [0,0,-mxThreadL(screw)+mxHeadLP(screw)/2] )
+                translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
             }
             mxBoltHexagonal( screw );
-            translate( [0,0,-mxThreadL(screw)+mxSquareHeadL(screw)/2] )
+            translate( [0,0,+mxGetThreadL(screw)-mxGetSquareHeadL(screw)/2] )
                 color( "cyan", 0.5 )
                 mxNutHexagonal( screw );
         }

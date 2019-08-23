@@ -20,7 +20,7 @@ use <../mx-screw.scad>
 module showcaseWalls( wh1, wh2, ww=200, wp=20 ) {
     translate ( [0,wp/2,0] )  {
         color( "LightSkyBlue" )
-        translate ( [0,0,-(wh2+wh1)/2] )
+        translate ( [0,0,+(wh2+wh1)/2] )
             cube( [ww,wp,wh2], center=true );
         color( "DodgerBlue" )
         translate ( [0,0,0] )
@@ -29,12 +29,12 @@ module showcaseWalls( wh1, wh2, ww=200, wp=20 ) {
 }
 
 module showCase() {
-    translate ( [-60,0,0] ) {
+    translate ( [+100,0,0] ) {
         // 1: Some walls
         showcaseWalls (3,10,15);
     }
 
-    translate ( [-40,0,0] ) {
+    translate ( [+80,0,0] ) {
         // 2: Bolt passage
         screw = M3(10);
         difference() {
@@ -43,7 +43,7 @@ module showCase() {
         }
     }
 
-    translate ( [-20,0,0] ) {
+    translate ( [+60,0,0] ) {
         // 3: Allen bolt
         screw = M3(10);
         difference() {
@@ -53,7 +53,7 @@ module showCase() {
         %mxBoltAllen (screw);
     }
 
-    translate ( [+0,0,0] ) {
+    translate ( [40,0,0] ) {
         // 4: Hexagonal bolt
         screw = M3(10);
         difference() {
@@ -73,7 +73,7 @@ module showCase() {
         %mxBoltAllen (screw);
     }
 
-    translate ( [+40,0,0] ) {
+    translate ( [-0,0,0] ) {
         // 6: Tight passage hexagonal
         screw = M3(10);
         difference() {
@@ -83,73 +83,74 @@ module showCase() {
         %mxBoltHexagonal (screw);
     }
 
-    translate ( [+60,0,0] ) {
+    translate ( [-20,0,0] ) {
         // 7: Nut passage
         screw = M3(10);
         difference() {
             showcaseWalls (3,10,15);
             mxBoltHexagonalPassage (screw,3);
-            translate( [0,0,-mxThreadL(screw)] )
+            translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
         %mxBoltHexagonal (screw,12);
     }
 
-    translate ( [+80,0,0] ) {
+    translate ( [-40,0,0] ) {
         // 8: Hexagonal nut
         screw = M3(10);
         difference() {
             showcaseWalls (3,10,15);
             mxBoltHexagonalPassage (screw,3);
-            translate( [0,0,-mxThreadL(screw)] )
+            translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
         %mxBoltHexagonal (screw,12);
-        translate( [0,0,-mxThreadL(screw)] )
+        translate( [0,0,mxGetThreadL(screw)] )
             %mxNutHexagonal (screw);
     }
 
-    translate ( [+100,0,0] ) {
+    translate ( [-60,0,0] ) {
         // 9: Square nut
         screw = M3(10);
         difference() {
             showcaseWalls (3,10,15);
             mxBoltHexagonalPassage (screw,3);
-            translate( [0,0,-mxThreadL(screw)] )
+            translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
         %mxBoltHexagonal (screw,12);
-        translate( [0,0,-mxThreadL(screw)] )
+        translate( [0,0,mxGetThreadL(screw)] )
             %mxNutSquare (screw);
     }
 
-    translate ( [+120,0,0] ) {
+    translate ( [-80,0,0] ) {
         // 10: Hexagonal nut passage
         screw = M3(10);
         difference() {
             showcaseWalls (3,10,15);
             mxBoltHexagonalPassage (screw,3);
-            translate( [0,0,-mxThreadL(screw)] )
+            translate( [0,0,mxGetThreadL(screw)] )
                 mxNutHexagonalPassage (screw);
         }
         %mxBoltHexagonal (screw,12);
-        translate( [0,0,-mxThreadL(screw)] )
+        translate( [0,0,mxGetThreadL(screw)] )
             %mxNutHexagonal (screw);
     }
 
-    translate ( [+140,0,0] ) {
+    translate ( [-100,0,0] ) {
         // 11: Square nut passage
         screw = M3(10);
         difference() {
             translate ( [0,-3,0] )
                 showcaseWalls (3,10,15);
             mxBoltPassage (screw,3);
-            translate( [0,0,-mxThreadL(screw)+4] )
+            translate( [0,0,mxGetThreadL(screw)-4] )
                 mxNutSquarePassage (screw);
         }
         %mxBoltHexagonal (screw,12);
-        translate( [0,0,-mxThreadL(screw)+4] )
+        translate( [0,0,mxGetThreadL(screw)-4] )
             %mxNutSquare (screw);
     }
 }
-showCase( $fn=100 );
+rotate( [0,180,0] )
+    showCase( $fn=100 );

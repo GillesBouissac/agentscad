@@ -6,9 +6,10 @@
  *   * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * Description: Metric screw modelisation
+ * Description: 3D printable metric screws taking into account printer precision
  * Author:      Gilles Bouissac
  */
+use <printing.scad>
 
 // ----------------------------------------
 //
@@ -18,11 +19,11 @@
 
 // Bolt orientation is:
 //      Head bottom at [0,0,0]
-//      Head goes Z+
-//      Thread goes Z-
+//      Head goes Z-
+//      Thread goes Z+
 // Nut orientation is opposite:
 //      Head top at [0,0,0]
-//      Head goes Z-
+//      Head goes Z+
 
 // Bolt passage loose on head to fit any type of head
 //  p   :  bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
@@ -30,8 +31,8 @@
 module mxBoltPassage( p=M2(), tlp=-1 ) {
     local_tl  = p[I_TL] ;
     local_tlp = tlp<0 ? p[I_TLP] : tlp ;
-    boltImpl (
-        p[I_TD]-p[I_TP],  local_tl+GAP,
+    mxBoltImpl (
+        p[I_TD]-p[I_TP],  local_tl+gap(),
         p[I_TDP],         local_tlp,
         p[I_HDP],         p[I_HLP]
     );
@@ -45,8 +46,8 @@ module mxBoltPassage( p=M2(), tlp=-1 ) {
 module mxNutPassage( p=M2(), hdp=-1, hlp=-1 ) {
     local_hdp = hdp<0 ? p[I_HDP] : hdp ;
     local_hlp = hlp<0 ? p[I_HLP] : hlp ;
-    translate( [0,0,-local_hlp ] )
-        boltImpl (
+    translate( [0,0,+local_hlp ] )
+        mxBoltImpl (
             0,         0,
             0,         0,
             local_hdp, local_hlp
@@ -60,9 +61,9 @@ module mxNutPassage( p=M2(), hdp=-1, hlp=-1 ) {
 //  Note : This passage will prevent nut from turning
 module mxNutHexagonalPassage( p=M2(), hhd=-1, hlp=-1 ) {
     local_hhd = hhd<0 ? p[I_HHD] : hhd ;
-    local_hlp = hlp<0 ? p[I_HHL]+2*GAP : hlp ;
-    translate( [0,0,-local_hlp/2 ] )
-        cylinder( r=local_hhd/2+GAP, h=local_hlp, center=true, $fn=6 );
+    local_hlp = hlp<0 ? p[I_HHL]+2*gap() : hlp ;
+    translate( [0,0,+local_hlp/2 ] )
+        cylinder( r=local_hhd/2+gap(), h=local_hlp, center=true, $fn=6 );
 }
 
 // Hexagonal nut passage
@@ -72,9 +73,9 @@ module mxNutHexagonalPassage( p=M2(), hhd=-1, hlp=-1 ) {
 //  Note : This passage will prevent nut from turning
 module mxNutSquarePassage( p=M2(), shw=-1, slp=-1 ) {
     local_shw = shw<0 ? p[I_HHD] : shw ;
-    local_slp = slp<0 ? p[I_HHL]+2*GAP : slp ;
-    translate( [0,0,-local_slp/2 ] )
-        cube( [local_shw+GAP,local_shw+GAP,local_slp], center=true );
+    local_slp = slp<0 ? p[I_HHL]+2*gap() : slp ;
+    translate( [0,0,+local_slp/2 ] )
+        cube( [local_shw+gap(),local_shw+gap(),local_slp], center=true );
 }
 
 // Bolt passage Tight on head for Allen head
@@ -84,10 +85,10 @@ module mxBoltAllenPassage( p=M2(), tlp=-1 ) {
     local_tl  = p[I_TL] ;
     local_tlp = tlp<0 ? p[I_TLP] : tlp ;
     union() {
-        boltImpl (
-            p[I_TD]-p[I_TP],   local_tl+GAP,
+        mxBoltImpl (
+            p[I_TD]-p[I_TP],   local_tl+gap(),
             p[I_TDP],          local_tlp,
-            p[I_AHD]+2*GAP,    p[I_HLP]
+            p[I_AHD]+2*gap(),  p[I_HLP]
         );
     }
 }
@@ -99,13 +100,13 @@ module mxBoltHexagonalPassage( p=M2(), tlp=-1 ) {
     local_tl  = p[I_TL] ;
     local_tlp = tlp<0 ? p[I_TLP] : tlp ;
     union() {
-        boltImpl (
-            p[I_TD]-p[I_TP],   local_tl+GAP,
+        mxBoltImpl (
+            p[I_TD]-p[I_TP],   local_tl+gap(),
             p[I_TDP],          local_tlp,
             0,       0
         );
-        translate( [0,0,+p[I_HLP]/2 ] )
-            cylinder( r=p[I_HHD]/2+GAP, h=p[I_HLP], center=true, $fn=6 );
+        translate( [0,0,-p[I_HLP]/2 ] )
+            cylinder( r=p[I_HHD]/2+gap(), h=p[I_HLP], center=true, $fn=6 );
     }
 }
 
@@ -117,13 +118,14 @@ module mxBoltAllen( p=M2(), tl=-1 ) {
     tool_l = 0.8*p[I_AHL];
     local_tl  = tl<0  ? p[I_TL]   : tl ;
     difference() {
-        boltImpl (
+        mxBoltImpl (
             p[I_TD],   local_tl,
             0,         0,
             p[I_AHD], p[I_AHL]
         );
-        translate( [0,0,p[I_AHL]+0.01] )
-            cylinder( r=tool_r, h=tool_l, $fn=6, center=true );
+        translate( [0,0,-p[I_AHL]-0.01] )
+            // -gap() for easier fitting with the tool
+            cylinder( r=tool_r-gap(), h=tool_l, $fn=6, center=true );
     }
 }
 
@@ -133,13 +135,14 @@ module mxBoltAllen( p=M2(), tl=-1 ) {
 module mxBoltHexagonal( p=M2(), tl=-1 ) {
     local_tl  = tl<0  ? p[I_TL]   : tl ;
     union() {
-        boltImpl (
+        mxBoltImpl (
             p[I_TD], local_tl,
             0,       0,
             0,       0
         );
-        translate( [0,0,+p[I_HHL]/2 ] )
-            cylinder( r=p[I_HHD]/2, h=p[I_HHL], center=true, $fn=6 );
+        translate( [0,0,-p[I_HHL]/2 ] )
+            // -gap() for easier fitting with the tool
+            cylinder( r=p[I_HHD]/2-gap(), h=p[I_HHL], center=true, $fn=6 );
     }
 }
 
@@ -149,9 +152,10 @@ module mxBoltHexagonal( p=M2(), tl=-1 ) {
 module mxNutHexagonal( p=M2() ) {
     local_hhd = p[I_HHD] ;
     local_hhl = p[I_HHL] ;
-    translate( [0,0,-local_hhl/2 ] )
+    translate( [0,0,+local_hhl/2 ] )
         difference() {
-            cylinder( r=local_hhd/2, h=local_hhl, center=true, $fn=6 );
+            // -gap() for easier fitting with the tool
+            cylinder( r=local_hhd/2-gap(), h=local_hhl, center=true, $fn=6 );
             cylinder( r=p[I_TAP]/2,  h=local_hhl, center=true );
         }
 }
@@ -163,9 +167,10 @@ module mxNutHexagonal( p=M2() ) {
 module mxNutSquare( p=M2(), shl=-1 ) {
     local_shd = p[I_HTS];
     local_shl = shl<0 ? p[I_HHL] : shl ;
-    translate( [0,0,-local_shl/2 ] )
+    translate( [0,0,+local_shl/2 ] )
         difference() {
-            cube( [local_shd,local_shd,local_shl], center=true );
+            // -gap() for easier fitting with the tool
+            cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
             cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
         }
 }
@@ -201,23 +206,23 @@ function M60  (tl=-1,tlp=-1,hlp=-1) = mxData(26,tl,tlp,hlp);
 function M64  (tl=-1,tlp=-1,hlp=-1) = mxData(27,tl,tlp,hlp);
 
 // Data accessors on data
-function mxName(s)              = s[I_NAME];
-function mxTapD(s)              = s[I_TAP];
-function mxPitch(s)             = s[I_TP];
-function mxThreadD(s)           = s[I_TD];
-function mxThreadDP(s)          = s[I_TDP];
-function mxThreadL(s)           = s[I_TL];
-function mxThreadLP(s)          = s[I_TLP];
-function mxHeadDP(s)            = s[I_HDP];
-function mxHeadLP(s)            = s[I_HLP];
-function mxAllenHeadD(s)        = s[I_AHD];
-function mxAllenHeadL(s)        = s[I_AHL];
-function mxAllenToolSize(s)     = s[I_ATS];
-function mxHexagonalHeadD(s)    = s[I_HHD];
-function mxHexagonalHeadL(s)    = s[I_HHL];
-function mxHexagonalToolSize(s) = s[I_HTS];
-function mxSquareHeadD(s)       = s[I_HTS];
-function mxSquareHeadL(s)       = s[I_HHL];
+function mxGetName(s)              = s[I_NAME];
+function mxGetTapD(s)              = s[I_TAP];
+function mxGetPitch(s)             = s[I_TP];
+function mxGetThreadD(s)           = s[I_TD];
+function mxGetThreadDP(s)          = s[I_TDP];
+function mxGetThreadL(s)           = s[I_TL];
+function mxGetThreadLP(s)          = s[I_TLP];
+function mxGetHeadDP(s)            = s[I_HDP];
+function mxGetHeadLP(s)            = s[I_HLP];
+function mxGetAllenHeadD(s)        = s[I_AHD];
+function mxGetAllenHeadL(s)        = s[I_AHL];
+function mxGetAllenToolSize(s)     = s[I_ATS];
+function mxGetHexagonalHeadD(s)    = s[I_HHD];
+function mxGetHexagonalHeadL(s)    = s[I_HHL];
+function mxGetHexagonalToolSize(s) = s[I_HTS];
+function mxGetSquareHeadD(s)       = s[I_HTS];
+function mxGetSquareHeadL(s)       = s[I_HHL];
 
 // ----------------------------------------
 //
@@ -226,21 +231,20 @@ function mxSquareHeadL(s)       = s[I_HHL];
 // ----------------------------------------
 
 // Renders a bolt with given parameters for Thread, Thread passage and Head
-module boltImpl( td, tl, tdp, tlp, hd, hl ) {
-    translate( [0,0,-(tl+tlp)/2 ] )
+module mxBoltImpl( td, tl, tdp, tlp, hd, hl ) {
+    translate( [0,0,+(tl+tlp)/2 ] )
         cylinder( r=td/2, h=tl-tlp, center=true );
-    translate( [0,0,-tlp/2 ] )
+    translate( [0,0,+tlp/2 ] )
         cylinder( r=tdp/2, h=tlp+VGG, center=true );
     if ( hl>0 ) {
-        translate( [0,0,+hl/2 ] )
+        translate( [0,0,-hl/2 ] )
             cylinder( r=hd/2, h=hl, center=true );
     }
 }
 
-VGG = 0.01; // Visual Glich Guard
-MFG = 0.01; // Manifold Guard
-GAP = 0.2;  // Bolt passage is deeper than bolt by this amount
-
+VGG     = 0.01; // Visual Glich Guard
+MFG     = 0.01; // Manifold Guard
+MXANGLE = 60;   // Metric thread flanks V angle
 
 I_IDX   =  0;
 I_NAME  =  1;
@@ -259,28 +263,36 @@ I_HHD   = 13; // Head Diameter for Hexagonal head
 I_HHL   = 14; // Head Length for Hexagonal head
 I_HTS   = 15; // Hexagonal Tool Size
 
-function mxDataLength() = len(MXDATA);
+function mxGetDataLength() = len(MXDATA);
 function mxData( idx, tl=-1, tlp=-1, hlp=-1 ) = let (
     local_tl  = tl<0 ? MXDATA[idx][CTL] : tl,
     local_tlp = (tlp<0 || tlp>local_tl) ? local_tl*20/100 : tlp,
-    local_hlp = hlp<0 ? MXDATA[idx][CHLP] : hlp
+    local_hlp = hlp<0 ? MXDATA[idx][CHLP] : hlp,
+
+    Theta     = MXANGLE/2,
+    Rmaj      = MXDATA[idx][CTD]/2+gap(),
+    Fmaj      = MXDATA[idx][CPITCH]/16,
+    RRmaj     = Fmaj/cos(Theta),
+    Cmaj      = [ -1, Rmaj-RRmaj*sin(Theta) ],
+    RTop      = Rmaj.y-RRmaj
+
 ) [
     idx,
     MXDATA[idx][CNAME],
-    MXDATA[idx][CPITCH],
-    MXDATA[idx][CTD]-MXDATA[idx][CPITCH],
-    MXDATA[idx][CTD],
-    MXDATA[idx][CTD]+2*GAP,
-    local_tl,
-    local_tlp,
-    MXDATA[idx][CHDP],
-    local_hlp,
-    MXDATA[idx][CAHD],
-    MXDATA[idx][CAHL],
-    MXDATA[idx][CATS],
-    MXDATA[idx][CHTS]/cos(30),
-    MXDATA[idx][CHHL],
-    MXDATA[idx][CHTS]
+    MXDATA[idx][CPITCH],                  // TP
+    MXDATA[idx][CTD]-MXDATA[idx][CPITCH], // TAP
+    MXDATA[idx][CTD],                     // TD
+    MXDATA[idx][CTD]+gap(2)+0.01+MXDATA[idx][CPITCH]*(1-sin(30))/(8*cos(30)),              // TDP 
+    local_tl,                             // TL
+    local_tlp,                            // TLP
+    MXDATA[idx][CHDP],                    // HDP
+    local_hlp,                            // HLP
+    MXDATA[idx][CAHD],                    // AHD 
+    MXDATA[idx][CAHL],                    // AHL
+    MXDATA[idx][CATS],                    // ATS
+    MXDATA[idx][CHTS]/cos(30),            // HHD
+    MXDATA[idx][CHHL],                    // HHL
+    MXDATA[idx][CHTS]                     // HTS
 ];
 
 //
@@ -377,7 +389,7 @@ CHTS     = 10;
 //
 // ----------------------------------------
 mxBoltHexagonal( M64(), $fn=100 );
-translate([0,0,-mxThreadL(M64())] )
+translate([0,0,+mxGetThreadL(M64())] )
     color( "silver", 0.5 )
     mxNutHexagonal( M64(), $fn=100 );
 translate([60,0]) {
