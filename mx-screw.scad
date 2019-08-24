@@ -114,8 +114,10 @@ module mxBoltHexagonalPassage( p=M2(), tlp=-1 ) {
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  tl   : bolt thread length, <0 means use default from p
 module mxBoltAllen( p=M2(), tl=-1 ) {
-    tool_r  = p[I_ATS]/(2*cos(30));
-    tool_l = p[I_AHL]/2;
+    // +gap() for easier fitting with the tool
+    tool_r = p[I_ATS]/(2*cos(30))+gap();
+    cone_h = tool_r/2*tan(30);
+    tool_l = p[I_AHL]*2/3;
     local_tl  = tl<0  ? p[I_TL]   : tl ;
     difference() {
         union() {
@@ -131,10 +133,9 @@ module mxBoltAllen( p=M2(), tl=-1 ) {
             }
         }
         translate( [0,0,-p[I_AHL]-VGG] ) {
-            // -gap() for easier fitting with the tool
-            cylinder( r=tool_r-gap(), h=tool_l, $fn=6 );
+            cylinder( r=tool_r, h=tool_l, $fn=6 );
             translate( [0,0,tool_l] )
-            cylinder( r1=tool_r-gap(), r2=0, h=(tool_r-gap())/2*tan(30), $fn=6 );
+            cylinder( r1=tool_r, r2=0, h=cone_h, $fn=6 );
 
         }
     }
@@ -145,6 +146,7 @@ module mxBoltAllen( p=M2(), tl=-1 ) {
 //  tl   : bolt thread length, <0 means use default from p
 module mxBoltHexagonal( p=M2(), tl=-1 ) {
     local_tl  = tl<0  ? p[I_TL]   : tl ;
+    local_hhd = p[I_HHD] ;
     local_hhl = p[I_HHL] ;
     union() {
         mxBoltImpl (
@@ -155,7 +157,7 @@ module mxBoltHexagonal( p=M2(), tl=-1 ) {
         translate( [0,0,-local_hhl/2 ] )
         intersection() {
             // -gap() for easier fitting with the tool
-            cylinder( r=p[I_HHD]/2-gap(), h=local_hhl, center=true, $fn=6 );
+            cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
             mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30) );
         }
     }
@@ -171,7 +173,7 @@ module mxNutHexagonal( p=M2() ) {
         intersection() {
             difference() {
                 // -gap() for easier fitting with the tool
-                cylinder( r=local_hhd/2-gap(), h=local_hhl, center=true, $fn=6 );
+                cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
                 cylinder( r=p[I_TAP]/2,  h=local_hhl+VGG, center=true );
             }
             mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30) );
