@@ -28,11 +28,11 @@ module showcaseAnimated() {
         idx=floor($t*len(ALL_SCREW));
         screw = ALL_SCREW[idx];
 
-        translate( [-2*mxGetHeadDP(screw),0,0] )
-            color( "blue" )
+        translate( [1.5*mxGetHeadDP(screw),0,4*mxGetHeadLP(screw)] )
+            color( "gold" )
             rotate( $vpr )
             linear_extrude(1)
-            text( mxGetName(screw), halign="center", valign="center", size=5 );
+            text( mxGetName(screw), halign="center", valign="center", size=mxGetThreadD(screw) );
         rotate( [180,0,0] )
         translate( [0,mxGetHeadDP(screw)/1.5,0] ) {
             translate( [3*mxGetHeadDP(screw),0,0] ) {

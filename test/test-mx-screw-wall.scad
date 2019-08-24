@@ -66,7 +66,7 @@ module showcaseBigWall() {
     difference() {
         showcaseWalls (WALL1_H,WALL2_H,WALL_W);
         for ( screw=ALL_SCREW ) {
-            showcaseScrewPassage( screw, 3 );
+            showcaseScrewPassage( screw, 3+mxGetThreadL(screw)*0.1 );
         }
     }
     for ( screw=ALL_SCREW ) {

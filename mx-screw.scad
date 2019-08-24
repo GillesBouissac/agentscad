@@ -72,7 +72,7 @@ module mxNutHexagonalPassage( p=M2(), hhd=-1, hlp=-1 ) {
 //  slp  : head length passage, <0 means use default from p
 //  Note : This passage will prevent nut from turning
 module mxNutSquarePassage( p=M2(), shw=-1, slp=-1 ) {
-    local_shw = shw<0 ? p[I_HHD] : shw ;
+    local_shw = shw<0 ? p[I_HTS] : shw ;
     local_slp = slp<0 ? p[I_HHL]+2*gap() : slp ;
     translate( [0,0,+local_slp/2 ] )
         cube( [local_shw+gap(),local_shw+gap(),local_slp], center=true );
@@ -115,17 +115,28 @@ module mxBoltHexagonalPassage( p=M2(), tlp=-1 ) {
 //  tl   : bolt thread length, <0 means use default from p
 module mxBoltAllen( p=M2(), tl=-1 ) {
     tool_r  = p[I_ATS]/(2*cos(30));
-    tool_l = 0.8*p[I_AHL];
+    tool_l = p[I_AHL]/2;
     local_tl  = tl<0  ? p[I_TL]   : tl ;
     difference() {
-        mxBoltImpl (
-            p[I_TD],   local_tl,
-            0,         0,
-            p[I_AHD], p[I_AHL]
-        );
-        translate( [0,0,-p[I_AHL]-0.01] )
+        union() {
+            mxBoltImpl (
+                p[I_TD],   local_tl,
+                0,         0,
+                0,         0
+            );
+            translate( [0,0,-p[I_AHL]/2] )
+            intersection() {
+                cylinder( r=p[I_AHD]/2, h=p[I_AHL], center=true );
+                mxBevelShape( p[I_AHL], p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A), a=BEVEL_ALLEN_A, t=false );
+            }
+        }
+        translate( [0,0,-p[I_AHL]-VGG] ) {
             // -gap() for easier fitting with the tool
-            cylinder( r=tool_r-gap(), h=tool_l, $fn=6, center=true );
+            cylinder( r=tool_r-gap(), h=tool_l, $fn=6 );
+            translate( [0,0,tool_l] )
+            cylinder( r1=tool_r-gap(), r2=0, h=(tool_r-gap())/2*tan(30), $fn=6 );
+
+        }
     }
 }
 
@@ -134,15 +145,19 @@ module mxBoltAllen( p=M2(), tl=-1 ) {
 //  tl   : bolt thread length, <0 means use default from p
 module mxBoltHexagonal( p=M2(), tl=-1 ) {
     local_tl  = tl<0  ? p[I_TL]   : tl ;
+    local_hhl = p[I_HHL] ;
     union() {
         mxBoltImpl (
             p[I_TD], local_tl,
             0,       0,
             0,       0
         );
-        translate( [0,0,-p[I_HHL]/2 ] )
+        translate( [0,0,-local_hhl/2 ] )
+        intersection() {
             // -gap() for easier fitting with the tool
-            cylinder( r=p[I_HHD]/2-gap(), h=p[I_HHL], center=true, $fn=6 );
+            cylinder( r=p[I_HHD]/2-gap(), h=local_hhl, center=true, $fn=6 );
+            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30) );
+        }
     }
 }
 
@@ -153,10 +168,13 @@ module mxNutHexagonal( p=M2() ) {
     local_hhd = p[I_HHD] ;
     local_hhl = p[I_HHL] ;
     translate( [0,0,+local_hhl/2 ] )
-        difference() {
-            // -gap() for easier fitting with the tool
-            cylinder( r=local_hhd/2-gap(), h=local_hhl, center=true, $fn=6 );
-            cylinder( r=p[I_TAP]/2,  h=local_hhl, center=true );
+        intersection() {
+            difference() {
+                // -gap() for easier fitting with the tool
+                cylinder( r=local_hhd/2-gap(), h=local_hhl, center=true, $fn=6 );
+                cylinder( r=p[I_TAP]/2,  h=local_hhl+VGG, center=true );
+            }
+            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30) );
         }
 }
 
@@ -168,11 +186,36 @@ module mxNutSquare( p=M2(), shl=-1 ) {
     local_shd = p[I_HTS];
     local_shl = shl<0 ? p[I_HHL] : shl ;
     translate( [0,0,+local_shl/2 ] )
-        difference() {
-            // -gap() for easier fitting with the tool
-            cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
-            cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
+        intersection() {
+            difference() {
+                // -gap() for easier fitting with the tool
+                cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
+                cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
+            }
+            //mxBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
+            mxBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A );
+            cylinder( r=(local_shd-gap())/2/cos(45)-p[I_TD]/10,  h=local_shl, center=true );
         }
+}
+
+// l    : head length
+// d    : diameter or tangent circle on top of head
+// a    : beveling angle
+// t    : true to get the top bevel
+// b    : true to get the bottom bevel
+module mxBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
+    h  = (d/2)*tan(a);
+    r  = (l+h)/tan(a);
+    intersection() {
+        if ( t ) {
+            translate([0,0,-l/2])
+            cylinder( r1=r, r2=0, h=(l+h) );
+        }
+        if ( b ) {
+            translate([0,0,-h-l/2])
+            cylinder( r1=0, r2=r, h=(l+h) );
+        }
+    }
 }
 
 // Mx constructors
@@ -206,23 +249,36 @@ function M60  (tl=-1,tlp=-1,hlp=-1) = mxData(26,tl,tlp,hlp);
 function M64  (tl=-1,tlp=-1,hlp=-1) = mxData(27,tl,tlp,hlp);
 
 // Data accessors on data
-function mxGetName(s)              = s[I_NAME];
-function mxGetTapD(s)              = s[I_TAP];
-function mxGetPitch(s)             = s[I_TP];
-function mxGetThreadD(s)           = s[I_TD];
-function mxGetThreadDP(s)          = s[I_TDP];
-function mxGetThreadL(s)           = s[I_TL];
-function mxGetThreadLP(s)          = s[I_TLP];
-function mxGetHeadDP(s)            = s[I_HDP];
-function mxGetHeadLP(s)            = s[I_HLP];
-function mxGetAllenHeadD(s)        = s[I_AHD];
-function mxGetAllenHeadL(s)        = s[I_AHL];
-function mxGetAllenToolSize(s)     = s[I_ATS];
-function mxGetHexagonalHeadD(s)    = s[I_HHD];
-function mxGetHexagonalHeadL(s)    = s[I_HHL];
-function mxGetHexagonalToolSize(s) = s[I_HTS];
-function mxGetSquareHeadD(s)       = s[I_HTS];
-function mxGetSquareHeadL(s)       = s[I_HHL];
+function mxGetName(s)                = s[I_NAME];
+function mxGetTapD(s)                = s[I_TAP];
+function mxGetPitch(s)               = s[I_TP];
+function mxGetThreadD(s)             = s[I_TD];
+function mxGetThreadDP(s)            = s[I_TDP];
+function mxGetThreadL(s)             = s[I_TL];
+function mxGetThreadLP(s)            = s[I_TLP];
+function mxGetHeadDP(s)              = s[I_HDP];
+function mxGetHeadLP(s)              = s[I_HLP];
+
+function mxGetAllenHeadD(s)          = s[I_AHD];
+function mxGetAllenHeadL(s)          = s[I_AHL];
+function mxGetAllenToolSize(s)       = s[I_ATS];
+
+function mxGetHexagonalHeadD(s)      = s[I_HHD];
+function mxGetHexagonalHeadL(s)      = s[I_HHL];
+function mxGetHexagonalToolSize(s)   = s[I_HTS];
+
+function mxGetSquareHeadD(s)         = s[I_HTS];
+function mxGetSquareHeadL(s)         = s[I_HHL];
+function mxGetSquareToolSize(s)      = s[I_HTS];
+
+// Values helpfull to draw threads
+function mxGetFunctionalRadiuses(s)  = s[I_RADF];
+function mxGetGlobalRadiuses(s)      = s[I_RADG];
+function mxGetSmoothRadiuses(s)      = s[I_RADS];
+function mxGetSmoothCenters(s)       = s[I_CENTR];
+function mxGetFlatHalfLenght(s)      = s[I_FLAT];
+function mxGetFlankAngle(s)          = s[I_ANGLE];
+
 
 // ----------------------------------------
 //
@@ -242,9 +298,12 @@ module mxBoltImpl( td, tl, tdp, tlp, hd, hl ) {
     }
 }
 
-VGG     = 0.01; // Visual Glich Guard
-MFG     = 0.01; // Manifold Guard
-MXANGLE = 60;   // Metric thread flanks V angle
+VGG            = 0.01;  // Visual Glich Guard
+MFG            = 0.001; // Manifold Guard
+MXANGLE        = 60;    // Metric thread flanks V angle
+BEVEL_HEXA_A   = 30;    // Hexagonal head bevel angle
+BEVEL_SQUARE_A = 30;    // Square head bevel angle
+BEVEL_ALLEN_A  = 30;    // Allen head bevel angle
 
 I_IDX   =  0;
 I_NAME  =  1;
@@ -262,6 +321,12 @@ I_ATS   = 12; // Allen Tool Size
 I_HHD   = 13; // Head Diameter for Hexagonal head
 I_HHL   = 14; // Head Length for Hexagonal head
 I_HTS   = 15; // Hexagonal Tool Size
+I_RADF  = 16; // Functional thread enclosing radiuses (between flat parts)
+I_RADG  = 17; // Global thread enclosing radiuses (with round parts)
+I_FLAT  = 18; // Flat parts HALF length
+I_RADS  = 19; // Smoothing parts Radiuses (circular parts)
+I_CENTR = 20; // Centers of round parts
+I_ANGLE = 21; // Thread flanks V angle
 
 function mxGetDataLength() = len(MXDATA);
 function mxData( idx, tl=-1, tlp=-1, hlp=-1 ) = let (
@@ -269,30 +334,45 @@ function mxData( idx, tl=-1, tlp=-1, hlp=-1 ) = let (
     local_tlp = (tlp<0 || tlp>local_tl) ? local_tl*20/100 : tlp,
     local_hlp = hlp<0 ? MXDATA[idx][CHLP] : hlp,
 
+    // Metric screw profile is well defined by wikipedia:
+    //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
+    p         = MXDATA[idx][CPITCH],
     Theta     = MXANGLE/2,
-    Rmaj      = MXDATA[idx][CTD]/2+gap(),
-    Fmaj      = MXDATA[idx][CPITCH]/16,
+    H         = p/(2*tan(Theta)),
+    Rmaj      = MXDATA[idx][CTD]/2,
+    Rmin      = Rmaj - 5*H/8,
+    Fmin      = p/8, // Flat part half length on Dmin
+    Fmaj      = p/16,
+    RRmin     = Fmin/cos(Theta),
     RRmaj     = Fmaj/cos(Theta),
-    Cmaj      = [ -1, Rmaj-RRmaj*sin(Theta) ],
-    RTop      = Rmaj.y-RRmaj
-
+    Cmin      = [ Fmin+MFG, Rmin+RRmin*sin(Theta) ],
+    Cmaj      = [ Fmin+p/2, Rmaj-RRmaj*sin(Theta) ],
+    RTop      = Cmaj.y+RRmaj,
+    RBot      = Cmin.y-RRmin
 ) [
     idx,
     MXDATA[idx][CNAME],
-    MXDATA[idx][CPITCH],                  // TP
-    MXDATA[idx][CTD]-MXDATA[idx][CPITCH], // TAP
-    MXDATA[idx][CTD],                     // TD
-    MXDATA[idx][CTD]+gap(2)+0.01+MXDATA[idx][CPITCH]*(1-sin(30))/(8*cos(30)),              // TDP 
-    local_tl,                             // TL
-    local_tlp,                            // TLP
-    MXDATA[idx][CHDP],                    // HDP
-    local_hlp,                            // HLP
-    MXDATA[idx][CAHD],                    // AHD 
-    MXDATA[idx][CAHL],                    // AHL
-    MXDATA[idx][CATS],                    // ATS
-    MXDATA[idx][CHTS]/cos(30),            // HHD
-    MXDATA[idx][CHHL],                    // HHL
-    MXDATA[idx][CHTS]                     // HTS
+    p,                         // TP
+    MXDATA[idx][CTD]-p,        // TAP
+    MXDATA[idx][CTD],          // TD
+    // gap(): see mx-thread
+    2*(RTop+gap()),            // TDP
+    local_tl,                  // TL
+    local_tlp,                 // TLP
+    MXDATA[idx][CHDP],         // HDP
+    local_hlp,                 // HLP
+    MXDATA[idx][CAHD],         // AHD 
+    MXDATA[idx][CAHL],         // AHL
+    MXDATA[idx][CATS],         // ATS
+    MXDATA[idx][CHTS]/cos(30), // HHD
+    MXDATA[idx][CHHL],         // HHL
+    MXDATA[idx][CHTS],         // HTS
+    [ Rmin,  Rmaj  ],          // RADF
+    [ RBot,  RTop  ],          // RADE
+    [ Fmin,  Fmaj  ],          // FLAT
+    [ RRmin, RRmaj ],          // RADR
+    [ Cmin,  Cmaj  ],          // CENTR
+    MXANGLE                    // ANGLE
 ];
 
 //
@@ -393,7 +473,7 @@ translate([0,0,+mxGetThreadL(M64())] )
     color( "silver", 0.5 )
     mxNutHexagonal( M64(), $fn=100 );
 translate([60,0]) {
-    color( "red" )
+    color( "gold" )
         mxBoltAllen( M1_6(), $fn=100 );
     color( "silver", 0.5 )
         mxNutSquare( M1_6(), $fn=100 );

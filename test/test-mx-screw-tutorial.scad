@@ -141,14 +141,14 @@ module showCase() {
         // 11: Square nut passage
         screw = M3(10);
         difference() {
-            translate ( [0,-3,0] )
+            translate ( [0,-mxGetSquareToolSize(screw)/2,0] )
                 showcaseWalls (3,10,15);
             mxBoltPassage (screw,3);
             translate( [0,0,mxGetThreadL(screw)-4] )
                 mxNutSquarePassage (screw);
         }
         %mxBoltHexagonal (screw,12);
-        translate( [0,0,mxGetThreadL(screw)-4] )
+        translate( [0,0,mxGetThreadL(screw)-3.8] )
             %mxNutSquare (screw);
     }
 }
