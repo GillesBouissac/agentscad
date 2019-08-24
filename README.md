@@ -11,7 +11,7 @@ My utilities for OpenSCAD
 
 # Metric threaded bolts
 
-![MX threaded panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-threaded.png)
+![MX threaded panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-thread.png)
 
 <p align="center">
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Metric threaded">Tutorial for metric threaded bolts</a>
