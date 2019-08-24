@@ -1,12 +1,20 @@
 # agentscad
 My utilities for OpenSCAD
 
-# Metric screws
+# Metric bolts
 
-![MX screw panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-screw.png)
+![MX bolt panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-screw.png)
 
 <p align="center">
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Screws">Tutorial for screws here</a>
+</p>
+
+# Metric threaded bolts
+
+![MX threaded panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-threaded.png)
+
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Metric threaded">Tutorial for metric threaded bolts</a>
 </p>
 
 # Hirth Joint
