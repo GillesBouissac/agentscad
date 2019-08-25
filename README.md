@@ -9,7 +9,7 @@ My utilities for OpenSCAD
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Screws">Tutorial for screws here</a>
 </p>
 
-# Metric threaded bolts
+# Metric threaded bolts (3D Printable)
 
 ![MX threaded panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-thread.png)
 

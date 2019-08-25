@@ -209,6 +209,10 @@ if (1) {
         mxBoltHexagonalThreaded(screw);
 *    translate([0,3*mxGetHeadDP(screw),0])
         mxBoltAllenThreaded(screw);
+*    translate([0,5*mxGetHeadDP(screw),0])
+        mxThreadInternal(screw);
+*    translate([0,7*mxGetHeadDP(screw),0])
+        mxThreadExternal(screw);
 }
 
 if (0) {
