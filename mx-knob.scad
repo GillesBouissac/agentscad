@@ -131,28 +131,33 @@ module mxKnobHandle ( knob_r, knob_h, cap_r, screw, thickness ) {
 
 // Knob cap
 module mxKnobCap ( cap_r, cap_h, screw, thickness ) {
-    local_cap_r   = cap_r-MARGIN;
-    local_scale   = (local_cap_r+thickness/3)/local_cap_r;
+    local_cap_r1  = cap_r-MARGIN;
+    local_cap_r2  = local_cap_r1+thickness/3;
+    local_scale   = local_cap_r2/local_cap_r1;
     cap_thickness = 4*NOZZLE;
 
     difference() {
-        cylinder( r=local_cap_r, h=cap_h );
-        cylinder( r=local_cap_r-cap_thickness, h=cap_h-thickness );
-        translate( [local_cap_r,local_cap_r,cap_h] )
-            bevelCutArc( local_cap_r-MFG, 2*cap_h, 360 ) ;
+        union() {
+            difference() {
+                cylinder( r=local_cap_r1, h=cap_h );
+                cylinder( r=local_cap_r1-cap_thickness, h=cap_h-thickness );
+            }
+            translate( [0,0,cap_h-thickness] )
+                linear_extrude( height=thickness, scale=local_scale )
+                circle( r=local_cap_r1 );
+
+            for ( a=[0:120:360] )
+                rotate( [0,0,a] )
+                translate( [local_cap_r1-cap_thickness/2+1.5*MARGIN,0,0] )
+                    cylinder( r=cap_thickness/2, h=cap_h );
+
+            // Pole to keep the screw in place
+            // This allow as well to pull up the cap by pushing back the screw
+            cylinder( r=mxGetThreadD(screw)/2, h=cap_h );
+        }
+        translate( [local_cap_r2,local_cap_r2,cap_h] )
+            bevelCutArc( local_cap_r2-MFG, 2*cap_h, 360, $bevel=thickness/3+0.5 ) ;
     }
-    translate( [0,0,cap_h-thickness] )
-        linear_extrude( height=thickness, scale=local_scale )
-        circle( r=local_cap_r );
-
-    for ( a=[0:120:360] )
-        rotate( [0,0,a] )
-        translate( [local_cap_r-cap_thickness/2+MARGIN,0,0] )
-            cylinder( r=cap_thickness/2, h=cap_h );
-
-    // Pole to keep the screw in place
-    // This allow as well to pull up the cap by pushing back the screw
-    cylinder( r=mxGetThreadD(screw)/2, h=cap_h );
 }
 
 module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
@@ -172,4 +177,4 @@ module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
 //    Showcase
 //
 // ----------------------------------------
-mxKnob ( M6(), $fn=100 );
+mxKnob ( M6(), part=0, $fn=100 );
