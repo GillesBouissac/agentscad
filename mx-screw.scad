@@ -259,10 +259,12 @@ function M60  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(26,tl,tlp
 function M64  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(27,tl,tlp,hl,hlp,tdp,hd,hdp);
 
 // Clones a screw allowing to overrides some characteristics
-function MClone (p,tl=-1,tlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(
+function MClone (p,tl=-1,tlp=-1, hl=-1, hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(
     idx = p[I_IDX],
-    tl  = tl<0  ? p[I_TL] : tl,
+    tl  = tl<0  ? p[I_TL]  : tl,
     tlp = tlp<0 ? p[I_TLP] : tlp,
+    hl  = hl<0  ? p[I_HHL] : hl,
+    hlp = hlp<0 ? p[I_HLP] : hlp,
     tdp = tdp<0 ? p[I_TDP] : tdp,
     hd  = hd<0  ? p[I_HHD] : hd,
     hdp = hdp<0 ? p[I_HDP] : hdp
