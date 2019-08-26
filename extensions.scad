@@ -102,22 +102,17 @@ function faceTheZenith( list, zenith=[0,100000] ) = rotateBuffer(list,closestToP
 //   - profile1 and profile2 are 3D points vectors
 //   - profile1 and profile2 have the exact same number of points
 //     use augment_profile from skin.scad if they don't
-function interpolateProfile(profile1, profile2, t) = [
+function interpolateProfile(profile1, profile2, t, speed=1) = [
     for ( i=[0:len(profile1)-1] )
         [   (1-t)*profile1[i].x+t*profile2[i].x,
             (1-t)*profile1[i].y+t*profile2[i].y,
-            (1-pow(t,2))*profile1[i].z+pow(t,2)*profile2[i].z
+            (1-pow(t,speed))*profile1[i].z+pow(t,speed)*profile2[i].z
         ]
 ];
 
 // ----------------------------------------
 //              Implementation
 // ----------------------------------------
-
-function morphImpl ( profile1, profile2, slices=1 ) = [
-	for(index = [0:slices-1])
-		interpolateProfile(profile1, profile2, index/(slices-1) )
-];
 function sortIndexedImpl(arr) = !(len(arr)>0) ? [] : let(
     pivot   = arr[floor(len(arr)/2)][0],
     lesser  = [ for (y = arr) if (y[0]  < pivot) y ],

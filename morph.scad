@@ -25,7 +25,8 @@ use <scad-utils/transformations.scad>
 //   - Every intermediate profile 'n-1' is closer to 'profile1' than profile 'n'
 //   - Every intermediate profile 'n'   is closer to 'profile2' than profile 'n-1'
 // zenith is a point far from the shape that will be used to reorder points in profiles before morphing
-function morph ( profile1, profile2, slices=1, zenith=[0,100000] ) =
+// speed: power factor of the x^speed curve: >1 we reach profile2 faster, <1 we reach profile2 slowlier
+function morph ( profile1, profile2, slices=1, zenith=[0,100000], speed=1 ) =
 let (
     aug_profile1  = augment_profile(to_3d(profile1),max(len(profile1),len(profile2))),
     aug_profile2  = augment_profile(to_3d(profile2),max(len(profile1),len(profile2))),
@@ -34,15 +35,16 @@ let (
 ) morphImpl (
 	turn_profile1,
 	turn_profile2,
-	slices
+	slices,
+    speed
 );
 
 // ----------------------------------------
 //              Implementation
 // ----------------------------------------
-function morphImpl ( profile1, profile2, slices=1 ) = [
+function morphImpl ( profile1, profile2, slices=1, speed=1 ) = [
 	for(index = [0:slices-1])
-		interpolateProfile(profile1, profile2, index/(slices-1) )
+		interpolateProfile( profile1, profile2, index/(slices-1), speed )
 ];
 
 // ----------------------------------------
