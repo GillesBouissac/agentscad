@@ -20,86 +20,76 @@ use <printing.scad>
 //                     API
 //
 // ----------------------------------------
-module mxThreadExternal ( screw, l=-1, t=-1 ) {
-    local_l   = l<0 ? mxGetThreadL(screw): l;
-    rotations = local_l / mxGetPitch(screw);
-    profile = mxThreadProfile ( screw, I=false );
+
+// Renders an external thread (for bolts)
+//   l: Thread length
+//   f: Generates flat faces if true
+module mxThreadExternal ( screw, l=-1, f=true ) {
+    local_l   = l<0 ? mxGetThreadL(screw) : l ;
+    rotations = local_l/mxGetPitch(screw) + (f ? 1:-1) ;
+    profile   = mxThreadProfile ( screw, I=false );
+    clipL     = local_l;
+    clipW     = mxGetThreadD(screw)+10;
     rotate([0,-90,0])
-        skin( mxThreadSlices(profile, mxGetPitch(screw), rotations) );
+        translate([f?-mxGetPitch(screw):0,0,0])
+        intersection() {
+            skin( mxThreadSlices(profile, mxGetPitch(screw), rotations) );
+            if ( f ) {
+                translate([mxGetPitch(screw)+clipL/2,0,0])
+                    cube([clipL, clipW, clipW],center=true);
+            }
+        }
 }
 
-module mxThreadInternal ( screw, l=-1, t=-1 ) {
+// Renders an internal thread (for nuts)
+//   l: Thread length
+//   t: Thickness of cylinder containing the thread
+//   f: Generates flat faces if true
+module mxThreadInternal ( screw, l=-1, t=-1, f=true ) {
     local_l   = l<0 ? mxGetThreadL(screw): l;
-    rotations = local_l / mxGetPitch(screw);
-    profile = mxThreadProfile ( screw, I=true );
+    rotations = local_l/mxGetPitch(screw) + (f ? 1:-1) ;
+    profile   = mxThreadProfile ( screw, t=t, I=true );
+    clipL     = local_l;
+    clipW     = mxGetThreadD(screw)+10;
     rotate([0,-90,0])
-        skin( mxThreadSlices(profile, mxGetPitch(screw), rotations) );
+        translate([f?-mxGetPitch(screw):0,0,0])
+        intersection() {
+            skin( mxThreadSlices(profile, mxGetPitch(screw), rotations) );
+            if ( f ) {
+                translate([mxGetPitch(screw)+clipL/2,0,0])
+                    cube([clipL, clipW, clipW],center=true);
+            }
+        }
 }
 
 module mxNutHexagonalThreaded( screw ) {
-    length = mxGetHexagonalHeadL(screw)+2*mxGetPitch(screw);
-    clipL = length-2*mxGetPitch(screw);
-    clipW = mxGetThreadD(screw)+10;
-    intersection() {
-        union() {
-            translate([0,0,-mxGetPitch(screw)])
-                mxThreadInternal ( screw, length );
-        }
-        translate([0,0,clipL/2])
-            cube([clipW, clipW, clipL],center=true);
-    }
+    length = mxGetHexagonalHeadL(screw);
+    mxThreadInternal ( screw, length );
     difference() {
         mxNutHexagonal(screw);
-        mxBoltPassage(screw,clipL);
+        mxBoltPassage(screw,length);
     }
 }
 
 module mxNutSquareThreaded( screw ) {
-    length = mxGetSquareHeadL(screw)+2*mxGetPitch(screw);
-    clipL = length-2*mxGetPitch(screw);
-    clipW = mxGetThreadD(screw)+10;
-    intersection() {
-        union() {
-            translate([0,0,-mxGetPitch(screw)])
-                mxThreadInternal ( screw, length );
-        }
-        translate([0,0,clipL/2])
-            cube([clipW, clipW, clipL],center=true);
-    }
+    length = mxGetSquareHeadL(screw);
+    mxThreadInternal ( screw, length );
     difference() {
         mxNutSquare(screw);
-        mxBoltPassage(screw,clipL);
+        mxBoltPassage(screw,length);
     }
 }
 
 module mxBoltHexagonalThreaded( screw, length=-1 ) {
     local_l = length<0 ? mxGetThreadL(screw): length;
-    clipL = local_l-2*mxGetPitch(screw);
-    clipW = mxGetThreadD(screw)+10;
-    intersection() {
-        union() {
-            translate([0,0,-mxGetPitch(screw)])
-                mxThreadExternal ( screw, local_l );
-        }
-        translate([0,0,clipL/2])
-            cube([clipW, clipW, clipL],center=true);
-    }
+    mxThreadExternal ( screw, local_l );
     translate([0,0,-MFG])
         mxBoltHexagonal(screw,0);
 }
 
 module mxBoltAllenThreaded( screw, length=-1 ) {
     local_l = length<0 ? mxGetThreadL(screw): length;
-    clipL = local_l-2*mxGetPitch(screw);
-    clipW = mxGetThreadD(screw)+10;
-    intersection() {
-        union() {
-            translate([0,0,-mxGetPitch(screw)])
-                mxThreadExternal ( screw, local_l );
-        }
-        translate([0,0,clipL/2])
-            cube([clipW, clipW, clipL],center=true);
-    }
+    mxThreadExternal ( screw, local_l );
     translate([0,0,0-MFG])
         mxBoltAllen(screw,0);
 }
@@ -206,7 +196,7 @@ if (1) {
 *    translate([0,1*mxGetHeadDP(screw),0])
         mxNutSquareThreaded(screw);
     translate([0,2*mxGetHeadDP(screw),0])
-        mxBoltHexagonalThreaded(screw);
+        mxBoltHexagonalThreaded(screw,30);
 *    translate([0,3*mxGetHeadDP(screw),0])
         mxBoltAllenThreaded(screw);
 *    translate([0,5*mxGetHeadDP(screw),0])
