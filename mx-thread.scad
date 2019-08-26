@@ -62,36 +62,47 @@ module mxThreadInternal ( screw, l=-1, t=-1, f=true ) {
         }
 }
 
-module mxNutHexagonalThreaded( screw ) {
+// Nut with Hexagonal head
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
+module mxNutHexagonalThreaded( screw, bt=true, bb=true ) {
     length = mxGetHexagonalHeadL(screw);
     mxThreadInternal ( screw, length );
     difference() {
-        mxNutHexagonal(screw);
-        mxBoltPassage(screw,length);
+        mxNutHexagonal(screw,bt=bt,bb=bb);
+        mxBoltPassage(screw);
     }
 }
 
-module mxNutSquareThreaded( screw ) {
+// Nut with Square head
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
+module mxNutSquareThreaded( screw, bt=true, bb=true ) {
     length = mxGetSquareHeadL(screw);
     mxThreadInternal ( screw, length );
     difference() {
-        mxNutSquare(screw);
-        mxBoltPassage(screw,length);
+        mxNutSquare(screw,bt=bt,bb=bb);
+        mxBoltPassage(screw);
     }
 }
 
-module mxBoltHexagonalThreaded( screw, length=-1 ) {
-    local_l = length<0 ? mxGetThreadL(screw): length;
+// Bolt with Hexagonal head
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
+module mxBoltHexagonalThreaded( screw, bt=true, bb=true ) {
+    local_l = mxGetThreadL(screw);
     mxThreadExternal ( screw, local_l );
     translate([0,0,-MFG])
-        mxBoltHexagonal(screw,0);
+        mxBoltHexagonal(screw,bt=bt,bb=bb);
 }
 
-module mxBoltAllenThreaded( screw, length=-1 ) {
-    local_l = length<0 ? mxGetThreadL(screw): length;
+// Bolt with Allen head
+//  bt   : Bevel top of head
+module mxBoltAllenThreaded( screw, bt=true ) {
+    local_l = mxGetThreadL(screw);
     mxThreadExternal ( screw, local_l );
     translate([0,0,0-MFG])
-        mxBoltAllen(screw,0);
+        mxBoltAllen(screw,bt=bt);
 }
 
 // ----------------------------------------
@@ -198,7 +209,7 @@ if (1) {
     translate([0,2*mxGetHeadDP(screw),0])
         mxBoltHexagonalThreaded(screw);
 *    translate([0,3*mxGetHeadDP(screw),0])
-        mxBoltAllenThreaded(screw,30);
+        mxBoltAllenThreaded(MClone(screw,30));
 *    translate([0,4*mxGetHeadDP(screw),0])
         mxThreadInternal(screw);
 *    translate([0,5*mxGetHeadDP(screw),0])

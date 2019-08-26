@@ -106,8 +106,9 @@ module mxBoltHexagonalPassage( p=M2() ) {
 }
 
 // Bolt with Allen head
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-module mxBoltAllen( p=M2() ) {
+//  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
+//  bt   : Bevel top of head
+module mxBoltAllen( p=M2(), bt=true ) {
     // +gap() for easier fitting with the tool
     tool_r   = p[I_ATS]/(2*cos(30))+gap();
     cone_h   = tool_r/2*tan(30);
@@ -123,7 +124,12 @@ module mxBoltAllen( p=M2() ) {
             translate( [0,0,-p[I_AHL]/2] )
             intersection() {
                 cylinder( r=p[I_AHD]/2, h=p[I_AHL], center=true );
-                mxBevelShape( p[I_AHL], p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A), a=BEVEL_ALLEN_A, t=false );
+                mxBevelShape(
+                    p[I_AHL],
+                    p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A),
+                    a=BEVEL_ALLEN_A,
+                    t=false,
+                    b=bt);
             }
         }
         translate( [0,0,-p[I_AHL]-VGG] ) {
@@ -137,7 +143,9 @@ module mxBoltAllen( p=M2() ) {
 
 // Bolt with Hexagonal head
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-module mxBoltHexagonal( p=M2() ) {
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
+module mxBoltHexagonal( p=M2(), bt=true, bb=true ) {
     local_tl  = p[I_TL] ;
     local_hhd = p[I_HHD] ;
     local_hhl = p[I_HHL] ;
@@ -151,7 +159,7 @@ module mxBoltHexagonal( p=M2() ) {
         intersection() {
             // -gap() for easier fitting with the tool
             cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
-            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30) );
+            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
         }
     }
 }
@@ -159,7 +167,7 @@ module mxBoltHexagonal( p=M2() ) {
 // Hexagonal nut
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  Note : This passage will prevent nut from turning
-module mxNutHexagonal( p=M2() ) {
+module mxNutHexagonal( p=M2(), bt=true, bb=true ) {
     local_hhd = p[I_HHD] ;
     local_hhl = p[I_HHL] ;
     translate( [0,0,+local_hhl/2 ] )
@@ -169,7 +177,7 @@ module mxNutHexagonal( p=M2() ) {
                 cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
                 cylinder( r=p[I_TAP]/2,  h=local_hhl+VGG, center=true );
             }
-            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30) );
+            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
         }
 }
 
@@ -177,7 +185,7 @@ module mxNutHexagonal( p=M2() ) {
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  shl  : square head length, <0 means use default hexagonal head length from p
 //  Note : This passage will prevent nut from turning
-module mxNutSquare( p=M2() ) {
+module mxNutSquare( p=M2(), bt=true, bb=true ) {
     local_shd = p[I_HTS] ;
     local_shl = p[I_HHL] ;
     translate( [0,0,+local_shl/2 ] )
@@ -188,7 +196,7 @@ module mxNutSquare( p=M2() ) {
                 cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
             }
             //mxBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
-            mxBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A );
+            mxBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
             cylinder( r=(local_shd-gap())/2/cos(45)-p[I_TD]/10,  h=local_shl, center=true );
         }
 }
