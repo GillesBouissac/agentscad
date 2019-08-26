@@ -19,7 +19,7 @@ MFG    = 0.01;  // ManiFold Guard
 VGG    = 1;     // Visual Glich Guard
 MARGIN = 0.2;
 NOZZLE = 0.4;
-R1_MIN_NOZZLE = 5;
+R1_MIN_NOZZLE = 3;
 
 module hirthJointSinus ( rmax, tooth, height, shoulder=0, inlay=0 ) {
     alpha = atan( (height/2)/rmax );
@@ -162,4 +162,7 @@ module hirthJointTooth ( radius, width, height ) {
 //    Showcase
 //
 // ----------------------------------------
-// hirthJointSinus( 10, 21, 1.2, 2, 1, $fn=100 );
+difference() {
+    hirthJointSinus( 5, 11, 1, 1, 1, $fn=100 );
+    cylinder(r=2.5+MARGIN,h=10,center=true, $fn=100);
+}
