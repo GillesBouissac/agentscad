@@ -90,19 +90,17 @@ module mxNutSquareThreaded( screw, bt=true, bb=true ) {
 //  bt   : Bevel top of head
 //  bb   : Bevel bottom of head
 module mxBoltHexagonalThreaded( screw, bt=true, bb=true ) {
-    local_l = mxGetThreadL(screw);
-    mxThreadExternal ( screw, local_l );
+    mxThreadExternal ( screw );
     translate([0,0,-MFG])
-        mxBoltHexagonal(screw,bt=bt,bb=bb);
+        mxBoltHexagonal(MClone(screw,0),bt=bt,bb=bb);
 }
 
 // Bolt with Allen head
 //  bt   : Bevel top of head
 module mxBoltAllenThreaded( screw, bt=true ) {
-    local_l = mxGetThreadL(screw);
-    mxThreadExternal ( screw, local_l );
+    mxThreadExternal ( screw );
     translate([0,0,0-MFG])
-        mxBoltAllen(screw,bt=bt);
+        mxBoltAllen(MClone(screw,0),bt=bt);
 }
 
 // ----------------------------------------
