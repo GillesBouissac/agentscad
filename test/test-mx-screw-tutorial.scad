@@ -36,118 +36,118 @@ module showCase() {
 
     translate ( [+80,0,0] ) {
         // 2: Bolt passage
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltPassage (screw,3);
+            mxBoltPassage (screw);
         }
     }
 
     translate ( [+60,0,0] ) {
         // 3: Allen bolt
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltPassage (screw,3);
+            mxBoltPassage (screw);
         }
         %mxBoltAllen (screw);
     }
 
     translate ( [40,0,0] ) {
         // 4: Hexagonal bolt
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltPassage (screw,3);
+            mxBoltPassage (screw);
         }
         %mxBoltHexagonal (screw);
     }
 
     translate ( [+20,0,0] ) {
         // 5: Tight passage allen
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltAllenPassage (screw,3);
+            mxBoltAllenPassage (screw);
         }
         %mxBoltAllen (screw);
     }
 
     translate ( [-0,0,0] ) {
         // 6: Tight passage hexagonal
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltHexagonalPassage (screw,3);
+            mxBoltHexagonalPassage (screw);
         }
         %mxBoltHexagonal (screw);
     }
 
     translate ( [-20,0,0] ) {
         // 7: Nut passage
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltHexagonalPassage (screw,3);
+            mxBoltHexagonalPassage (screw);
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
-        %mxBoltHexagonal (screw,12);
+        %mxBoltHexagonal (MClone(screw,12));
     }
 
     translate ( [-40,0,0] ) {
         // 8: Hexagonal nut
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltHexagonalPassage (screw,3);
+            mxBoltHexagonalPassage (screw);
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
-        %mxBoltHexagonal (screw,12);
+        %mxBoltHexagonal (MClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)] )
             %mxNutHexagonal (screw);
     }
 
     translate ( [-60,0,0] ) {
         // 9: Square nut
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltHexagonalPassage (screw,3);
+            mxBoltHexagonalPassage (screw);
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
-        %mxBoltHexagonal (screw,12);
+        %mxBoltHexagonal (MClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)] )
             %mxNutSquare (screw);
     }
 
     translate ( [-80,0,0] ) {
         // 10: Hexagonal nut passage
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             showcaseWalls (3,10,15);
-            mxBoltHexagonalPassage (screw,3);
+            mxBoltHexagonalPassage (screw);
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutHexagonalPassage (screw);
         }
-        %mxBoltHexagonal (screw,12);
+        %mxBoltHexagonal (MClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)] )
             %mxNutHexagonal (screw);
     }
 
     translate ( [-100,0,0] ) {
         // 11: Square nut passage
-        screw = M3(10);
+        screw = M3(10,3);
         difference() {
             translate ( [0,-mxGetSquareToolSize(screw)/2,0] )
                 showcaseWalls (3,10,15);
-            mxBoltPassage (screw,3);
+            mxBoltPassage (screw);
             translate( [0,0,mxGetThreadL(screw)-4] )
                 mxNutSquarePassage (screw);
         }
-        %mxBoltHexagonal (screw,12);
+        %mxBoltHexagonal (MClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)-3.8] )
             %mxNutSquare (screw);
     }

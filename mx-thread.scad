@@ -196,12 +196,12 @@ if (1) {
 *    translate([0,1*mxGetHeadDP(screw),0])
         mxNutSquareThreaded(screw);
     translate([0,2*mxGetHeadDP(screw),0])
-        mxBoltHexagonalThreaded(screw,30);
+        mxBoltHexagonalThreaded(screw);
 *    translate([0,3*mxGetHeadDP(screw),0])
-        mxBoltAllenThreaded(screw);
-*    translate([0,5*mxGetHeadDP(screw),0])
+        mxBoltAllenThreaded(screw,30);
+*    translate([0,4*mxGetHeadDP(screw),0])
         mxThreadInternal(screw);
-*    translate([0,7*mxGetHeadDP(screw),0])
+*    translate([0,5*mxGetHeadDP(screw),0])
         mxThreadExternal(screw);
 }
 

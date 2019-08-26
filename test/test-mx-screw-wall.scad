@@ -35,13 +35,19 @@ let(
 
 module showcaseScrewPassage ( t, tlp ) {
     translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-WALL_W/2,0,0] ) {
-        mxBoltPassage ( t, tlp=tlp, $fn=100 );
+        mxBoltPassage ( MClone(t, tlp=tlp) );
     }
 }
 module showcaseScrew ( t ) {
     translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-WALL_W/2,0,0] ) {
-        color( "silver", 0.7 )
-            mxBoltAllen   ( t, $fn=100 );
+        color( "silver", 0.7 ) {
+            if ( mxGetIdx(t)%2 ) {
+                mxBoltAllen ( t );
+            }
+            else {
+                mxBoltHexagonal ( t );
+            }
+        }
         color( "gold" )
             translate( [0,-t[8]/2-1.5,-t[9]/2] )
             rotate ( [90,0,0] )
@@ -66,7 +72,7 @@ module showcaseBigWall() {
     difference() {
         showcaseWalls (WALL1_H,WALL2_H,WALL_W);
         for ( screw=ALL_SCREW ) {
-            showcaseScrewPassage( screw, 3+mxGetThreadL(screw)*0.1 );
+            showcaseScrewPassage( screw, 2+mxGetThreadL(screw)*0.3 );
         }
     }
     for ( screw=ALL_SCREW ) {
@@ -74,4 +80,4 @@ module showcaseBigWall() {
     }
 }
 
-showcaseBigWall ($fn=100);
+showcaseBigWall ($fn=50);
