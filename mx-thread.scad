@@ -164,7 +164,7 @@ function mxThreadRounding( R, C, T1, T2) = [
 ];
 function mxThreadSlices( profile, pitch, rotations=1 ) = [
     let ( step=360/($fn<3?3:$fn) )
-    for ( a=[-step/2:step:rotations*360-step/2] )
+    for ( a=[-step/2:step:rotations*360+step/2] )
         transform(translation([a*pitch/360,0,0])*rotation([a,0,0]), profile )
 ];
 
