@@ -91,7 +91,7 @@ module mxNutSquareThreaded( screw, bt=true, bb=true ) {
 //  bb   : Bevel bottom of head
 module mxBoltHexagonalThreaded( screw, bt=true, bb=true ) {
     mxThreadExternal ( screw );
-    translate([0,0,-MFG])
+    translate([0,0,0])
         mxBoltHexagonal(MClone(screw,0),bt=bt,bb=bb);
 }
 
@@ -99,7 +99,7 @@ module mxBoltHexagonalThreaded( screw, bt=true, bb=true ) {
 //  bt   : Bevel top of head
 module mxBoltAllenThreaded( screw, bt=true ) {
     mxThreadExternal ( screw );
-    translate([0,0,0-MFG])
+    translate([0,0,0])
         mxBoltAllen(MClone(screw,0),bt=bt);
 }
 
@@ -205,7 +205,7 @@ if (1) {
         mxNutSquareThreaded(screw, $fn=50);
     translate([0,2*mxGetHeadDP(screw),0])
         mxBoltHexagonalThreaded(screw, $fn=50);
-*    translate([0,3*mxGetHeadDP(screw),0])
+    translate([0,3*mxGetHeadDP(screw),0])
         mxBoltAllenThreaded(MClone(screw,30), $fn=50);
 *    translate([0,4*mxGetHeadDP(screw),0])
         mxThreadInternal(screw, $fn=50);
