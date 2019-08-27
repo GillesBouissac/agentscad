@@ -9,6 +9,7 @@
  * Description: 3D printable metric screws taking into account printer precision
  * Author:      Gilles Bouissac
  */
+use <extensions.scad>
 use <printing.scad>
 
 // ----------------------------------------
@@ -258,8 +259,31 @@ function M56  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(25,tl,tlp
 function M60  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(26,tl,tlp,hl,hlp,tdp,hd,hdp);
 function M64  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(27,tl,tlp,hl,hlp,tdp,hd,hdp);
 
+// Guess what is the better standard thread from the given one
+//   if td>0: will pick the first screw larger than the given value
+//   if td<0: will pick the first screw smaller than the given value
+function mxGuess ( td, tl=-1,tlp=-1, hl=-1, hlp=-1,tdp=-1,hd=-1,hdp=-1) =
+let (
+    dists    = [ for( i=[0:len(MXDATA)-1] ) let ( diff=MXDATA[i][CTD]-abs(td) )
+        ( diff==0 || sign(td)==0 || sign(td)==sign(diff) ) ? abs(diff) : 1e100 ],
+    sorted   = sortIndexed(dists),
+    filtered = [ for (a=sorted) if (a[0]!=1e100) a ],
+    idx      = len(filtered)==0 ? undef : filtered[0][1]
+)
+mxData(
+    idx = idx,
+    tl  = tl,
+    tlp = tlp,
+    hl  = hl,
+    hlp = hlp,
+    tdp = tdp,
+    hd  = hd,
+    hdp = hdp
+);
+
 // Clones a screw allowing to overrides some characteristics
-function MClone (p,tl=-1,tlp=-1, hl=-1, hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(
+function mxClone (p,tl=-1,tlp=-1, hl=-1, hlp=-1,tdp=-1,hd=-1,hdp=-1) =
+mxData(
     idx = p[I_IDX],
     tl  = tl<0  ? p[I_TL]  : tl,
     tlp = tlp<0 ? p[I_TLP] : tlp,
@@ -509,3 +533,12 @@ translate([60,0]) {
     color( "silver", 0.5 )
         mxNutSquare( M1_6(), $fn=100 );
 }
+
+echo( "mxGuess(   2):    expected M2: ",   mxGetName(mxGuess(2)) ) ;
+echo( "mxGuess(  -2):    expected M2: ",   mxGetName(mxGuess(-2)) ) ;
+echo( "mxGuess(  -1.99): expected M1.6: ", mxGetName(mxGuess(-1.99)) ) ;
+echo( "mxGuess(   2.1):  expected M2.5: ", mxGetName(mxGuess(2.1)) ) ;
+echo( "mxGuess(   0):    expected M1.6: ", mxGetName(mxGuess(0)) ) ;
+echo( "mxGuess( 100):    expected undef:", mxGetName(mxGuess(100)) ) ;
+echo( "mxGuess(-100):    expected M64:",   mxGetName(mxGuess(-100)) ) ;
+

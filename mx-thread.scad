@@ -92,7 +92,7 @@ module mxNutSquareThreaded( screw, bt=true, bb=true ) {
 module mxBoltHexagonalThreaded( screw, bt=true, bb=true ) {
     mxThreadExternal ( screw );
     translate([0,0,0])
-        mxBoltHexagonal(MClone(screw,0),bt=bt,bb=bb);
+        mxBoltHexagonal(mxClone(screw,0),bt=bt,bb=bb);
 }
 
 // Bolt with Allen head
@@ -100,7 +100,7 @@ module mxBoltHexagonalThreaded( screw, bt=true, bb=true ) {
 module mxBoltAllenThreaded( screw, bt=true ) {
     mxThreadExternal ( screw );
     translate([0,0,0])
-        mxBoltAllen(MClone(screw,0),bt=bt);
+        mxBoltAllen(mxClone(screw,0),bt=bt);
 }
 
 // ----------------------------------------
@@ -206,11 +206,11 @@ if (1) {
     translate([0,2*mxGetHeadDP(screw),0])
         mxBoltHexagonalThreaded(screw, $fn=50);
     translate([0,3*mxGetHeadDP(screw),0])
-        mxBoltAllenThreaded(MClone(screw,30), $fn=50);
+        mxBoltAllenThreaded(mxClone(screw,30), $fn=50);
 *    translate([0,4*mxGetHeadDP(screw),0])
         mxThreadInternal(screw, $fn=50);
 *    translate([0,5*mxGetHeadDP(screw),0])
-        mxThreadExternal(MClone(screw,6),$fn=50);
+        mxThreadExternal(mxClone(screw,6),$fn=50);
 }
 
 if (0) {

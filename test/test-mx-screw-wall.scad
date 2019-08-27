@@ -35,7 +35,7 @@ let(
 
 module showcaseScrewPassage ( t, tlp ) {
     translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-WALL_W/2,0,0] ) {
-        mxBoltPassage ( MClone(t, tlp=tlp) );
+        mxBoltPassage ( mxClone(t, tlp=tlp) );
     }
 }
 module showcaseScrew ( t ) {

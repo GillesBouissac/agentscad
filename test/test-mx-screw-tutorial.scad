@@ -92,7 +92,7 @@ module showCase() {
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
-        %mxBoltHexagonal (MClone(screw,12));
+        %mxBoltHexagonal (mxClone(screw,12));
     }
 
     translate ( [-40,0,0] ) {
@@ -104,7 +104,7 @@ module showCase() {
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
-        %mxBoltHexagonal (MClone(screw,12));
+        %mxBoltHexagonal (mxClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)] )
             %mxNutHexagonal (screw);
     }
@@ -118,7 +118,7 @@ module showCase() {
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutPassage (screw);
         }
-        %mxBoltHexagonal (MClone(screw,12));
+        %mxBoltHexagonal (mxClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)] )
             %mxNutSquare (screw);
     }
@@ -132,7 +132,7 @@ module showCase() {
             translate( [0,0,mxGetThreadL(screw)] )
                 mxNutHexagonalPassage (screw);
         }
-        %mxBoltHexagonal (MClone(screw,12));
+        %mxBoltHexagonal (mxClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)] )
             %mxNutHexagonal (screw);
     }
@@ -147,7 +147,7 @@ module showCase() {
             translate( [0,0,mxGetThreadL(screw)-4] )
                 mxNutSquarePassage (screw);
         }
-        %mxBoltHexagonal (MClone(screw,12));
+        %mxBoltHexagonal (mxClone(screw,12));
         translate( [0,0,mxGetThreadL(screw)-3.8] )
             %mxNutSquare (screw);
     }
