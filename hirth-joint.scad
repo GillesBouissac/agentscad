@@ -21,36 +21,43 @@ MARGIN = 0.2;
 NOZZLE = 0.4;
 R1_MIN_NOZZLE = 3;
 
-module hirthJointSinus ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+// rmax:     Radius of external cylinder containing teeth
+// teeth:    Nunber of required teeth
+// height:   Teeth height
+// shoulder: Shoulder height (base cylinder below teeth)
+// inlay:    Inlay height (hexagonal inlay below shoulder)
+// shift:    Number of tooth to rotate the resuting teeth set
+module hirthJointSinus ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
-    width = 2*PI*rmax/tooth;
+    width = 2*PI*rmax/teeth;
 
-    hirthJoint ( rmax, tooth, height, shoulder, inlay )
+    hirthJoint ( rmax, teeth, height, shoulder, inlay, shift )
         hirthJointProfileSinus ( width, th );
 }
 
-module hirthJointTriangle ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+module hirthJointTriangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
-    width = 2*PI*rmax/tooth;
+    width = 2*PI*rmax/teeth;
 
-    hirthJoint ( rmax, tooth, height, shoulder, inlay )
+    hirthJoint ( rmax, teeth, height, shoulder, inlay, shift )
         hirthJointProfileTriangle ( width, th );
 }
 
-module hirthJointRectangle ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
-    width = 2*PI*rmax/tooth;
+    width = 2*PI*rmax/teeth;
 
-    hirthJoint ( rmax, tooth, height, shoulder, inlay )
+    hirthJoint ( rmax, teeth, height, shoulder, inlay, shift )
         hirthJointProfileRectangle ( width, th );
 }
 
-module hirthJointPassage ( rmax, inlay=0 ) {
-    translate( [0,0,-inlay/2] )
-        cylinder( r=(rmax+MARGIN)/cos(30), h=inlay+2*MARGIN, center=true, $fn=6 );
+module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
+    height = inlay+height+shoulder;
+    translate( [0,0,-inlay-MARGIN] )
+        cylinder( r=(rmax+MARGIN)/cos(30), h=height+2*MARGIN, $fn=6 );
 }
 
 
@@ -59,15 +66,15 @@ module hirthJointPassage ( rmax, inlay=0 ) {
 //    Implementation
 //
 // ----------------------------------------
-module hirthJoint ( rmax, tooth, height, shoulder=0, inlay=0 ) {
+module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
 
-    rmin  = R1_MIN_NOZZLE*NOZZLE*tooth/(2*PI);
-    angle = 360/tooth;
-    width = 2*PI*rmax/tooth;
+    rmin  = R1_MIN_NOZZLE*NOZZLE*teeth/(2*PI);
+    angle = 360/teeth;
+    width = 2*PI*rmax/teeth;
 
     echo ( "hirthJoint rmin: ",                rmin );
-    echo ( "hirthJoint tooth angle (degre): ", angle );
-    echo ( "hirthJoint tooth width: ",         width );
+    echo ( "hirthJoint teeth angle (degre): ", angle );
+    echo ( "hirthJoint teeth width: ",         width );
 
     translate( [0,0,+shoulder] )
     intersection() {
@@ -77,7 +84,8 @@ module hirthJoint ( rmax, tooth, height, shoulder=0, inlay=0 ) {
             cylinder( r=rmin, h=height+VGG, center=true );
         }
 
-        for ( a=[0:360/tooth:359] ) {
+        rotate ([0,0,shift*360/teeth])
+        for ( a=[0:360/teeth:359] ) {
             rotate( [0,0,a] )
                 if ( $children>0 ) {
                     hirthJointTooth( rmax, width, height )
@@ -163,6 +171,8 @@ module hirthJointTooth ( radius, width, height ) {
 //
 // ----------------------------------------
 difference() {
-    hirthJointSinus( 5, 11, 1, 1, 1, $fn=100 );
+    hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
     cylinder(r=2.5+MARGIN,h=10,center=true, $fn=100);
 }
+translate( [15,0,0] )
+    hirthJointRectangle( 5, 11, 1, 1, 1, shift=0, $fn=100 );
