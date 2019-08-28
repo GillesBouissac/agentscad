@@ -11,15 +11,8 @@
  */
 
 // ----------------------------------------
-//
-//    API
-//
+//                    API
 // ----------------------------------------
-MFG    = 0.01;  // ManiFold Guard
-VGG    = 1;     // Visual Glich Guard
-MARGIN = 0.2;
-NOZZLE = 0.4;
-R1_MIN_NOZZLE = 3;
 
 // rmax:     Radius of external cylinder containing teeth
 // teeth:    Nunber of required teeth
@@ -27,31 +20,35 @@ R1_MIN_NOZZLE = 3;
 // shoulder: Shoulder height (base cylinder below teeth)
 // inlay:    Inlay height (hexagonal inlay below shoulder)
 // shift:    Number of tooth to rotate the resuting teeth set
+
+// Hirth Joint with sinusoidal profile
 module hirthJointSinus ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
     hirthJoint ( rmax, teeth, height, shoulder, inlay, shift )
-        hirthJointProfileSinus ( width, th );
+        hirthJointProfileSinus ();
 }
 
+// Hirth Joint with triangular profile
 module hirthJointTriangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
     hirthJoint ( rmax, teeth, height, shoulder, inlay, shift )
-        hirthJointProfileTriangle ( width, th );
+        hirthJointProfileTriangle ();
 }
 
+// Hirth Joint with rectangular profile
 module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
     hirthJoint ( rmax, teeth, height, shoulder, inlay, shift )
-        hirthJointProfileRectangle ( width, th );
+        hirthJointProfileRectangle ();
 }
 
 module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
@@ -62,15 +59,19 @@ module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
 
 
 // ----------------------------------------
-//
-//    Implementation
-//
-// ----------------------------------------
+//             Implementation
+// ----------------------------------------.
+
+VGG    = 1;     // Visual Glich Guard
+MARGIN = 0.2;
+NOZZLE = 0.4;
+R1_MIN_NOZZLE = 3;
+
 module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
 
     rmin  = R1_MIN_NOZZLE*NOZZLE*teeth/(2*PI);
     angle = 360/teeth;
-    width = 2*PI*rmax/teeth;
+    width = rmax*tan(360/teeth);
 
     echo ( "hirthJoint rmin: ",                rmin );
     echo ( "hirthJoint teeth angle (degre): ", angle );
@@ -95,7 +96,7 @@ module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
                     alpha = atan( (height/2)/rmax );
                     th = (rmax*tan(2*alpha)/cos(alpha))/2;
                     hirthJointTooth( rmax, width, height )
-                        hirthJointProfileSinus(width,th);
+                        hirthJointProfileSinus();
                 }
         }
     }
@@ -108,34 +109,35 @@ module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
         cylinder( r=rmax/cos(30), h=inlay, center=true, $fn=6 );
 }
 
-module hirthJointProfileSinus ( width, height ) {
+module hirthJointProfileSinus () {
+    step = $fn>0?360/$fn:3;
     polygon ([
-        for ( i=[-width/2-MFG:+width/30:+width/2+MFG] )
-            [height/2*cos(i*360/width)+height/2,i]
+        for ( a=[-180:step:181] )
+            [1/2*cos(a)+1/2,a/360]
     ]);
 }
 
-module hirthJointProfileTriangle ( width, height ) {
+module hirthJointProfileTriangle () {
     polygon ([
-        [0,-width/2],
-        [0,+width/2],
-        [height,0],
+        [0,-1/2],
+        [0,+1/2],
+        [1,0],
     ]);
 }
 
-module hirthJointProfileRectangle ( width, height ) {
+module hirthJointProfileRectangle () {
     polygon ([
-        [0,-width/2],
-        [0,-width/4+MARGIN/2],
-        [height,-width/4+MARGIN/2],
-        [height,+width/4-MARGIN/2],
-        [0,+width/4-MARGIN/2],
-        [0,+width/2],
+        [0,-1/2],
+        [0,-1/4+MARGIN/2],
+        [1,-1/4+MARGIN/2],
+        [1,+1/4-MARGIN/2],
+        [0,+1/4-MARGIN/2],
+        [0,+1/2],
     ]);
 }
 
 module hirthJointTooth ( radius, width, height ) {
-    alpha = atan( (height/2)/radius );
+    alpha   = atan( (height/2)/radius );
 
     intersection() {
         linear_extrude( height=height )
@@ -159,16 +161,15 @@ module hirthJointTooth ( radius, width, height ) {
 
     th = (radius*tan(2*alpha)/cos(alpha))/2;
     translate( [radius,0,0] )
-    rotate( [0,-90,0] )
-    rotate( [0,alpha,0] )
-    linear_extrude( height=radius/cos(alpha), scale=0 )
-        children();
+        rotate( [0,-90,0] )
+        rotate( [0,alpha,0] )
+        linear_extrude( height=radius/cos(alpha), scale=0 )
+            scale( [height,width,1] )
+            children();
 }
 
 // ----------------------------------------
-//
-//    Showcase
-//
+//                 Showcase
 // ----------------------------------------
 difference() {
     hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );

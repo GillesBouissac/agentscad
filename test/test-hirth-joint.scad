@@ -60,14 +60,14 @@ module hirthJointShow( part=0 ) {
                 color( "DarkGreen" )
                 translate( [0,0,-2] )
                     cylinder( r=(RADIUS+2)/cos(30), h=4, center=true );
-                    hirthJointPassage( RADIUS, INLAY );
+                    hirthJointPassage( RADIUS, HEIGHT, SHOULDER, INLAY );
             }
         }
     }
 }
 difference() {
-    hirthJointShow( 0, $fn=200 );
-    cylinder( r=1.5+MARGIN/2, h=100, center=true, $fn=200 );
+    hirthJointShow( 0, $fn=50 );
+    cylinder( r=1.5+MARGIN/2, h=100, center=true, $fn=50 );
 }
 
 /*
