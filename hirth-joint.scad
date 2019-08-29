@@ -53,8 +53,8 @@ module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 )
 
 module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
     height = inlay+height+shoulder;
-    translate( [0,0,-inlay-MARGIN] )
-        cylinder( r=(rmax+MARGIN)/cos(30), h=height+2*MARGIN, $fn=6 );
+    translate( [0,0,-inlay] )
+        cylinder( r=(rmax+MARGIN/2)/cos(30), h=height, $fn=6 );
 }
 
 
@@ -100,19 +100,23 @@ module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
                 }
         }
     }
-    translate( [0,0,+shoulder/2] )
-    difference () {
-        cylinder( r=rmax, h=shoulder,     center=true );
-        cylinder( r=rmin, h=shoulder+VGG, center=true );
+    if ( shoulder>0 ) {
+        translate( [0,0,+shoulder/2] )
+        difference () {
+            cylinder( r=rmax, h=shoulder,     center=true );
+            cylinder( r=rmin, h=shoulder+VGG, center=true );
+        }
     }
-    translate( [0,0,-inlay/2] )
-        cylinder( r=rmax/cos(30), h=inlay, center=true, $fn=6 );
+    if ( inlay>0 ) {
+        translate( [0,0,-inlay/2] )
+            cylinder( r=rmax/cos(30), h=inlay, center=true, $fn=6 );
+    }
 }
 
 module hirthJointProfileSinus () {
-    step = $fn>0?360/$fn:3;
+    step = $fn>0?360/$fn:6;
     polygon ([
-        for ( a=[-180:step:181] )
+        for ( a=[-180:step:180-step] )
             [1/2*cos(a)+1/2,a/360]
     ]);
 }
@@ -175,5 +179,9 @@ difference() {
     hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
     cylinder(r=2.5+MARGIN,h=10,center=true, $fn=100);
 }
-translate( [15,0,0] )
-    hirthJointRectangle( 5, 11, 1, 1, 1, shift=0, $fn=100 );
+%hirthJointPassage( 5, 1, 1, 1, $fn=100 );
+
+translate( [15,0,0] ) {
+    hirthJointRectangle( 6, 11, 1, 1, 1, shift=0, $fn=100 );
+    %hirthJointPassage( 6, 1, 1, 1, $fn=100 );
+}
