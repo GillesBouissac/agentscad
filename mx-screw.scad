@@ -230,34 +230,34 @@ module mxBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
 //   tdp: Thread diameter passage,          -1 = computed from td and gap()
 //   hd:  Head external diameter,           -1 = use standard value
 //   hdp: Head external diameter,           -1 = use common value
-function M1_6 (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(0,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M2   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(1,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M2_5 (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(2,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M3   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(3,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M4   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(4,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M5   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(5,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M6   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(6,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M8   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(7,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M10  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(8,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M12  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(9,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M14  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(10,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M16  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(11,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M18  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(12,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M20  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(13,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M22  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(14,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M24  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(15,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M27  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(16,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M30  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(17,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M33  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(18,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M36  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(19,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M39  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(20,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M42  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(21,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M45  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(22,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M48  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(23,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M52  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(24,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M56  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(25,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M60  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(26,tl,tlp,hl,hlp,tdp,hd,hdp);
-function M64  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(27,tl,tlp,hl,hlp,tdp,hd,hdp);
+function M1_6 (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(0,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M2   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(1,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M2_5 (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(2,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M3   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(3,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M4   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(4,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M5   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(5,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M6   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(6,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M8   (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(7,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M10  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(8,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M12  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(9,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M14  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(10,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M16  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(11,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M18  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(12,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M20  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(13,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M22  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(14,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M24  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(15,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M27  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(16,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M30  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(17,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M33  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(18,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M36  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(19,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M39  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(20,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M42  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(21,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M45  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(22,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M48  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(23,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M52  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(24,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M56  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(25,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M60  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(26,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
+function M64  (tl=-1,tlp=-1,hl=-1,hlp=-1,tdp=-1,hd=-1,hdp=-1) = mxData(27,tl,tlp,hl,hl,hlp,tdp,hd,hdp);
 
 // Guess what is the better standard thread from the given one
 //   if td>0: will pick the first screw larger than the given value
@@ -274,7 +274,8 @@ mxData(
     idx = idx,
     tl  = tl,
     tlp = tlp,
-    hl  = hl,
+    ahl = hl,
+    hhl = hl,
     hlp = hlp,
     tdp = tdp,
     hd  = hd,
@@ -282,12 +283,13 @@ mxData(
 );
 
 // Clones a screw allowing to overrides some characteristics
-function mxClone (p,tl=-1,tlp=-1, hl=-1, hlp=-1,tdp=-1,hd=-1,hdp=-1) =
+function mxClone (p,tl=-1,tlp=-1, ahl=-1, hhl=-1, hlp=-1,tdp=-1,hd=-1,hdp=-1) =
 mxData(
     idx = p[I_IDX],
     tl  = tl<0  ? p[I_TL]  : tl,
     tlp = tlp<0 ? p[I_TLP] : tlp,
-    hl  = hl<0  ? p[I_HHL] : hl,
+    ahl = ahl<0 ? p[I_AHL] : ahl,
+    hhl = hhl<0 ? p[I_HHL] : hhl,
     hlp = hlp<0 ? p[I_HLP] : hlp,
     tdp = tdp<0 ? p[I_TDP] : tdp,
     hd  = hd<0  ? p[I_HHD] : hd,
@@ -376,16 +378,16 @@ I_CENTR = 20; // Centers of round parts
 I_ANGLE = 21; // Thread flanks V angle
 
 function mxGetDataLength() = len(MXDATA);
-function mxData( idx, tl=-1, tlp=-1, hl=-1, hlp=-1, tdp=-1, hd=-1, hdp=-1 ) = let (
+function mxData( idx, tl=-1, tlp=-1, ahl=-1, hhl=-1, hlp=-1, tdp=-1, hd=-1, hdp=-1 ) = let (
     local_tl  = tl<0 ? MXDATA[idx][CTL] : tl,
     local_tlp = (tlp<0 || tlp>local_tl) ? local_tl : tlp,
-    local_hhl = hl<0  ? MXDATA[idx][CHHL] : hl,
-    local_ahl = hl<0  ? MXDATA[idx][CAHL] : hl,
-    local_hlp = hlp<0 ? MXDATA[idx][CHLP] : hlp,
-    local_ahd = hd<0  ? MXDATA[idx][CAHD] : hd,
-    local_hhd = hd<0  ? MXDATA[idx][CHTS]/cos(30) : hd,
-    local_hts = hd<0  ? MXDATA[idx][CHTS] : hd*cos(30),
-    local_hdp = hdp<0 ? MXDATA[idx][CHDP] : hdp,
+    local_hhl = hhl<0  ? MXDATA[idx][CHHL] : hhl,
+    local_ahl = ahl<0  ? MXDATA[idx][CAHL] : ahl,
+    local_hlp = hlp<0  ? MXDATA[idx][CHLP] : hlp,
+    local_ahd = hd<0   ? MXDATA[idx][CAHD] : hd,
+    local_hhd = hd<0   ? MXDATA[idx][CHTS]/cos(30) : hd,
+    local_hts = hd<0   ? MXDATA[idx][CHTS] : hd*cos(30),
+    local_hdp = hdp<0  ? MXDATA[idx][CHDP] : hdp,
 
     // Metric screw profile is well defined by wikipedia:
     //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
