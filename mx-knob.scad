@@ -148,7 +148,7 @@ module mxKnobCap ( cap_r, cap_h, screw, thickness ) {
 
             for ( a=[0:120:360] )
                 rotate( [0,0,a] )
-                translate( [local_cap_r1-cap_thickness/2+1.5*MARGIN,0,0] )
+                translate( [local_cap_r1-cap_thickness/2+2*MARGIN,0,0] )
                     cylinder( r=cap_thickness/2, h=cap_h );
 
             // Pole to keep the screw in place
