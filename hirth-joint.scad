@@ -54,7 +54,7 @@ module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 )
 module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
     height = inlay+height+shoulder;
     translate( [0,0,-inlay] )
-        cylinder( r=(rmax+MARGIN/2)/cos(30), h=height, $fn=6 );
+        cylinder( r=rmax/cos(30)+MARGIN/2, h=height, $fn=6 );
 }
 
 
