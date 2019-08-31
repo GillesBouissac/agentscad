@@ -85,9 +85,9 @@ module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
 module mxKnobHandle ( knob_r, knob_h, base_t, base_r, base_h, cap_r, cap_h, screw, wall_t ) {
     difference() {
         mxKnobHandleShape ( knob_r, knob_h, cap_r, screw, wall_t );
+        mxKnobHandleHoles ( knob_r, knob_h, cap_r, screw, wall_t );
         translate( [0,0,knob_h-cap_h] )
             mxKnobCapPassage ( cap_r, cap_h, wall_t );
-        cylinder( r=cap_r, h=knob_h );
     }
     mxKnobBase ( base_r, base_h, screw, base_t, wall_t);
 }
@@ -108,42 +108,32 @@ module mxKnobBase ( base_r, base_h, screw, bottom_t, wall_t ) {
 // Knob handle with screw passage and grips
 module mxKnobHandleShape ( knob_r, knob_h, cap_r, screw, thickness ) {
     sphere_r = knob_r*1.2;
+    intersection() {
+        cylinder( r=knob_r, h=knob_h );
+        translate( [0,0,sphere_r+thickness/2] )
+            sphere( r=sphere_r );
+    }
+}
 
-    knob_c   = 2*PI*knob_r;
+// Knob handle with screw passage and grips
+module mxKnobHandleHoles ( knob_r, knob_h, cap_r, screw, thickness ) {
     grip_d   = mxGetThreadD(screw);
     grip_nb  = 9;
 
-    echo( "mxKnobHandle: grip_nb=", grip_nb );
+    // Main hole
+    cylinder( r=cap_r, h=knob_h+MFG );
 
-    difference () {
-        union () {
-            intersection() {
-                cylinder( r=knob_r, h=knob_h );
-                translate( [0,0,sphere_r+thickness/2] )
-                    difference () {
-                        sphere( r=sphere_r );
-                        sphere( r=sphere_r-thickness );
-                    }
-            }
-            intersection() {
-                difference () {
-                    cylinder( r=knob_r, h=knob_h );
-                    cylinder( r=cap_r, h=knob_h+MFG );
-                }
-                translate( [0,0,sphere_r+thickness/2] )
-                    sphere( r=sphere_r );
-            }
-        }
-        translate( [knob_r,knob_r,0] )
-            bevelCutArc( knob_r-MFG, 2*knob_h, 360,
-                $bevel=thickness*2/3,
-                $bevelProfile=bevelArc() ) ;
+    // Beveling of top part
+    translate( [knob_r,knob_r,0] )
+        bevelCutArc( knob_r-MFG, 2*knob_h, 360,
+            $bevel=thickness*2/3,
+            $bevelProfile=bevelArc() ) ;
 
-        for ( a=[0:360/grip_nb:360] ) {
-            rotate( [0,0,a] )
-            translate( [knob_r+grip_d/3,0,0] )
-                cylinder( r=grip_d/2, h=knob_h+VGG );
-        }
+    // Handle grips
+    for ( a=[0:360/grip_nb:360] ) {
+        rotate( [0,0,a] )
+        translate( [knob_r+grip_d/3,0,0] )
+            cylinder( r=grip_d/2, h=knob_h+VGG );
     }
 }
 
@@ -156,26 +146,30 @@ module mxKnobCap ( cap_r, cap_h, screw, thickness ) {
 
     difference() {
         union() {
-            difference() {
-                cylinder( r=local_cap_r1, h=cap_h );
-                cylinder( r=local_cap_r1-cap_thickness, h=cap_h-thickness );
-            }
+            // Main shape
+            cylinder( r=local_cap_r1, h=cap_h );
+
+            // Top hat
             translate( [0,0,cap_h-thickness] )
                 linear_extrude( height=thickness, scale=local_scale )
                 circle( r=local_cap_r1 );
 
+            // Grips
             for ( a=[0:120:360] )
                 rotate( [0,0,a] )
                 translate( [cap_r-cap_thickness/2+CAP_GRIP,0,0] )
                     cylinder( r=cap_thickness/2, h=cap_h );
-
-            // Pole to keep the screw in place
-            // This allow as well to pull up the cap by pushing back the screw
-            cylinder( r=mxGetThreadD(screw)/2, h=cap_h );
         }
+        // Main hole
+        cylinder( r=local_cap_r1-cap_thickness, h=cap_h-thickness );
+
+        // Final beveling of bottom part
         translate( [local_cap_r2,local_cap_r2,cap_h] )
             bevelCutArc( local_cap_r2-MFG, 2*cap_h, 360, $bevel=thickness/3+0.5 ) ;
     }
+    // Pole to keep the screw in place
+    // This allow as well to pull up the cap by pushing back the screw
+    cylinder( r=mxGetThreadD(screw)/2, h=cap_h );
 }
 
 module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
@@ -195,4 +189,4 @@ module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
 //    Showcase
 //
 // ----------------------------------------
-mxKnob ( M6(), part=3, $fn=100 );
+mxKnob ( M6(), part=0, $fn=100 );

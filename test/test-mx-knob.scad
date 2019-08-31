@@ -54,4 +54,4 @@ module mxKnobTest() {
             %mxBoltHexagonal ( M1_6() );
     }
 }
-mxKnobTest($fn=100);
+mxKnobTest($fn=50);
