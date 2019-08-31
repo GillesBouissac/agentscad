@@ -18,10 +18,11 @@ use <bevel.scad>
 //    API
 //
 // ----------------------------------------
-MFG    = 0.01;  // ManiFold Guard
-VGG    = 1;     // Visual Glich Guard
-MARGIN = 0.2;
-NOZZLE = 0.4;
+MFG      = 0.01;  // ManiFold Guard
+VGG      = 1;     // Visual Glich Guard
+MARGIN   = 0.2;
+NOZZLE   = 0.4;
+CAP_GRIP = 0.3; // Amount of overlap between cap grips and knob handle
 
 // Knob that for mx hexagonal screw
 // - screw:    the screw: M2(), M3() etc...
@@ -45,26 +46,32 @@ module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
     cap_h     = knob_h-base_h-NOZZLE;
     cap_r     = min(knob_r-wall_t,base_r);
 
-    translate( [0,0,-bottom_t] ) {
-        if ( part==0 || part==2 ) {
-            translate( [0,0,knob_h-cap_h+knob_h] )
-                color ( "white" )
-                mxKnobCap    ( cap_r, cap_h, screw, wall_t );
+    if ( part==0 ) {
+        translate( [0,0,-cap_h+2*knob_h] )
+            color ( "white" )
+            mxKnobCap ( cap_r, cap_h, screw, wall_t );
+        mxKnobHandle ( knob_r, knob_h, bottom_t, base_r, base_h, cap_r, cap_h, screw, wall_t );
+    }
+    if ( part==1 ) {
+         mxKnobHandle ( knob_r, knob_h, bottom_t, base_r, base_h, cap_r, cap_h, screw, wall_t );
+        %translate( [0,0,knob_h-cap_h] )
+            mxKnobCap ( cap_r, cap_h, screw, wall_t );
+    }
+    if ( part==2 ) {
+        rotate( [180,0,0] ) {
+            translate( [0,0,-cap_h] )
+                mxKnobCap ( cap_r, cap_h, screw, wall_t );
+            %
+            translate( [0,0,-knob_h] )
+                mxKnobHandle ( knob_r, knob_h, bottom_t, base_r, base_h, cap_r, cap_h, screw, wall_t );
         }
-        if ( part==3 ) {
-            translate( [0,0,knob_h-cap_h] )
-                color ( "white" )
-                mxKnobCap    ( cap_r, cap_h, screw, wall_t );
-        }
-        if ( part==0 || part==1 ) {
-            difference() {
-                mxKnobHandle ( knob_r, knob_h, cap_r, screw, wall_t );
-                translate( [0,0,knob_h-cap_h] )
-                    mxKnobCapPassage ( cap_r, cap_h, wall_t );
-                cylinder( r=cap_r, h=knob_h );
-            }
-            mxKnobBase ( base_r, base_h, screw, bottom_t, wall_t);
-        }
+    }
+    if ( part==3 ) {
+        // Special rendering, the cap in the knob
+        translate( [0,0,knob_h-cap_h] )
+            color ( "white" )
+            mxKnobCap    ( cap_r, cap_h, screw, wall_t );
+        mxKnobHandle ( knob_r, knob_h, bottom_t, base_r, base_h, cap_r, cap_h, screw, wall_t );
     }
 }
 
@@ -73,6 +80,17 @@ module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
 //    Implementation
 //
 // ----------------------------------------
+
+// Complete knob handle
+module mxKnobHandle ( knob_r, knob_h, base_t, base_r, base_h, cap_r, cap_h, screw, wall_t ) {
+    difference() {
+        mxKnobHandleShape ( knob_r, knob_h, cap_r, screw, wall_t );
+        translate( [0,0,knob_h-cap_h] )
+            mxKnobCapPassage ( cap_r, cap_h, wall_t );
+        cylinder( r=cap_r, h=knob_h );
+    }
+    mxKnobBase ( base_r, base_h, screw, base_t, wall_t);
+}
 
 // Knob base with inlay for the screw
 // - thickness: wall thickness
@@ -88,7 +106,7 @@ module mxKnobBase ( base_r, base_h, screw, bottom_t, wall_t ) {
 }
 
 // Knob handle with screw passage and grips
-module mxKnobHandle ( knob_r, knob_h, cap_r, screw, thickness ) {
+module mxKnobHandleShape ( knob_r, knob_h, cap_r, screw, thickness ) {
     sphere_r = knob_r*1.2;
 
     knob_c   = 2*PI*knob_r;
@@ -148,7 +166,7 @@ module mxKnobCap ( cap_r, cap_h, screw, thickness ) {
 
             for ( a=[0:120:360] )
                 rotate( [0,0,a] )
-                translate( [local_cap_r1-cap_thickness/2+2*MARGIN,0,0] )
+                translate( [cap_r-cap_thickness/2+CAP_GRIP,0,0] )
                     cylinder( r=cap_thickness/2, h=cap_h );
 
             // Pole to keep the screw in place
@@ -177,4 +195,4 @@ module mxKnobCapPassage ( cap_r, cap_h, thickness ) {
 //    Showcase
 //
 // ----------------------------------------
-mxKnob ( M6(), part=0, $fn=100 );
+mxKnob ( M6(), part=3, $fn=100 );
