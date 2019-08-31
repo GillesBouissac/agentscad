@@ -9,6 +9,7 @@
  * Description: Hirth Joint modelisation
  * Author:      Gilles Bouissac
  */
+use <printing.scad>
 
 // ----------------------------------------
 //                    API
@@ -54,7 +55,7 @@ module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 )
 module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
     height = inlay+height+shoulder;
     translate( [0,0,-inlay] )
-        cylinder( r=rmax/cos(30)+MARGIN/2, h=height, $fn=6 );
+        cylinder( r=rmax/cos(30)+gap()/2, h=height, $fn=6 );
 }
 
 
@@ -62,16 +63,14 @@ module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
 //             Implementation
 // ----------------------------------------.
 
-VGG    = 1;     // Visual Glich Guard
-MARGIN = 0.2;
-NOZZLE = 0.4;
-R1_MIN_NOZZLE = 3;
+VGG           = 1; // Visual Glich Guard for better previews
+NB_MIN_NOZZLE = 3; // Minimal nb nozzle pass for a tooth width
 
 module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
 
-    rmin  = R1_MIN_NOZZLE*NOZZLE*teeth/(2*PI);
+    rmin  = NB_MIN_NOZZLE*nozzle()*teeth/(2*PI);
     angle = 360/teeth;
-    width = rmax*tan(360/teeth);
+    width = 2*rmax*tan(angle/2);
 
     echo ( "hirthJoint rmin: ",                rmin );
     echo ( "hirthJoint teeth angle (degre): ", angle );
@@ -85,8 +84,9 @@ module hirthJoint ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
             cylinder( r=rmin, h=height+VGG, center=true );
         }
 
-        rotate ([0,0,shift*360/teeth])
-        for ( a=[0:360/teeth:359] ) {
+        step=360/teeth;
+        rotate ([0,0,shift*step])
+        for ( a=[0:step:360] ) {
             rotate( [0,0,a] )
                 if ( $children>0 ) {
                     hirthJointTooth( rmax, width, height )
@@ -132,10 +132,10 @@ module hirthJointProfileTriangle () {
 module hirthJointProfileRectangle () {
     polygon ([
         [0,-1/2],
-        [0,-1/4+MARGIN/2],
-        [1,-1/4+MARGIN/2],
-        [1,+1/4-MARGIN/2],
-        [0,+1/4-MARGIN/2],
+        [0,-1/4+gap()/2],
+        [1,-1/4+gap()/2],
+        [1,+1/4-gap()/2],
+        [0,+1/4-gap()/2],
         [0,+1/2],
     ]);
 }
@@ -175,13 +175,34 @@ module hirthJointTooth ( radius, width, height ) {
 // ----------------------------------------
 //                 Showcase
 // ----------------------------------------
-difference() {
+translate( [0,0,0] ) {
     hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
-    cylinder(r=2.5+MARGIN,h=10,center=true, $fn=100);
+    %hirthJointPassage( 5, 1, 1, 1, $fn=100 );
 }
-%hirthJointPassage( 5, 1, 1, 1, $fn=100 );
-
 translate( [15,0,0] ) {
-    hirthJointRectangle( 6, 11, 1, 1, 1, shift=0, $fn=100 );
-    %hirthJointPassage( 6, 1, 1, 1, $fn=100 );
+    hirthJointRectangle( 5, 11, 1, 1, 1, shift=0, $fn=100 );
+    %hirthJointPassage( 5, 1, 1, 1, $fn=100 );
+}
+translate( [30,0,0] ) {
+    hirthJointTriangle( 5, 11, 1, 1, 1, shift=0, $fn=100 );
+    %hirthJointPassage( 5, 1, 1, 1, $fn=100 );
+}
+
+translate( [0,15,0] ) {
+    hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
+    translate( [0,0,3] )
+    rotate([0,180,0])
+        hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
+}
+translate( [15,15,0] ) {
+    hirthJointRectangle( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
+    translate( [0,0,3] )
+    rotate([0,180,0])
+        hirthJointRectangle( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
+}
+translate( [30,15,0] ) {
+    hirthJointTriangle( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
+    translate( [0,0,3] )
+    rotate([0,180,0])
+        hirthJointTriangle( 5, 11, 1, 1, 1, shift=0.5, $fn=100 );
 }

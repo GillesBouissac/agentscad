@@ -18,5 +18,8 @@
 GAP     = 0.2;
 NOZZLE  = 0.4;
 
+// Distance between 2 parts that must touch be not be stuck
 function gap(mult=1)    = is_undef($gap) ? mult*GAP : mult*$gap;
+
+// The printer nozzle diameter
 function nozzle(mult=1) = is_undef($nozzle) ? mult*NOZZLE : mult*$nozzle;
