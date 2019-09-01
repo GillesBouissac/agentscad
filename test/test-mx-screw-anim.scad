@@ -37,14 +37,14 @@ module showcaseAnimated() {
         translate( [0,mxGetHeadDP(screw)/1.5,0] ) {
             translate( [3*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
-                    mxBoltPassage( screw, 3 );
+                    mxBoltPassage( mxClone(screw,tlp=3) );
                 translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
             }
             translate( [1.5*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
-                    mxBoltAllenPassage( screw, 3 );
+                    mxBoltAllenPassage( mxClone(screw,tlp=3) );
                 translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
@@ -58,14 +58,14 @@ module showcaseAnimated() {
         translate( [0,-mxGetHeadDP(screw)/1.5,0] ) {
             translate( [3*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
-                    mxBoltPassage( screw, 3 );
+                    mxBoltPassage( mxClone(screw,tlp=3) );
                 translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );
             }
             translate( [1.5*mxGetHeadDP(screw),0,0] ) {
                 color( "red", 0.5 )
-                    mxBoltHexagonalPassage( screw, 3 );
+                    mxBoltHexagonalPassage( mxClone(screw,tlp=3) );
                 translate( [0,0,+mxGetThreadL(screw)-mxGetHeadLP(screw)/2] )
                     color( "silver", 0.5 )
                     mxNutPassage( screw );

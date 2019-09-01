@@ -12,6 +12,7 @@
  */
 
 use <extensions.scad>
+use <scad-utils/mirror.scad>
 
 RADIUSBEVEL        = 0.5; // Default radius bevel
 CUTTER_W           = 1;
@@ -28,7 +29,7 @@ module bevelCutLinear ( length, width ) {
         cube( [width,CUTTER_W,length] );
     // Bevel
     if ( bevelActive() ) {
-        mirrorY()
+        mirror_x()
         translate ( [-width/2, 0, 0] )
         linear_extrude( height=length )
             bevelProfileModule ( b );
@@ -50,8 +51,8 @@ module bevelCutCornerConcave ( radius, width, angle=90 ) {
 
     // Cutter
     rotate( [0,0,angle/2] )
-        mirrorZ()
-        mirrorX()
+        mirror_z()
+        mirror_y()
         translate ( [+cutterDiag, 0, 0] )
         rotate( [0,0,90-angle/2] )
         translate ( [-cutterSide, 0, 0] )
@@ -68,10 +69,10 @@ module bevelCutCornerConcave ( radius, width, angle=90 ) {
         longSideY = (longSide+mfg())*cos(angle/2);
 
         rotate( [0,0,angle/2] )
-        mirrorZ()
+        mirror_z()
         translate ( [diagonal, 0, 0] ) 
         difference() {
-            mirrorX()
+            mirror_y()
             linear_extrude( height=width/2 )
                 polygon([
                     [0,          0],
@@ -79,7 +80,7 @@ module bevelCutCornerConcave ( radius, width, angle=90 ) {
                     [-longSideX,-longSideY],
                 ]);
 
-            mirrorX()
+            mirror_y()
             difference() {
                 linear_extrude( height=width/2 )
                     polygon([
@@ -107,7 +108,7 @@ module bevelCutArc ( radius, width, angle=90 ) {
     cutter = mod(angle,180)==0 ? radius+b : radius/cos(angle/2);
 
     translate ( [0, distance, 0] )
-    mirrorZ()
+    mirror_z()
     translate ( [-radius, -radius, 0] ) {
         // Cutter
         rotate( [0,0,-mfg()] )
@@ -127,7 +128,7 @@ module bevelCutArc ( radius, width, angle=90 ) {
 // Concave circular beveling of a plate
 module bevelCutArcConcave ( radius, width, angle=90 ) {
     b = getRadiusBevel();
-    mirrorZ() {
+    mirror_z() {
         // Cutter
         rotate( [0,0,-mfg()] )
         rotate_extrude( angle=angle+2*mfg() )
