@@ -57,18 +57,22 @@ THICKNESS   = 3*nozzle()+0.05;
 //                 Showcase
 // ----------------------------------------
 
+color( "gold" )
 glue_circle ( $fn=200 );
 
+translate( [0,0,20] )
+rotate( [-30,0,0] )
+difference() {
+    translate( [0,0,5/2] )
+        cube( [ 70, 70, 5 ], center=true );
+#    glue_circle_receiver ( $fn=200 );
+}
+
+translate( [0,0,-20] )
+rotate( [+30,0,0] )
 difference() {
     translate( [0,0,-5/2] )
         cube( [ 70, 70, 5 ], center=true );
     glue_circle_receiver ( $fn=200 );
 }
 
-*
-rotate ( [180,0,0] )
-difference() {
-    translate( [0,0,5/2] )
-        cube( [ 70, 70, 5 ], center=true );
-    glue_circle_receiver ( $fn=200 );
-}

@@ -41,3 +41,10 @@ My utilities for OpenSCAD
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Cut-and-Bevel">Tutorial for beveling here</a>
 </p>
 
+# Glue shapes library
+
+![Glue panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-glue.png)
+
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Glue-shapes">Tutorial for glue shapes here</a>
+</p>
