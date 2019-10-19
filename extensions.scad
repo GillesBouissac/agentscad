@@ -31,6 +31,15 @@ let ( ref3=vec3(ref) ) [
         norm ( vec3(e)-ref3 )
 ];
 
+// Computes angle (degree) for the given fragment of circle ciconference
+function angle_for_circ ( circ, radius ) = (180/PI)*(circ/radius);
+
+// Computes ciconference fragment for the given circle angle (degree)
+function circ_for_angle ( angle, radius ) = (180/PI)*(angle*radius);
+
+// Returns the sum of given list of numbers
+function sum_list ( list ) = list[0] + ( len(list)>1 ? sum_list( [ for(i=[1:len(list)-1]) list[i] ] ):0 );
+
 // input : list of numbers
 // output: sorted list of numbers in couple [value,originalIdx]
 function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
