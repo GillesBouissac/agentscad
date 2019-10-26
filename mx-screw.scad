@@ -30,12 +30,13 @@ use <printing.scad>
 //  p   :  bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  Note : This passage will NOT block the bolt
 module mxBoltPassage( p=M2() ) {
+    drill     = p[I_TD]-p[I_TP]+gap() ;
     local_tl  = p[I_TL] ;
     local_tlp = p[I_TLP] ;
     local_hlp = p[I_HLP] ;
     local_hdp = p[I_HDP] ;
     mxBoltImpl (
-        p[I_TD]-p[I_TP],  local_tl,
+        drill,            local_tl,
         p[I_TDP],         local_tlp,
         local_hdp,        local_hlp
     );
@@ -78,11 +79,12 @@ module mxNutSquarePassage( p=M2() ) {
 // Bolt passage Tight on head for Allen head
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 module mxBoltAllenPassage( p=M2() ) {
+    drill     = p[I_TD]-p[I_TP]+gap() ;
     local_tl  = p[I_TL] ;
     local_tlp = p[I_TLP] ;
     union() {
         mxBoltImpl (
-            p[I_TD]-p[I_TP],   local_tl+gap(),
+            drill,             local_tl+gap(),
             p[I_TDP],          local_tlp,
             p[I_AHD]+2*gap(),  p[I_HLP]
         );
@@ -93,11 +95,12 @@ module mxBoltAllenPassage( p=M2() ) {
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  Note : This passage will block the bolt
 module mxBoltHexagonalPassage( p=M2() ) {
+    drill     = p[I_TD]-p[I_TP]+gap() ;
     local_tl  = p[I_TL] ;
     local_tlp = p[I_TLP] ;
     union() {
         mxBoltImpl (
-            p[I_TD]-p[I_TP],   local_tl+gap(),
+            drill,             local_tl+gap(),
             p[I_TDP],          local_tlp,
             0,       0
         );
