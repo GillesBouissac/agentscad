@@ -37,6 +37,9 @@ function angle_for_circ ( circ, radius ) = (180/PI)*(circ/radius);
 // Computes ciconference fragment for the given circle angle (degree)
 function circ_for_angle ( angle, radius ) = (180/PI)*(angle*radius);
 
+// Computes angle (degree) for the given segment length that cut the circle
+function angle_for_cut ( segment, radius ) = radius==0 ? 360 : 2*asin((segment/2)/radius);
+
 // Returns the sum of given list of numbers
 function sum_list ( list ) = list[0] + ( len(list)>1 ? sum_list( [ for(i=[1:len(list)-1]) list[i] ] ):0 );
 
@@ -76,6 +79,9 @@ function interpolateProfile(profile1, profile2, t, speed=1) = [
             (1-pow(t,speed))*profile1[i].z+pow(t,speed)*profile2[i].z
         ]
 ];
+
+function vec2(p) = len(p) < 2 ? concat(p,0) : [p[0],p[1]];
+function to_2d(list) = [ for(v = list) vec2(v) ];
 
 // ----------------------------------------
 //              Implementation
