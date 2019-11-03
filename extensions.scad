@@ -83,6 +83,25 @@ function interpolateProfile(profile1, profile2, t, speed=1) = [
 function vec2(p) = len(p) < 2 ? concat(p,0) : [p[0],p[1]];
 function to_2d(list) = [ for(v = list) vec2(v) ];
 
+
+// r: cylinders radius
+// h: oblong height
+// i: interval between cylinders axis
+// center: @see cylinder
+module oblong ( r, h=1, i=0, center=false ) {
+    if ( i>0 ) {
+        translate( [0,+i/2,0] )
+            cylinder( r=r, h=h, center=center );
+        translate( [0,-i/2,0] )
+            cylinder( r=r, h=h, center=center );
+        translate( [0,0,center ? 0 : h/2 ] )
+            cube( [ 2*r, i, h ], center=true ) ;
+    }
+    else {
+        cylinder( r=r, h=h, center=center );
+    }
+}
+
 // ----------------------------------------
 //              Implementation
 // ----------------------------------------
