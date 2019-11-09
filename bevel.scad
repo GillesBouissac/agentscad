@@ -24,15 +24,18 @@ CUTTER_W           = 1;
 // Line beveling of a plate
 module bevelCutLinear ( length, width ) {
     b = getRadiusBevel();
-    // Cutter
-    translate ( [-width/2, -CUTTER_W, 0] )
-        cube( [width,CUTTER_W,length] );
-    // Bevel
-    if ( bevelActive() ) {
-        mirror_x()
-        translate ( [-width/2, 0, 0] )
-        linear_extrude( height=length )
-            bevelProfileModule ( b );
+    rotate( [0,0,90] )
+    rotate( [0,90,0] ) {
+        // Cutter
+        translate ( [-width/2, -CUTTER_W, 0] )
+            cube( [width,CUTTER_W,length] );
+        // Bevel
+        if ( bevelActive() ) {
+            mirror_x()
+            translate ( [-width/2, 0, 0] )
+            linear_extrude( height=length )
+                bevelProfileModule ( b );
+        }
     }
 }
 
@@ -229,9 +232,7 @@ module bevelShow() {
 
         union() {
             color("blue") {
-                translate ( [5, 0, 0] )
-                    rotate( [90,0,0] )
-                    rotate( [0,0,90] )
+                translate ( [5, -10, 0] )
                     bevelCutLinear( 10, 2 );
                 translate ( [5, 5, 0] )
                     bevelCutArc( 5, 2 );
@@ -239,8 +240,7 @@ module bevelShow() {
 
             color("green") {
                 translate ( [0, -15, 0] )
-                    rotate( [0,0,45] )
-                    rotate( [0,90,0] )
+                    rotate( [0,0,-45] )
                     bevelCutLinear( 5/cos(45), 2 );
                 translate ( [5, -10, 0] )
                     bevelCutArc( 5, 2, -45 );
@@ -248,8 +248,7 @@ module bevelShow() {
 
             color("red") {
                 translate ( [0, -11, 0] )
-                    rotate( [90,0,0] )
-                    rotate( [0,0,-90] )
+                    rotate( [0,0,180] )
                     bevelCutLinear( 4-1.5*tan(135/2), 2 );
                 translate ( [0, -15, 0] )
                     rotate( [0,0,180] )
@@ -257,7 +256,7 @@ module bevelShow() {
                 translate ( [0, -11, 0] )
                     bevelCutArcConcave( 0, 2 );
                 translate ( [-3, -11, 0] )
-                    rotate( [0,90,0] )
+                    rotate( [0,0,-90] )
                     bevelCutLinear( 3, 2 );
             }
 
@@ -265,54 +264,46 @@ module bevelShow() {
                 translate ( [-3, -10, 0] )
                     rotate( [0,0,90] )
                     bevelCutArc( 0.50, 2, 180 );
-                translate ( [-3, -10, 0] )
-                    rotate( [0,90,0] )
-                    rotate( [0,0,-180] )
+                translate ( [0, -10, 0] )
+                    rotate( [0,0,90] )
                     bevelCutLinear( 3, 2 );
                 translate ( [0, -10, 0] )
                     rotate( [0,0,-90] )
                     bevelCutArcConcave( 0, 2 );
                 translate ( [0, -5, 0] )
-                    rotate( [90,0,0] )
-                    rotate( [0,0,-90] )
+                    rotate( [0,0,180] )
                     bevelCutLinear( 5, 2 );
             }
 
             color("yellow") {
                 translate ( [0, -5, 0] )
                     bevelCutArcConcave( 0, 2, 45 );
-
-                translate ( [-1, -4, 0] )
-                    rotate( [0,0,-45] )
-                    rotate( [0,90,0] )
+                translate ( [0, -5, 0] )
+                    rotate( [0,0,-135] )
+                    translate ( [0, -1/cos(45), 0] )
                     bevelCutLinear( 1/cos(45), 2 );
-
                 translate ( [-1, -4, 0] )
                     rotate( [0,0,45] )
                     bevelCutCornerConcave( 0, 2, 45 );
-
                 translate ( [-2, -4, 0] )
-                    rotate( [0,0,0] )
-                    rotate( [0,90,0] )
+                    rotate( [0,0,-90] )
                     bevelCutLinear( 1, 2 );
             }
 
             color("cyan") {
                 translate ( [-2, 0, 0] )
-                    rotate( [90,0,0] )
-                    rotate( [0,0,-90] )
+                    rotate( [0,0,180] )
                     bevelCutLinear( 4, 2 );
 
                 translate ( [-2, 0, 0] )
                     bevelCutCornerConcave( 0, 2 );
 
                 translate ( [-5, 0, 0] )
-                    rotate( [0,90,0] )
+                    rotate( [0,0,-90] )
                     bevelCutLinear( 3, 2 );
 
-                translate ( [-5, 0, 0] )
-                    rotate( [0,0,-135] )
-                    rotate( [0,-90,0] )
+                translate ( [0, 5, 0] )
+                    rotate( [0,0,135] )
                     bevelCutLinear( 5/cos(45), 2 );
 
             }
