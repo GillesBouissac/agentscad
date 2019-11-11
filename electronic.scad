@@ -10,8 +10,10 @@
  * Design:      Gilles Bouissac
  * Author:      Gilles Bouissac
  */
+use <agentscad/extensions.scad>
 use <agentscad/printing.scad>
 use <agentscad/mx-screw.scad>
+
 
 // ----------------------------------------
 //                  API
@@ -63,16 +65,29 @@ function newPcb (
     above  = ELECTRONICS_COMPS_H,
     below  = ELECTRONICS_PINS_H,
     holes  = []
-    ) =
-[ sx, sy, t, border, above, below, holes ];
+) = let(
+    sz     = t+above+below,
+    pcbh   = t+below,
+    dz     = sz/2-pcbh
+) [ sx, sy, sz, dz, t, border, above, below, holes ];
 function getPcbSx(p)          = p[IP_SX];
 function getPcbSy(p)          = p[IP_SY];
-function getPcbSz(p)          = p[IP_ABOVE]+p[IP_BELOW]+p[IP_T];
+function getPcbSz(p)          = p[IP_SZ];
+function getPcbDz(p)          = p[IP_DZ];
 function getPcbT(p)           = p[IP_T];
 function getPcbBorder(p)      = p[IP_BORDER];
 function getPcbAbove(p)       = p[IP_ABOVE];
 function getPcbBelow(p)       = p[IP_BELOW];
 function getPcbHoles(p)       = p[IP_HOLES];
+IP_SX     = 0;
+IP_SY     = 1;
+IP_SZ     = 2;
+IP_DZ     = 3;
+IP_T      = 4;
+IP_BORDER = 5;
+IP_ABOVE  = 6;
+IP_BELOW  = 7;
+IP_HOLES  = 8;
 
 module pcbShape ( pcb ) {
     a      = pcb[IP_ABOVE];
@@ -83,21 +98,50 @@ module pcbShape ( pcb ) {
     sy     = pcb[IP_SY];
     difference() {
         union() {
-            translate( [0,0,a/2] )
+            translate( [0,0,a/2-pcb[IP_DZ]] )
                 cube( [sx-border, sy-border, a ], center=true );
             color( "#888", 0.9 )
-            translate( [0,0,t/2-t] )
+            translate( [0,0,t/2-t-pcb[IP_DZ]] )
                 cube( [sx, sy, t ], center=true );
-            translate( [0,0,-b/2-t] )
+            translate( [0,0,-b/2-t-pcb[IP_DZ]] )
                 cube( [sx-border, sy-border, b ], center=true );
         }
         for ( h=pcb[IP_HOLES] )
-            translate( [ h[0], h[1] ] )
+            translate( [ h[0], h[1], 0 ] )
                 cylinder( r=h[2]/2, h=100, center=true );
     }
 }
 
 
+// r:  Cable diameter
+// i:  [Optional] Distance between centers is cable section is oblong
+// t:  [Optional] Cable length
+// c:  [Optional] [x,y,z] position of cable starting point
+// v:  [Optional] [x,y,z] vector of cable orientation
+function newCable ( r, i=undef, l=undef, c=undef, v=undef ) = [
+    r,
+    is_undef(i) ? 0 : i,
+    is_undef(l) ? 0 : l,
+    is_undef(c) ? [0,0,0] : c,
+    is_undef(v) ? [1,0,0] : v
+];
+function getCableR(p) = p[IC_R];
+function getCableI(p) = p[IC_I];
+function getCableL(p) = p[IC_L];
+function getCableC(p) = p[IC_C];
+function getCableV(p) = p[IC_V];
+IC_R    = 0;
+IC_I    = 1;
+IC_L    = 2;
+IC_C    = 3;
+IC_V    = 4;
+
+module cableShape ( cable, l=undef ) {
+    l_l = is_undef(l) ? getCableL(cable) : l;
+    translate( [ cable[IC_C][0], cable[IC_C][1], cable[IC_C][2] ] )
+        alignOnVector ( cable[IC_V] )
+            oblong ( r=getCableR(cable), h=getCableL(cable), i=getCableI(cable) );
+}
 
 // ----------------------------------------
 //              Implementation
@@ -118,13 +162,6 @@ ELECTRONICS_PINS_H  = 3;
 PCB_THICKNESS       = 1.5;
 PCB_BORDER          = 0.8;
 
-IP_SX     = 0;
-IP_SY     = 1;
-IP_T      = 2;
-IP_BORDER = 3;
-IP_ABOVE  = 4;
-IP_BELOW  = 5;
-IP_HOLES  = 6;
 
 
 // ----------------------------------------
@@ -143,6 +180,10 @@ translate( [0, 0, 0] ) {
         [+10, -5, screw ]
     ]);
     %pcbShape(pcb,$fn=PRECISION);
+}
+translate( [0, 0, 0] ) {
+    cable  = newCable ( r=3, i=6, l=30, c=[5, -30, 7], v=[1,-1,1] );
+    cableShape(cable,$fn=PRECISION);
 }
 
 
