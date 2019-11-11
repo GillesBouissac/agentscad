@@ -23,6 +23,8 @@ function mfg(mult=1) = is_undef($mfg) ? mult*MFG : mult*$mfg;
 // Modulo
 function mod(a,m) = a - m*floor(a/m);
 
+// Sums all the elements of a list of elements
+function sum(l) = __sum(l,0);
 
 // Returns a vector of distance from each point in list and ref
 function distanceToPoint ( list, ref ) =
@@ -40,14 +42,11 @@ function circ_for_angle ( angle, radius ) = (180/PI)*(angle*radius);
 // Computes angle (degree) for the given segment length that cut the circle
 function angle_for_cut ( segment, radius ) = radius==0 ? 360 : 2*asin((segment/2)/radius);
 
-// Returns the sum of given list of numbers
-function sum_list ( list ) = list[0] + ( len(list)>1 ? sum_list( [ for(i=[1:len(list)-1]) list[i] ] ):0 );
-
 // input : list of numbers
 // output: sorted list of numbers in couple [value,originalIdx]
 function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
     indexed = [ for ( i=[0:len(arr)-1] ) [ arr[i], i ]  ]
-) sortIndexedImpl( indexed );
+) __sortIndexed( indexed );
 
 // Returns the index in list of the closest point to ref
 function closestToPoint ( list, ref=undef ) =
@@ -102,24 +101,25 @@ module oblong ( r, h=1, i=0, center=false ) {
     }
 }
 
+// Rotates a shape from [0,0,1] to given vector
+module alignOnVector(v) {
+    length = norm([v.x,v.y,v.z]);  // radial distance
+    b = acos(v.z/length);          // inclination angle
+    c = atan2(v.y,v.x);            // azimuthal angle
+    rotate([0, b, c])
+        children();
+}
+
 // ----------------------------------------
 //              Implementation
 // ----------------------------------------
-function sortIndexedImpl(arr) = !(len(arr)>0) ? [] : let(
+function __sortIndexed(arr) = !(len(arr)>0) ? [] : let(
     pivot   = arr[floor(len(arr)/2)][0],
     lesser  = [ for (y = arr) if (y[0]  < pivot) y ],
     equal   = [ for (y = arr) if (y[0] == pivot) y ],
     greater = [ for (y = arr) if (y[0]  > pivot) y ]
 ) concat(
-    sortIndexedImpl(lesser), equal, sortIndexedImpl(greater)
+    __sortIndexed(lesser), equal, __sortIndexed(greater)
 );
-function sortIndexedImpl(arr) = !(len(arr)>0) ? [] : let(
-    pivot   = arr[floor(len(arr)/2)][0],
-    lesser  = [ for (y = arr) if (y[0]  < pivot) y ],
-    equal   = [ for (y = arr) if (y[0] == pivot) y ],
-    greater = [ for (y = arr) if (y[0]  > pivot) y ]
-) concat(
-    sortIndexedImpl(lesser), equal, sortIndexedImpl(greater)
-);
-
+function __sum(l,i=0) = i<len(l)-1 ? l[i] + __sum(l,i+1) : l[i];
 
