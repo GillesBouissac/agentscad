@@ -30,13 +30,19 @@ function newBoxShell (
     sx, sy, tsz, bsz,
     t    = BOX_BOTTOM_T,
     wt   = BOX_WALL_T,
-    lps  = BOX_LIPS_H
+    lps  = undef
 ) = let(
     sz  = tsz+bsz,
     esz = sz+2*t,
     esx = sx+2*wt,
     esy = sy+2*wt
-) [ sx, sy, sz, esx, esy, esz, tsz, bsz-gap(), tsz+t, bsz+t-gap(), t, wt, lps ];
+) [
+    sx, sy, sz,
+    esx, esy, esz,
+    tsz, bsz,
+    tsz+t, bsz+t,
+    t, wt, is_undef(lps) ? BOX_LIPS_H : lps
+];
 IB_SX     = 0;
 IB_SY     = 1;
 IB_SZ     = 2;
@@ -69,47 +75,19 @@ function getBoxShellLipsH(p)    = p[IB_LPS];
 // Top part of the box
 module boxShellTop( box ) {
     difference() {
-        union() {
-            intersection() {
-                difference() {
-                    boxShellShape(box);
-                    boxShellHollow(box);
-                }
-                boxShellTopClip(box);
-            }
-            boxShellLips(box, false);
-        }
-        boxShellBevel(box);
+        boxShellTopShape(box);
+        boxShellTopHollow(box);
+        boxShellTopBevel(box);
     }
 }
 
 // Bottom part of the box
 module boxShellBottom( box ) {
     difference() {
-        union() {
-            intersection() {
-                difference() {
-                    boxShellShape(box);
-                    boxShellHollow(box);
-                }
-                boxShellBottomClip(box);
-            }
-            boxShellLips(box, true);
-        }
-        boxShellBevel(box);
+        boxShellBottomShape(box);
+        boxShellBottomHollow(box);
+        boxShellBottomBevel(box);
     }
-}
-
-// Top clipping
-module boxShellTopClip( box ) {
-    translate( [0, 0, box[IB_ESZ]-box[IB_ETSZ]+box[IB_LPS]-gap() ] )
-        cube( [box[IB_ESX], box[IB_ESY], box[IB_ESZ]], center=true );
-}
-
-// Bottom clipping
-module boxShellBottomClip( box ) {
-    translate( [0, 0, -box[IB_ESZ]+box[IB_EBSZ] ] )
-        cube( [box[IB_ESX], box[IB_ESY], box[IB_ESZ]], center=true );
 }
 
 // ----------------------------------------
@@ -120,19 +98,32 @@ BOX_WALL_T   = 1.5;
 BOX_LIPS_H   = 2.0;
 
 module boxShellHollow ( params ) {
-    difference() {
-        union() {
-            cube( [params[IB_SX], params[IB_SY], params[IB_SZ]], center=true );
-            translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ]+params[IB_LPS]/2 ] )
-                cube( [
-                    params[IB_ESX],
-                    params[IB_ESY],
-                    params[IB_LPS]
-                ],
-                center=true );
-        }
-    }
+    cube( [params[IB_SX], params[IB_SY], params[IB_SZ]], center=true );
+    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ]+params[IB_LPS]/2 ] )
+        cube( [
+            params[IB_ESX],
+            params[IB_ESY],
+            params[IB_LPS]
+        ],
+        center=true );
 }
+module boxShellTopHollow ( params ) {
+    translate( [0, 0, +params[IB_SZ]/2-params[IB_TSZ]/2 ] )
+        cube( [params[IB_SX], params[IB_SY], params[IB_TSZ]], center=true );
+    boxShellLipsHollow( params, inner=false );
+}
+module boxShellBottomHollow ( params ) {
+    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ]/2 ] )
+        cube( [params[IB_SX], params[IB_SY], params[IB_BSZ]], center=true );
+    boxShellLipsHollow( params, inner=true );
+}
+module boxShellTopBevel( params ) {
+    boxShellBevel( params );
+}
+module boxShellBottomBevel( params ) {
+    boxShellBevel( params );
+}
+
 module boxShellBevel( params ) {
     mirror_y()
         translate( [params[IB_ESX]/2, params[IB_ESY]/2, 0 ] )
@@ -146,27 +137,55 @@ module boxShellBevel( params ) {
         translate( [params[IB_ESX]/2, -params[IB_ESY]/2, 0 ] )
         bevelCutLinear( params[IB_ESY], params[IB_ESZ] );
 }
+
+module boxShellTopShape( params ) {
+    h = params[IB_ETSZ] - params[IB_LPS] ;
+    translate( [0, 0, +params[IB_ESZ]/2-h/2 ] )
+        cube( [params[IB_ESX], params[IB_ESY], h], center=true );
+    difference() {
+        boxShellLipsShape ( params, false );
+        boxShellLipsHollow ( params, false );
+    }
+}
+module boxShellBottomShape( params ) {
+    translate( [0, 0, -params[IB_ESZ]/2+params[IB_EBSZ]/2 ] )
+        cube( [params[IB_ESX], params[IB_ESY], params[IB_EBSZ]], center=true );
+    boxShellLipsShape ( params, true );
+}
 module boxShellShape( params ) {
     cube( [params[IB_ESX], params[IB_ESY], params[IB_ESZ]], center=true );
 }
+
 module boxShellLips( params, inner=true ) {
+    difference() {
+        boxShellLipsShape ( params, inner );
+        boxShellLipsHollow ( params, inner );
+    }
+}
+module boxShellLipsShape( params, inner=true ) {
     wt = params[IB_WT];
     sx = params[IB_ESX] - ( inner ? wt+gap()/2: 0 ) ;
     sy = params[IB_ESY] - ( inner ? wt+gap()/2: 0 ) ;
     h  = params[IB_LPS]-gap();
 
     translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 + ( inner ? 0 : gap() ) ] )
-        difference() {
-            cube( [sx, sy, h], center=true );
-            cube( [sx-wt+gap()/2, sy-wt+gap()/2, h], center=true );
-        }
+        cube( [sx, sy, h], center=true );
+}
+module boxShellLipsHollow( params, inner=true ) {
+    wt = params[IB_WT];
+    sx = params[IB_ESX] - ( inner ? wt+gap()/2: 0 ) ;
+    sy = params[IB_ESY] - ( inner ? wt+gap()/2: 0 ) ;
+    h  = params[IB_LPS]-gap();
+
+    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 + ( inner ? 0 : gap() ) ] )
+        cube( [sx-wt+gap()/2, sy-wt+gap()/2, h], center=true );
 }
 
 // ----------------------------------------
 //                Showcase
 // ----------------------------------------
 PRECISION  = 100;
-SEPARATION = 2;
+SEPARATION = 0;
 SHOW_SX    = 40;
 SHOW_SY    = 20;
 SHOW_TSZ   = 8;
