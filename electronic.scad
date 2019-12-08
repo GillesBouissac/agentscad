@@ -16,9 +16,9 @@ use <agentscad/mx-screw.scad>
 
 
 // ----------------------------------------
-//                  API
+// LED component 5mm
 // ----------------------------------------
-module led_5mm() {
+module led5mm() {
     color( LED_OOLOR, 0.5 ) {
         cylinder( r=LED_D/2, h=LED_L-LED_D/2 );
         cylinder( r=LED_FLANGE_D/2, h=LED_FLANGE_L );
@@ -28,7 +28,7 @@ module led_5mm() {
             sphere(r=LED_D/2);
     }
 }
-module led_5mm_passage() {
+module led5mmPassage() {
     cylinder( r=LED_DP/2, h=LED_L-LED_D/2 );
     translate( [0,0,-LED_PINS_H-gap()] )
         cylinder( r=LED_FLANGE_DP/2, h=LED_PINS_H+LED_FLANGE_L+2*gap() );
@@ -45,6 +45,9 @@ function getLed5mmPinsW()    = LED_PINS_W;
 function getLed5mmPinsL()    = LED_PINS_L;
 function getLed5mmPinsH()    = LED_PINS_H;
 
+// ----------------------------------------
+// PCB object
+// ----------------------------------------
 
 // sx:     size on x
 // sy:     size on y
@@ -112,6 +115,9 @@ module pcbShape ( pcb ) {
     }
 }
 
+// ----------------------------------------
+// Cable object
+// ----------------------------------------
 
 // r:  Cable diameter
 // i:  [Optional] Distance between centers is cable section is oblong
@@ -144,6 +150,84 @@ module cableShape ( cable, l=undef ) {
 }
 
 // ----------------------------------------
+// E27 Corn Bulb based on
+//   Gezee LED Silver Corn Bulb
+//   Type:E27 Watt:15W Input Volt:85-265V Color:6000K
+// ----------------------------------------
+CORN_BULB_E27_TD     = 25;
+CORN_BULB_E27_TL     = 21;
+CORN_BULB_E27_BD     = 30;
+CORN_BULB_E27_BL     = 53;
+CORN_BULB_E27_SINK_L = 19;
+CORN_BULB_E27_BASE_D = 10;
+CORN_BULB_E27_BASE_L =  9;
+
+// Gezee LED Silver Corn Bulb
+// Type:E27 Watt:15W Input Volt:85-265V Color:6000K
+module cornBulbE27() {
+    color("#dd8",0.5)
+    translate( [0,0,CORN_BULB_E27_SINK_L+CORN_BULB_E27_BL/2] )
+        cylinder( r=CORN_BULB_E27_BD/2, h=CORN_BULB_E27_BL, center=true );
+    translate( [0,0,CORN_BULB_E27_SINK_L/2] )
+        cylinder( r=CORN_BULB_E27_BD/2, h=CORN_BULB_E27_SINK_L, center=true );
+    translate( [0,0,-CORN_BULB_E27_TL/2] )
+        cylinder( r=CORN_BULB_E27_TD/2, h=CORN_BULB_E27_TL, center=true );
+    translate( [0,0,-CORN_BULB_E27_TL-CORN_BULB_E27_BASE_L/2] )
+        cylinder(
+            r1=CORN_BULB_E27_BASE_D/2,
+            r2=CORN_BULB_E27_TD/2,
+            h=CORN_BULB_E27_BASE_L, center=true );
+}
+function getCornBulbE27TD() = CORN_BULB_E27_TD;     // Thread Diameter
+function getCornBulbE27TL() = CORN_BULB_E27_TL;     // Thread Length
+function getCornBulbE27D()  = CORN_BULB_E27_BD;     // Bulb Diameter
+function getCornBulbE27L()  = CORN_BULB_E27_BL;     // Bulb Length
+function getCornBulbE27SL() = CORN_BULB_E27_SINK_L; // Heatsink Length
+function getCornBulbE27BD() = CORN_BULB_E27_BASE_D; // Base Diameter
+function getCornBulbE27BL() = CORN_BULB_E27_BASE_L; // Base Length
+
+// ----------------------------------------
+// E27 LAMP HOLDER
+// ----------------------------------------
+E27_HOLDER_TD     = 40;
+E27_HOLDER_TDP    = E27_HOLDER_TD+1.4;
+E27_HOLDER_TL     = 35;
+E27_HOLDER_HAND_H = 7;
+E27_HOLDER_RING_D = 58;
+E27_HOLDER_T      = 3;
+E27_HOLDER_SOCK_D = 48;
+
+module lampHolderE27() {
+    difference() {
+        color ( "#777" ) {
+            translate( [0,0,E27_HOLDER_TL/4+E27_HOLDER_HAND_H/2+E27_HOLDER_T/2] )
+                cylinder( r=E27_HOLDER_SOCK_D/2, h=E27_HOLDER_HAND_H, center=true );
+            translate( [0,0,E27_HOLDER_TL/4] )
+                cylinder( r=E27_HOLDER_RING_D/2, h=E27_HOLDER_T, center=true );
+        }
+        cylinder( r=E27_HOLDER_TDP/2, h=100, center=true );
+    }
+    color ( "#555" ) {
+        translate( [0,0,0] )
+            cylinder( r=E27_HOLDER_TD/2, h=E27_HOLDER_TL, center=true );
+        translate( [0,0,-E27_HOLDER_T/2] )
+            cylinder( r=E27_HOLDER_SOCK_D/2, h=E27_HOLDER_T, center=true );
+        translate( [0,0,-E27_HOLDER_TL/2] )
+            sphere( r=E27_HOLDER_TD/2 );
+    }
+    translate ( [ 0,0,getLampHolderE27BH()] )
+        children();
+}
+function getLampHolderE27TD()  = E27_HOLDER_TD;     // External Thread Diameter
+function getLampHolderE27TDP() = E27_HOLDER_TDP;    // TD Passage
+function getLampHolderE27TL()  = E27_HOLDER_TL;     // Thread Length
+function getLampHolderE27BH()  = E27_HOLDER_TL/2;   // Bulb Height position
+function getLampHolderE27HH()  = E27_HOLDER_HAND_H; // Handle Height
+function getLampHolderE27RD()  = E27_HOLDER_RING_D; // Handle Ring Diameter
+function getLampHolderE27T()   = E27_HOLDER_T;      // Handle Ring Thickness
+function getLampHolderE2SD()   = E27_HOLDER_SOCK_D; // Socket Diameter
+
+// ----------------------------------------
 //              Implementation
 // ----------------------------------------
 LED_D         = 5;
@@ -167,11 +251,11 @@ PCB_BORDER          = 0.8;
 // ----------------------------------------
 //                Showcase
 // ----------------------------------------
-PRECISION  = 50;
+PRECISION  = 100;
 
 translate( [0, 20, 15] ) {
-    led_5mm($fn=PRECISION);
-    #led_5mm_passage($fn=PRECISION);
+    led5mm($fn=PRECISION);
+//    #led5mmPassage($fn=PRECISION);
 }
 translate( [0, 0, 0] ) {
     screw = M2_5(tl=16, ahd=5) ;
@@ -185,5 +269,9 @@ translate( [0, 0, 0] ) {
     cable  = newCable ( r=3, i=6, l=30, c=[5, -30, 7], v=[1,-1,1] );
     cableShape(cable,$fn=PRECISION);
 }
-
+translate( [0, 60, 0] ) {
+    lampHolderE27($fn=PRECISION);
+    translate ( [ 0,0,E27_HOLDER_TL/2] )
+        cornBulbE27($fn=PRECISION);
+}
 
