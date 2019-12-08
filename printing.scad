@@ -17,9 +17,11 @@
 // ----------------------------------------
 
 // Default values
-GAP     = 0.2;
-NOZZLE  = 0.4;
-LAYER   = 0.2;
+GAP      = 0.2;
+NOZZLE   = 0.4;
+LAYER    = 0.2;
+
+VOLUME_MK3S = [250,210,210];
 
 // Distance between 2 parts that must touch be not be stuck
 function gap(mult=1)    = is_undef($gap) ? mult*GAP : mult*$gap;
@@ -29,4 +31,10 @@ function nozzle(mult=1) = is_undef($nozzle) ? mult*NOZZLE : mult*$nozzle;
 
 // The layer height
 function layer(mult=1) = is_undef($layer) ? mult*LAYER : mult*$layer;
+
+// The print volume available
+function printVolume() = is_undef($bed) ? getPrintVolumePrusaMk3s() : $bed;
+
+// Known volume sizes
+function getPrintVolumePrusaMk3s() = VOLUME_MK3S;
 
