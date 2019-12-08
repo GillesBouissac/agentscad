@@ -82,6 +82,26 @@ function interpolateProfile(profile1, profile2, t, speed=1) = [
 function vec2(p) = len(p) < 2 ? concat(p,0) : [p[0],p[1]];
 function to_2d(list) = [ for(v = list) vec2(v) ];
 
+// Keep the original object and add a mirrored copy
+module cloneMirror( m ) {
+    children();
+    mirror(m) children();
+}
+// Keep the original object and add a scaled copy
+module cloneScale( m ) {
+    children();
+    scale(m) children();
+}
+// Keep the original object and add a rotated copy
+module cloneRotate( m ) {
+    children();
+    rotate(m) children();
+}
+// Keep the original object and add a translated copy
+module cloneTranslate( m ) {
+    children();
+    translate(m) children();
+}
 
 // r: cylinders radius
 // h: oblong height
