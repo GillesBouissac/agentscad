@@ -22,13 +22,13 @@ CUTTER_W           = 1;
 // ----------------------------------------
 
 // Line beveling of a plate
-module bevelCutLinear ( length, width ) {
+module bevelCutLinear ( length, width, cut=CUTTER_W ) {
     b = getRadiusBevel();
     rotate( [0,0,90] )
     rotate( [0,90,0] ) {
         // Cutter
-        translate ( [-width/2, -CUTTER_W, 0] )
-            cube( [width,CUTTER_W,length] );
+        translate ( [-width/2, -cut, 0] )
+            cube( [width,cut,length] );
         // Bevel
         if ( bevelActive() ) {
             mirror_x()
