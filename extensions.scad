@@ -43,6 +43,10 @@ function circ_for_angle ( angle, radius ) = (180/PI)*(angle*radius);
 function angle_for_cut ( segment, radius ) = radius==0 ? 360 : 2*asin((segment/2)/radius);
 
 // input : list of numbers
+// output: sorted list of numbers
+function sortNum(arr) = [ for ( e=sortIndexed(arr) ) e[0] ];
+
+// input : list of numbers
 // output: sorted list of numbers in couple [value,originalIdx]
 function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
     indexed = [ for ( i=[0:len(arr)-1] ) [ arr[i], i ]  ]
