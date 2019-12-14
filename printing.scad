@@ -20,6 +20,7 @@
 GAP      = 0.2;
 NOZZLE   = 0.4;
 LAYER    = 0.2;
+OVERHANG = 60;
 
 VOLUME_MK3S = [250,210,210];
 
@@ -31,6 +32,9 @@ function nozzle(mult=1) = is_undef($nozzle) ? mult*NOZZLE : mult*$nozzle;
 
 // The layer height
 function layer(mult=1) = is_undef($layer) ? mult*LAYER : mult*$layer;
+
+// The maximum overhang angle the printer can print from vertical
+function overhang() = is_undef($overhang) ? OVERHANG : $overhang;
 
 // The print volume available
 function printVolume() = is_undef($bed) ? getPrintVolumePrusaMk3s() : $bed;
