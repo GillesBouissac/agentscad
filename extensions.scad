@@ -69,6 +69,9 @@ let (
 // After this function the point at idx=0 is the closest point to zenith
 function faceTheZenith( list, zenith=[0,100000] ) = rotateBuffer(list,closestToPoint(list,zenith));
 
+// Step in range [0:1] from $fn
+function getStep() = 1/($fn<=0 ? 10 : $fn );
+
 // Compute a profile made from ratio of 2 given profiles
 // The total participation of both profiles is 1
 // We assume that:
