@@ -37,10 +37,10 @@ use <agentscad/things/snap-star.scad>
 //           see logs (ECHO: "NB Branches: "...) for BRANCH_NB value
 // $fn:    Rendering precision
 // $layer: Print layer thickness
-SMOOTH  = 200;
+SMOOTH  = 100;
 FAST    = 20;
 LOWPOLY = 6;
-showParts ( part=0, sub_part=0, $fn=SMOOTH, $layer=0.3 );
+showParts ( part=6, sub_part=0, $fn=SMOOTH, $layer=0.3 );
 
 
 // ----------------------------------------
@@ -614,13 +614,13 @@ module showParts (part=0, sub_part=0) {
     }
     else if ( part==6 ) {
         // All branches on a single bed
-        allBranches(star);
+        snapStarAllBranches(star);
         % translate([0,0,-1]) // Image of the printer bed
             cube( [ printVolume().x, printVolume().y, 1 ], center=true );
     }
     else if ( part==7 ) {
         // Star core
-        starCore(star);
+        snapStarCore(star);
     }
     else if ( part==8 ) {
         // Star stand
