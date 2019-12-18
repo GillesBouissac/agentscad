@@ -40,7 +40,7 @@ use <agentscad/things/snap-star.scad>
 SMOOTH  = 100;
 FAST    = 20;
 LOWPOLY = 6;
-showParts ( part=6, sub_part=0, $fn=SMOOTH, $layer=0.3 );
+showParts ( part=0, sub_part=0, $fn=SMOOTH, $layer=0.3 );
 
 
 // ----------------------------------------
