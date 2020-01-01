@@ -11,6 +11,7 @@
  * Author:      Gilles Bouissac
  */
 use <scad-utils/linalg.scad>
+use <scad-utils/transformations.scad>
 
 // ----------------------------------------
 //                  API
@@ -42,6 +43,14 @@ function circ_for_angle ( angle, radius ) = (180/PI)*(angle*radius);
 // Computes angle (degree) for the given segment length that cut the circle
 function angle_for_cut ( segment, radius ) = radius==0 ? 360 : 2*asin((segment/2)/radius);
 
+// https://stackoverflow.com/a/33920320
+// angle = atan2( ( b x a ) . n, a . b)
+function angle_vector ( a, b ) = let (
+    a3 = vec3(a),
+    b3 = vec3(b),
+    n3 = [0,0,1]
+) atan2 ( cross(b3,a3)*n3, a3*b3 );
+
 // input : list of numbers
 // output: sorted list of numbers
 function sortNum(arr) = [ for ( e=sortIndexed(arr) ) e[0] ];
@@ -71,6 +80,30 @@ function faceTheZenith( list, zenith=[0,100000] ) = rotateBuffer(list,closestToP
 
 // Step in range [0:1] from $fn
 function getStep() = 1/($fn<=0 ? 10 : $fn );
+
+// Apply a rotation matrix on a 2D vector for given angle
+function rot2d ( v, a ) = [ [cos(a), -sin(a)], [sin(a), cos(a)] ]*v;
+
+// Duplicates the given 2D polygon and shift it
+//   the returned polygon's edges are shifted by 'distance' like wrinkles
+// source:   2D polygon
+// distance: distance between each target edge and source edge
+function wrinkle ( source, distance ) = let( last=len(source)-1 )
+[
+    for ( i=[0:last] ) let (
+        c   = source[i],
+        p   = (i==0)    ? 2*c-source[i+1] : source[i-1],
+        n   = (i==last) ? 2*c-source[i-1] : source[i+1],
+        cp  = p-c,
+        cn  = n-c,
+        p1  = c + distance/norm(cp)*cp,
+        n1  = c + distance/norm(cn)*cn,
+        p2  = c + rot2d(p1-c,-90),
+        n2  = c + rot2d(n1-c,+90),
+        a   = angle_vector( p2-c, n2-c )/2,
+        n3  = c + rot2d(n2-c,a)/cos(a)
+    ) n3
+];
 
 // Compute a profile made from ratio of 2 given profiles
 // The total participation of both profiles is 1
@@ -149,4 +182,24 @@ function __sortIndexed(arr) = !(len(arr)>0) ? [] : let(
     __sortIndexed(lesser), equal, __sortIndexed(greater)
 );
 function __sum(l,i=0) = i<len(l)-1 ? l[i] + __sum(l,i+1) : l[i];
+
+// ----------------------------------------
+//                Showcase
+// ----------------------------------------
+module showLine( line ) {
+    lineBot = to_3d(line);
+    lineTop = transform( translation([0,0,1]), lineBot);
+    showPolyFaces = [ for ( i=[0:len(line)-2] ) [i,len(line)+i,len(line)+i+1,i+1] ];
+    polyhedron(points=concat(lineBot,lineTop), faces=showPolyFaces);
+}
+showPoly2wrinkle = [ [1,8], [2,7], [2,6], [1,5], [1,4], [2,3], [2,2], [1,2], [1,0.5], [2,0.5] ];
+color( "#66ff66" ) showLine( wrinkle(showPoly2wrinkle,-0.8) );
+color( "#99ff66" ) showLine( wrinkle(showPoly2wrinkle,-0.6) );
+color( "#ccff66" ) showLine( wrinkle(showPoly2wrinkle,-0.4) );
+color( "#ccff33" ) showLine( wrinkle(showPoly2wrinkle,-0.2) );
+color( "#66ffff" ) showLine( showPoly2wrinkle );
+color( "#ffff66" ) showLine( wrinkle(showPoly2wrinkle,+0.2) );
+color( "#ffff99" ) showLine( wrinkle(showPoly2wrinkle,+0.4) );
+color( "#ffffcc" ) showLine( wrinkle(showPoly2wrinkle,+0.6) );
+color( "#ffffff" ) showLine( wrinkle(showPoly2wrinkle,+0.8) );
 
