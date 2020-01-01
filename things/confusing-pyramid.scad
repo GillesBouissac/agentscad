@@ -17,7 +17,7 @@
 /* [Global] */
 
 // Height of the pyramid
-PYRAMID_HEIGHT = 50; // [0:250]
+PYRAMID_HEIGHT = 60; // [0:250]
 
 // Beveling around shapes
 BEVEL          = 0.5; // [0:5]
@@ -67,7 +67,9 @@ module pyramidPart() {
     minkowski() {
         difference() {
             pyramid();
-            cutter();
+            // Beveling with minkowski adds a thickness we must remove
+            translate( [0,-BEVEL*cos(45),-BEVEL*cos(45)] )
+                cutter();
         }
         sphere(BEVEL);
     }
@@ -76,8 +78,6 @@ module pyramidPart() {
 // ----------------------------------------
 //            Final rendering
 // ----------------------------------------
-
 pyramidPart( $fn=100 );
-scale( [1,-1,1] )
+translate( [0,PYRAMID_HL+2*BEVEL,0] )
 pyramidPart( $fn=100 );
-
