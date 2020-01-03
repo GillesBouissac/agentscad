@@ -83,6 +83,10 @@ function getSnapJointCutterW(joint)      = joint[I_CW];
 function getSnapJointCutterD(joint)      = joint[I_CD];
 function getSnapJointHGap(joint=[])      = gap();
 function getSnapJointVGap(joint)         = joint[I_INT]?0:getSnapJointHGap()*tan(joint[I_SA]);
+function getSnapJointRadialT(joint)      = let(
+    angle     = 180/joint[I_L],
+    thickness = joint[I_IP] ? joint[I_T]/cos(angle) : joint[I_T]
+) thickness;
 
 module snapJointShape ( joint ) {
     if ( joint[I_INT] )
@@ -140,7 +144,7 @@ SPRING_W    = 3;
 SPRING_A    = 40;
 
 CUTTER_W  = 1;
-CUTTER_D  = 3;
+CUTTER_D  = 1;
 
 function newSnapJoint (
     isint,

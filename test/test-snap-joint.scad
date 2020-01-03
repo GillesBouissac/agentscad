@@ -37,9 +37,9 @@ SHOW_ITV_H   = 30;
 SHOW_TUBE_H  = 10;
 
 module showSnapJointTube (joint) {
-    width = getSnapJointT(joint);
+    width = getSnapJointRadialT(joint);
     difference() {
-        cylinder ( r=getSnapJointR(joint)+width+0.0, h=SHOW_TUBE_H-getSnapJointVGap(joint));
+        cylinder ( r=getSnapJointR(joint)+width, h=SHOW_TUBE_H-getSnapJointVGap(joint));
         cylinder ( r=getSnapJointR(joint)-0.1, h=SHOW_TUBE_H-getSnapJointVGap(joint));
     }
 }
@@ -57,23 +57,27 @@ module showSnapJoint (joint) {
 module showSnapJointParts (part=0, sub_part=0, cut=undef, cut_rotation=undef) {
 
     // One time snap joint, cannot be removed after insertion
-    joint_circ_ext_spring_i = newSnapCircleInt ( radius=7, height=7, leaves=5, spring_w=5 );
-    joint_circ_ext_spring_e = newSnapCircleExt ( source=joint_circ_ext_spring_i, springs=true, cutdistance=1 );
+    joint_circ_ext_spring_i = newSnapCircleInt ( height=7, spring_w=5 );
+    joint_circ_ext_spring_e = newSnapCircleExt ( source=joint_circ_ext_spring_i, springs=true );
 
     // Removables snap joint
-    joint_circ_int_spring_i = newSnapCircleInt ( radius=7, leaves=5, springs=true, cutdistance=1.5 );
+    joint_circ_int_spring_i = newSnapCircleInt ( springs=true );
     joint_circ_int_spring_e = newSnapCircleExt ( source=joint_circ_int_spring_i );
 
-    joint_tri_i = newSnapPolygonInt ( radius=14, leaves=3, springs=true, cutdistance=3 );
+    joint_tri_i = newSnapPolygonInt (
+        radius=10, leaves=3, springs=true, spring_w=2.5 );
     joint_tri_e = newSnapPolygonExt ( source=joint_tri_i );
 
-    joint_quad_i = newSnapPolygonInt ( radius=10, leaves=4, springs=true, cutdistance=3 );
+    joint_quad_i = newSnapPolygonInt (
+        radius=10, leaves=4, springs=true );
     joint_quad_e = newSnapPolygonExt ( source=joint_quad_i );
 
-    joint_pent_i = newSnapPolygonInt ( radius=7, leaves=5, springs=true, cutdistance=3 );
+    joint_pent_i = newSnapPolygonInt (
+        radius=10, leaves=5, springs=true );
     joint_pent_e = newSnapPolygonExt ( source=joint_pent_i );
 
-    joint_hex_i = newSnapPolygonInt ( radius=7, leaves=6, springs=true, cutdistance=3 );
+    joint_hex_i = newSnapPolygonInt (
+        radius=10, leaves=6, springs=true );
     joint_hex_e = newSnapPolygonExt ( source=joint_hex_i );
 
     if ( part==0 ) {
