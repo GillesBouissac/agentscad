@@ -1,6 +1,10 @@
 # agentscad
 My utilities for OpenSCAD
 
+# Prerequisites
+
+[Follow these instructions to use the library](https://github.com/GillesBouissac/agentscad/wiki)
+
 # Metric bolts
 
 ![MX bolt panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-screw.png)
