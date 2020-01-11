@@ -3,7 +3,7 @@ My utilities for OpenSCAD
 
 # Prerequisites
 
-[Follow these instructions to use the library](https://github.com/GillesBouissac/agentscad/wiki)
+[Follow these instructions to use the library](https://github.com/GillesBouissac/agentscad/wiki/Prerequisites)
 
 # Metric bolts
 
