@@ -45,6 +45,14 @@ My utilities for OpenSCAD
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs">Tutorial for screw knobs here</a>
 </p>
 
+# Canvas and Lithophanes
+
+![Canvas panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-canvas.png)
+
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Canvas">Tutorial for canvas here</a>
+</p>
+
 # Beveling library
 
 ![Beveling panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-bevel.png)

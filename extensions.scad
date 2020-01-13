@@ -14,12 +14,29 @@ use <scad-utils/linalg.scad>
 use <scad-utils/transformations.scad>
 
 // ----------------------------------------
-//                  API
+//           Control
 // ----------------------------------------
 
 // ManiFold Guard
 MFG = 0.01;
 function mfg(mult=1) = is_undef($mfg) ? mult*MFG : mult*$mfg;
+
+// Step in range [0:1] from $fn
+function getStep() = 1/($fn<=0 ? 10 : $fn );
+
+// Check if given value is defined and in range [minv:maxv],
+// If not returns the closest range limit,
+//   or default value if undef,
+// default defv is optional, minv is returned if not given
+function forceValueInRange ( value, minv, maxv, defv ) = let (
+    _min = is_undef(minv)?-1e6:minv,
+    _max = is_undef(maxv)?+1e6:maxv,
+    _def = is_undef(defv)?(minv?minv:0):defv
+) is_undef(value)?_def:value<_min?_min:(value>_max?_max:value) ;
+
+// ----------------------------------------
+//           Mathematics
+// ----------------------------------------
 
 // Modulo
 function mod(a,m) = a - m*floor(a/m);
@@ -27,12 +44,38 @@ function mod(a,m) = a - m*floor(a/m);
 // Sums all the elements of a list of elements
 function sum(l) = __sum(l,0);
 
+// ----------------------------------------
+//           Lists 
+// ----------------------------------------
+
+// input : list of numbers
+// output: sorted list of numbers
+function sortNum(arr) = [ for ( e=sortIndexed(arr) ) e[0] ];
+
+// input : list of numbers
+// output: sorted list of numbers in couple [value,originalIdx]
+function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
+    indexed = [ for ( i=[0:len(arr)-1] ) [ arr[i], i ]  ]
+) __sortIndexed( indexed );
+
+// ----------------------------------------
+//           Euclidean space functions
+// ----------------------------------------
+function vec2(p) = len(p) < 2 ? concat(p,0) : [p[0],p[1]];
+function to_2d(list) = [ for(v = list) vec2(v) ];
+
 // Returns a vector of distance from each point in list and ref
 function distanceToPoint ( list, ref ) =
 let ( ref3=vec3(ref) ) [
     for ( e=list )
         norm ( vec3(e)-ref3 )
 ];
+
+// Returns the index in list of the closest point to ref
+function closestToPoint ( list, ref=undef ) =
+let (
+    sorted_dist = is_undef(ref) ? list : sortIndexed ( distanceToPoint(list,ref) )
+) sorted_dist[0][1];
 
 // Computes angle (degree) for the given fragment of circle ciconference
 function angle_for_circ ( circ, radius ) = (180/PI)*(circ/radius);
@@ -51,21 +94,55 @@ function angle_vector ( a, b ) = let (
     n3 = [0,0,1]
 ) atan2 ( cross(b3,a3)*n3, a3*b3 );
 
-// input : list of numbers
-// output: sorted list of numbers
-function sortNum(arr) = [ for ( e=sortIndexed(arr) ) e[0] ];
+// Apply a rotation matrix on a 2D vector for given angle
+function rot2d ( v, a ) = [ [cos(a), -sin(a)], [sin(a), cos(a)] ]*v;
 
-// input : list of numbers
-// output: sorted list of numbers in couple [value,originalIdx]
-function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
-    indexed = [ for ( i=[0:len(arr)-1] ) [ arr[i], i ]  ]
-) __sortIndexed( indexed );
+//
+// Project given list of vertices on a sphere using cylindrical projection
+//    Point x and y places the point on the sphere, z augments radius for elevation
+// The whole sphere is covered by points where:
+//    x = [0,2] from left to right
+//    y = [0,1] from bottom to top
+//
+// vertices: list of 3D vertices to project
+// radius:   radius of the sphere (elevation 0)
+//
+function projectSphereCylindrical ( vertices, radius=undef ) =
+let ( r=forceValueInRange(radius,minv=0,defv=100) ) [
+    for ( pt=vertices ) let (
+        theta     = 180*(1-pt.y),
+        phi       = 180*pt.x,
+        elevation = r+pt.z
+    ) [ elevation*sin(theta)*cos(phi), elevation*sin(theta)*sin(phi), elevation*cos(theta) ]
+];
 
-// Returns the index in list of the closest point to ref
-function closestToPoint ( list, ref=undef ) =
+//
+// Project given list of vertices on a sphere using cylindrical projection
+//    Point x and y places the point on the cylinder, z augments radius for elevation
+// The whole cylinder is covered by points where:
+//    x = [0,2] from left to right
+//    y = [0,1] from bottom to top
+//
+// vertices: list of 3D vertices to project
+// radius:   radius of the cylinder (elevation 0)
+// height:   cylinder height
+//
+function projectCylinder ( vertices, radius=undef, height=undef ) =
 let (
-    sorted_dist = is_undef(ref) ? list : sortIndexed ( distanceToPoint(list,ref) )
-) sorted_dist[0][1];
+    r=forceValueInRange(radius,minv=0,defv=height/PI),
+    h=forceValueInRange(height,minv=0,defv=radius*PI)
+)[
+    for ( pt=vertices ) let (
+        z         = h*(pt.y-0.5),
+        phi       = 180*pt.x,
+        elevation = r+pt.z
+    )
+    [ elevation*cos(phi), elevation*sin(phi), z ]
+];
+
+// ----------------------------------------
+//           List Comprehension
+// ----------------------------------------
 
 // Turn points in buffer so that element at index idx becomes element at index 0
 function rotateBuffer( list, idx ) = 
@@ -77,12 +154,6 @@ let (
 
 // After this function the point at idx=0 is the closest point to zenith
 function faceTheZenith( list, zenith=[0,100000] ) = rotateBuffer(list,closestToPoint(list,zenith));
-
-// Step in range [0:1] from $fn
-function getStep() = 1/($fn<=0 ? 10 : $fn );
-
-// Apply a rotation matrix on a 2D vector for given angle
-function rot2d ( v, a ) = [ [cos(a), -sin(a)], [sin(a), cos(a)] ]*v;
 
 // Duplicates the given 2D polygon and shift it
 //   the returned polygon's edges are shifted by 'distance' like wrinkles
@@ -119,8 +190,20 @@ function interpolateProfile(profile1, profile2, t, speed=1) = [
         ]
 ];
 
-function vec2(p) = len(p) < 2 ? concat(p,0) : [p[0],p[1]];
-function to_2d(list) = [ for(v = list) vec2(v) ];
+//
+// Computes pt.z given its x,y and 4 reference points in a rectangle x1,x2,y1,y2
+//   q11, q12, q21, q22 are the corner of the rectangle for which z is known
+// see: https://en.wikipedia.org/wiki/Bilinear_interpolation#Unit_square
+//
+function interpolateBilinear ( pt, q11, q12, q21, q22 ) = let(
+    x = (pt.x-q11.x)/(q22.x-q11.x),
+    y = (pt.y-q11.y)/(q22.y-q11.y),
+    i = q11.z*(1-x)*(1-y) + q21.z*x*(1-y) + q12.z*(1-x)*y + q22.z*x*y
+) i;
+
+// ----------------------------------------
+//           Modules
+// ----------------------------------------
 
 // Keep the original object and add a mirrored copy
 module cloneMirror( m ) {
