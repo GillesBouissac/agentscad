@@ -17,16 +17,16 @@ use <agentscad/canvas.scad>
 
 //
 // Images sources:
-//    Pinguin:      http://clipart-library.com/clipart/709738.htm
+//    Penguin:      http://clipart-library.com/clipart/709738.htm
 //    Morris Minor: https://pixabay.com/fr/photos/morris-minor-limousine-oldtimer-4754082/
 //
-use <images/clipart-library-pinguin.scad>
+use <images/clipart-library-penguin.scad>
 use <images/pixabay-morris-minor.scad>
 
-pinguin = levels_clipartlibrarypinguin();
+penguin = levels_clipartlibrarypenguin();
 module showPlane(preserve=true, moved=false, resized=false) {
     canvas = newCanvas( [200,100], [200,100] );
-    image  = drawImage ( pinguin, canvas,
+    image  = drawImage ( penguin, canvas,
         size=resized?[100,50]:undef, start=moved?[90,40]:undef, preserve=preserve );
     mesh   = canvas2mesh( image, skin=false, thickness=5 );
     projected  = getMeshVertices(mesh);
@@ -37,7 +37,7 @@ module showPlane(preserve=true, moved=false, resized=false) {
 module showSphereFull( skin=true, positive=true, resized=false ) {
     // If image size is reduced we need more pixels in the canvas
     canvas = newCanvas( [2,1], resized?[400,200]:[200,100] );
-    image  = drawImage ( pinguin, canvas, size=resized?[undef,0.5]:undef );
+    image  = drawImage ( penguin, canvas, size=resized?[undef,0.5]:undef );
     mesh   = canvas2mesh( image, skin=skin, positive=positive, thickness=10 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
     lithophane = newMesh(projected,getMeshFaces(mesh));
@@ -45,7 +45,7 @@ module showSphereFull( skin=true, positive=true, resized=false ) {
     meshPolyhedron ( lithophane );
 }
 module showSphereCrop(preserve=true) {
-    levels = imageCrop(pinguin, [40,40], [43,66]);
+    levels = imageCrop(penguin, [40,40], [43,66]);
     canvas = newCanvas( [2,1], [200,100] );
     image  = drawImage ( levels, canvas, size=[1,0.5], preserve=preserve );
     mesh   = canvas2mesh( image, skin=true, thickness=10 );
@@ -56,7 +56,7 @@ module showSphereCrop(preserve=true) {
 }
 module showCylinder() {
     canvas = newCanvas( [2,1], [200,100] );
-    image  = drawImage ( pinguin, canvas );
+    image  = drawImage ( penguin, canvas );
     mesh   = canvas2mesh( image, skin=false, thickness=10 );
     projected  = projectCylinder( getMeshVertices(mesh), 100, 314 );
     lithophane = newMesh(projected,getMeshFaces(mesh));

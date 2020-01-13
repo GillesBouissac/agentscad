@@ -5,6 +5,22 @@ My utilities for OpenSCAD
 
 [Follow these instructions to use the library](https://github.com/GillesBouissac/agentscad/wiki/Prerequisites)
 
+# Canvas and Lithophanes
+
+![Canvas panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-canvas.png)
+
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Canvas">Tutorial for canvas here</a>
+</p>
+
+# Snap Joint
+
+![Snap Joint panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-snap-joint.png)
+
+<p align="center">
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Snap-Joint">Tutorial for Snap Joint here</a>
+</p>
+
 # Metric bolts
 
 ![MX bolt panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-screw.png)
@@ -29,28 +45,12 @@ My utilities for OpenSCAD
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Hirth-Joint">Tutorial for Hirth Joint here</a>
 </p>
 
-# Snap Joint
-
-![Snap Joint panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-snap-joint.png)
-
-<p align="center">
-<a href="https://github.com/GillesBouissac/agentscad/wiki/Snap-Joint">Tutorial for Snap Joint here</a>
-</p>
-
 # Metric screw knobs
 
 ![Screw Knobs panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-knob.png)
 
 <p align="center">
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Screw-Knobs">Tutorial for screw knobs here</a>
-</p>
-
-# Canvas and Lithophanes
-
-![Canvas panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-canvas.png)
-
-<p align="center">
-<a href="https://github.com/GillesBouissac/agentscad/wiki/Canvas">Tutorial for canvas here</a>
 </p>
 
 # Beveling library

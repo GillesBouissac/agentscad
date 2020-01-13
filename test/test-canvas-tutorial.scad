@@ -17,9 +17,9 @@ use <agentscad/canvas.scad>
 
 //
 // Images sources:
-//    Pinguin:       http://clipart-library.com/clipart/709738.htm
+//    Penguin:       http://clipart-library.com/clipart/709738.htm
 //
-use <images/clipart-library-pinguin.scad>
+use <images/clipart-library-penguin.scad>
 
 // ----------------------------------------
 //    API
@@ -28,7 +28,7 @@ use <images/clipart-library-pinguin.scad>
 // We use $fn for number of pixels to be able to have fast rendering
 //   during design. We can set $fn to higher value for final rendering.
 $fn=100;
-showCase(8) {
+showCase() {
     step_01();
     step_02();
     step_03();
@@ -58,9 +58,9 @@ module step_02() {
     // Creates an empty canvas with dimension and number of pixels
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
     // Load image levels
-    pinguin    = levels_clipartlibrarypinguin();
+    penguin    = levels_clipartlibrarypenguin();
     // Draw the image in the canvas
-    canvas     = drawImage ( pinguin, empty );
+    canvas     = drawImage ( penguin, empty );
     // Makes a 3D mesh with canvas
     flat       = canvas2mesh( canvas );
 
@@ -71,17 +71,17 @@ module step_02() {
 // 3: Scale image in canvas
 module step_03() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
+    penguin    = levels_clipartlibrarypenguin();
 
     // Draw the image resized
     // preserves aspect ratio is on, these 3 method gives same result:
-    // canvas     = drawImage ( pinguin, empty, size=[40,40] );
-    // canvas     = drawImage ( pinguin, empty, size=[40,undef] );
-    // canvas     = drawImage ( pinguin, empty, size=[40,<any number>] );
-    // canvas     = drawImage ( pinguin, empty, size=[40] );
-    // canvas     = drawImage ( pinguin, empty, size=[<any number>,40] );
+    // canvas     = drawImage ( penguin, empty, size=[40,40] );
+    // canvas     = drawImage ( penguin, empty, size=[40,undef] );
+    // canvas     = drawImage ( penguin, empty, size=[40,<any number>] );
+    // canvas     = drawImage ( penguin, empty, size=[40] );
+    // canvas     = drawImage ( penguin, empty, size=[<any number>,40] );
     // The missing or incorrect value is ignored and recomputed
-    canvas     = drawImage ( pinguin, empty, size=[150,40] );
+    canvas     = drawImage ( penguin, empty, size=[150,40] );
 
     flat       = canvas2mesh( canvas );
     meshPolyhedron ( flat );
@@ -90,11 +90,11 @@ module step_03() {
 // 4: Preserve aspect ratio off
 module step_04() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
+    penguin    = levels_clipartlibrarypenguin();
 
     // Draw the image resized, preserve aspect ratio is off
     // Now the image is squashed to fit the dimension specified
-    canvas     = drawImage ( pinguin, empty, size=[150,40], preserve=false );
+    canvas     = drawImage ( penguin, empty, size=[150,40], preserve=false );
 
     flat       = canvas2mesh( canvas );
     meshPolyhedron ( flat );
@@ -103,11 +103,11 @@ module step_04() {
 // 5: Move image on canvas
 module step_05() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
+    penguin    = levels_clipartlibrarypenguin();
 
     // Draw the image moved, preserve aspect ratio is on
     // Now the image is moved in the canvas at specified position
-    canvas     = drawImage ( pinguin, empty, size=[40], start=[150,10] );
+    canvas     = drawImage ( penguin, empty, size=[40], start=[150,10] );
 
     flat = canvas2mesh( canvas );
     meshPolyhedron ( flat );
@@ -116,11 +116,11 @@ module step_05() {
 // 6: Crop image
 module step_06() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
+    penguin    = levels_clipartlibrarypenguin();
 
     // Gets a small part of the image
     // Remember image 'y' goes from top to bottom
-    eyes       = imageCrop( pinguin, size=[60,30], start=[20,15]);
+    eyes       = imageCrop( penguin, size=[60,30], start=[20,15]);
     canvas     = drawImage ( eyes, empty );
 
     flat       = canvas2mesh( canvas );
@@ -130,8 +130,8 @@ module step_06() {
 // 7: Set first layer thickness
 module step_07() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
-    canvas     = drawImage ( pinguin, empty );
+    penguin    = levels_clipartlibrarypenguin();
+    canvas     = drawImage ( penguin, empty );
 
     // Specify a first layer thickness
     flat       = canvas2mesh( canvas, minlayer=10 );
@@ -142,8 +142,8 @@ module step_07() {
 // 8: Set image thickness
 module step_08() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
-    canvas     = drawImage ( pinguin, empty );
+    penguin    = levels_clipartlibrarypenguin();
+    canvas     = drawImage ( penguin, empty );
 
     // Specify image thickness
     flat       = canvas2mesh( canvas, thickness=10 );
@@ -154,8 +154,8 @@ module step_08() {
 // 9: Only skin
 module step_09() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
-    canvas     = drawImage ( pinguin, empty );
+    penguin    = levels_clipartlibrarypenguin();
+    canvas     = drawImage ( penguin, empty );
 
     // If we don't need base plate
     flat       = canvas2mesh( canvas, skin=true );
@@ -166,8 +166,8 @@ module step_09() {
 // 10: Negative image
 module step_10() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
-    canvas     = drawImage ( pinguin, empty );
+    penguin    = levels_clipartlibrarypenguin();
+    canvas     = drawImage ( penguin, empty );
 
     // Negative image
     flat       = canvas2mesh( canvas, positive=false );
@@ -180,8 +180,8 @@ module step_11() {
 
     // The canvas MUST have size [2,1] for correct projection on cylinder
     empty      = newCanvas( [2,1], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
-    canvas     = drawImage ( pinguin, empty );
+    penguin    = levels_clipartlibrarypenguin();
+    canvas     = drawImage ( penguin, empty );
     flat       = canvas2mesh( canvas );
 
     // Projection of the points on a cylinder
@@ -198,12 +198,12 @@ module step_12() {
 
     // The canvas MUST have size [2,1] for correct projection on sphere
     empty      = newCanvas( [2,1], [2*$fn,$fn] );
-    pinguin    = levels_clipartlibrarypinguin();
+    penguin    = levels_clipartlibrarypenguin();
 
     // Reduce image to avoid ugly triangles on top of sphere
     // Everything we've seen (crop/scale/move/negative...) works
     //   works here as well
-    canvas     = drawImage ( pinguin, empty, [undef,0.5] );
+    canvas     = drawImage ( penguin, empty, [undef,0.5] );
     
     // The sphere is a closed volume we only need the surface
     flat       = canvas2mesh( canvas, skin=true );
