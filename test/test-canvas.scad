@@ -17,7 +17,7 @@ use <agentscad/canvas.scad>
 
 //
 // Images sources:
-//    Turtle:       http://clipart-library.com/clipart/kTMnaXbMc.htm
+//    Pinguin:      http://clipart-library.com/clipart/709738.htm
 //    Morris Minor: https://pixabay.com/fr/photos/morris-minor-limousine-oldtimer-4754082/
 //
 use <images/clipart-library-pinguin.scad>

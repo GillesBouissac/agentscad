@@ -17,7 +17,7 @@ use <agentscad/canvas.scad>
 
 //
 // Images sources:
-//    Turtle:       http://clipart-library.com/clipart/kTMnaXbMc.htm
+//    Pinguin:       http://clipart-library.com/clipart/709738.htm
 //
 use <images/clipart-library-pinguin.scad>
 
@@ -27,8 +27,8 @@ use <images/clipart-library-pinguin.scad>
 
 // We use $fn for number of pixels to be able to have fast rendering
 //   during design. We can set $fn to higher value for final rendering.
-$fn=50;
-showCase() {
+$fn=100;
+showCase(8) {
     step_01();
     step_02();
     step_03();
@@ -77,9 +77,11 @@ module step_03() {
     // preserves aspect ratio is on, these 3 method gives same result:
     // canvas     = drawImage ( pinguin, empty, size=[40,40] );
     // canvas     = drawImage ( pinguin, empty, size=[40,undef] );
+    // canvas     = drawImage ( pinguin, empty, size=[40,<any number>] );
     // canvas     = drawImage ( pinguin, empty, size=[40] );
-    // canvas     = drawImage ( pinguin, empty, size=[undef,40] );
-    canvas     = drawImage ( pinguin, empty, size=[40,40] );
+    // canvas     = drawImage ( pinguin, empty, size=[<any number>,40] );
+    // The missing or incorrect value is ignored and recomputed
+    canvas     = drawImage ( pinguin, empty, size=[150,40] );
 
     flat       = canvas2mesh( canvas );
     meshPolyhedron ( flat );
@@ -103,8 +105,8 @@ module step_05() {
     empty      = newCanvas( [200,100], [2*$fn,$fn] );
     pinguin    = levels_clipartlibrarypinguin();
 
-    // Draw the image resized, preserve aspect ratio is off
-    // Now the image is squashed to fit the dimension specified
+    // Draw the image moved, preserve aspect ratio is on
+    // Now the image is moved in the canvas at specified position
     canvas     = drawImage ( pinguin, empty, size=[40], start=[150,10] );
 
     flat = canvas2mesh( canvas );
@@ -117,7 +119,7 @@ module step_06() {
     pinguin    = levels_clipartlibrarypinguin();
 
     // Gets a small part of the image
-    // Remember image y goes from top to bottom
+    // Remember image 'y' goes from top to bottom
     eyes       = imageCrop( pinguin, size=[60,30], start=[20,15]);
     canvas     = drawImage ( eyes, empty );
 
