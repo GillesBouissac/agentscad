@@ -15,6 +15,8 @@ use <agentscad/extensions.scad>
 use <agentscad/mesh.scad>
 use <agentscad/canvas.scad>
 
+$fn=100;
+
 //
 // Images sources:
 //    Penguin:      http://clipart-library.com/clipart/709738.htm
@@ -25,10 +27,10 @@ use <images/pixabay-morris-minor.scad>
 
 penguin = levels_clipartlibrarypenguin();
 module showPlane(preserve=true, moved=false, resized=false) {
-    canvas = newCanvas( [200,100], [200,100] );
+    canvas = newCanvas( [200,100], [2*$fn,$fn] );
     image  = drawImage ( penguin, canvas,
         size=resized?[100,50]:undef, start=moved?[90,40]:undef, preserve=preserve );
-    mesh   = canvas2mesh( image, skin=false, thickness=5 );
+    mesh   = canvas2mesh( image, skin=false, minlayer=2, thickness=5 );
     projected  = getMeshVertices(mesh);
     lithophane = newMesh(projected,getMeshFaces(mesh));
     //render()
@@ -36,7 +38,7 @@ module showPlane(preserve=true, moved=false, resized=false) {
 }
 module showSphereFull( skin=true, positive=true, resized=false ) {
     // If image size is reduced we need more pixels in the canvas
-    canvas = newCanvas( [2,1], resized?[400,200]:[200,100] );
+    canvas = newCanvas( [2,1], resized?[4*$fn,2*$fn]:[2*$fn,$fn] );
     image  = drawImage ( penguin, canvas, size=resized?[undef,0.5]:undef );
     mesh   = canvas2mesh( image, skin=skin, positive=positive, thickness=10 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
@@ -46,7 +48,7 @@ module showSphereFull( skin=true, positive=true, resized=false ) {
 }
 module showSphereCrop(preserve=true) {
     levels = imageCrop(penguin, [40,40], [43,66]);
-    canvas = newCanvas( [2,1], [200,100] );
+    canvas = newCanvas( [2,1], [2*$fn,$fn] );
     image  = drawImage ( levels, canvas, size=[1,0.5], preserve=preserve );
     mesh   = canvas2mesh( image, skin=true, thickness=10 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
@@ -55,7 +57,7 @@ module showSphereCrop(preserve=true) {
     meshPolyhedron ( lithophane );
 }
 module showCylinder() {
-    canvas = newCanvas( [2,1], [200,100] );
+    canvas = newCanvas( [2,1], [2*$fn,$fn] );
     image  = drawImage ( penguin, canvas );
     mesh   = canvas2mesh( image, skin=false, thickness=10 );
     projected  = projectCylinder( getMeshVertices(mesh), 100, 314 );
@@ -65,7 +67,7 @@ module showCylinder() {
 }
 module showBigShere() {
     levels = levels_pixabaymorrisminor();
-    canvas = newCanvas( [2,1], [600,300] );
+    canvas = newCanvas( [2,1], [6*$fn,3*$fn] );
     image  = drawImage ( levels, canvas, size=[undef,0.4] );
     mesh   = canvas2mesh( image, skin=true, thickness=5 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
@@ -82,12 +84,15 @@ module showText( t ) {
             linear_extrude ( height=1 )
                 text( t[i], halign="center", size=30-i*3 );
 }
+/*
+*/
 translate ( [000,0,0] ) {
     rotate( [90,0,0] )
         translate ( [-100,-50,0] )
         showPlane();
     showText( [ "Plane", "thick", "positive", "preserve on" ] );
 }
+/*
 translate ( [300,0,0] ) {
     rotate( [90,0,0] )
         translate ( [-100,-50,0] )
@@ -125,10 +130,10 @@ translate ( [2100,0,0] ) {
         showSphereCrop(preserve=false);
     showText( [ "Sphere", "preserve off", "crop", "resize", "skin", "positive" ] );
 }
-translate ( [1000,1000,800] ) {
+translate ( [1000,1500,800] ) {
     scale( [10,10,10] )
     rotate( [0,0,90]  )
         showBigShere();
 }
-
+*/
 
