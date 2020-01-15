@@ -34,6 +34,18 @@ function forceValueInRange ( value, minv, maxv, defv ) = let (
     _def = is_undef(defv)?(minv?minv:0):defv
 ) is_undef(value)?_def:value<_min?_min:(value>_max?_max:value) ;
 
+// Object class accessors/control
+function getClass(object) = is_list(object) ? object[0] : undef;
+function isClass(object,class) = let (
+    classList = [ if(is_list(class)) class else [class] ][0],
+    found = [ for ( c=classList ) if ( c==getClass(object) ) c ]
+) len(found)>0 ;
+function assertClass(object,class) = let (
+    classList = [ if(is_list(class)) class else [class] ][0],
+    a = assert( isClass( object, classList ),
+        str("object class \"",getClass(object),"\" not in ", classList) )
+) a ;
+
 // ----------------------------------------
 //           Mathematics
 // ----------------------------------------
