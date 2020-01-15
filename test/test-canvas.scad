@@ -15,7 +15,8 @@ use <agentscad/extensions.scad>
 use <agentscad/mesh.scad>
 use <agentscad/canvas.scad>
 
-$fn=100;
+// rendering precision tuning
+$fn=80;
 
 //
 // Images sources:
@@ -33,7 +34,7 @@ module showPlane(preserve=true, moved=false, resized=false) {
     mesh   = canvas2mesh( image, skin=false, minlayer=2, thickness=5 );
     projected  = getMeshVertices(mesh);
     lithophane = newMesh(projected,getMeshFaces(mesh));
-    //render()
+    render()
     meshPolyhedron ( lithophane );
 }
 module showSphereFull( skin=true, positive=true, resized=false ) {
@@ -43,7 +44,7 @@ module showSphereFull( skin=true, positive=true, resized=false ) {
     mesh   = canvas2mesh( image, skin=skin, positive=positive, thickness=10 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
     lithophane = newMesh(projected,getMeshFaces(mesh));
-    // render()
+    render()
     meshPolyhedron ( lithophane );
 }
 module showSphereCrop(preserve=true) {
@@ -53,7 +54,7 @@ module showSphereCrop(preserve=true) {
     mesh   = canvas2mesh( image, skin=true, thickness=10 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
     lithophane = newMesh(projected,getMeshFaces(mesh));
-    // render()
+    render()
     meshPolyhedron ( lithophane );
 }
 module showCylinder() {
@@ -62,7 +63,7 @@ module showCylinder() {
     mesh   = canvas2mesh( image, skin=false, thickness=10 );
     projected  = projectCylinder( getMeshVertices(mesh), 100, 314 );
     lithophane = newMesh(projected,getMeshFaces(mesh));
-    // render()
+    render()
     meshPolyhedron ( lithophane );
 }
 module showBigShere() {
@@ -72,7 +73,7 @@ module showBigShere() {
     mesh   = canvas2mesh( image, skin=true, thickness=5 );
     projected  = projectSphereCylindrical( getMeshVertices(mesh), 100 );
     lithophane = newMesh(projected,getMeshFaces(mesh));
-    // render()
+    render()
     meshPolyhedron ( lithophane );
 }
 module showText( t ) {
@@ -92,7 +93,6 @@ translate ( [000,0,0] ) {
         showPlane();
     showText( [ "Plane", "thick", "positive", "preserve on" ] );
 }
-/*
 translate ( [300,0,0] ) {
     rotate( [90,0,0] )
         translate ( [-100,-50,0] )
@@ -135,5 +135,6 @@ translate ( [1000,1500,800] ) {
     rotate( [0,0,90]  )
         showBigShere();
 }
+/*
 */
 

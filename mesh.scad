@@ -11,16 +11,20 @@
  * Author:      Gilles Bouissac
  */
 
+use <agentscad/extensions.scad>
 
+// ----------------------------------------
+//           API
+// ----------------------------------------
 
+function classMesh()      = "mesh";
 
 module meshPolyhedron ( mesh ) {
-    polyhedron ( points=mesh[0], faces=mesh[1] );
+    class = assertClass(mesh,classMesh());
+    polyhedron ( points=getMeshVertices(mesh), faces=getMeshFaces(mesh) );
 }
 
-function newMesh( vertices, faces ) = [ vertices, faces ];
-function getMeshVertices( mesh ) = mesh[0];
-function getMeshFaces( mesh )    = mesh[1];
-
-
+function newMesh( vertices, faces ) = [ classMesh(), vertices, faces ];
+function getMeshVertices( mesh )    = let(class = assertClass(mesh,classMesh())) mesh[1];
+function getMeshFaces( mesh )       = let(class = assertClass(mesh,classMesh())) mesh[2];
 

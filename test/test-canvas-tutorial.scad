@@ -27,7 +27,7 @@ use <images/clipart-library-penguin.scad>
 
 // We use $fn for number of pixels to be able to have fast rendering
 //   during design. We can set $fn to higher value for final rendering.
-$fn=100;
+$fn=50;
 showCase() {
     step_01();
     step_02();
@@ -219,24 +219,20 @@ module step_12() {
 // ----------------------------------------
 
 module showOneStep ( x=0 ) {
-    translate([x-100,0,0])
+    render()
+        translate([x-100,0,0])
         children();
 }
 
 module showCase( only_one=undef ) {
     range = SHOW_ITV_H*($children-1);
-    intersection () {
-        union() {
-            if ( is_undef(only_one) )
-                for ( i=[0:$children-1] )
-                    showOneStep(-range/2+i*SHOW_ITV_H)
-                        children(i);
-            else
-                showOneStep()
-                    children(only_one-1);
-        }
-        color ( "#fff",0.1 )
-            translate( [-5000,-5000,-5000] )
-            cube( [10000,10000,10000] );
+    union() {
+        if ( is_undef(only_one) )
+            for ( i=[0:$children-1] )
+                showOneStep(-range/2+i*SHOW_ITV_H)
+                    children(i);
+        else
+            showOneStep()
+                children(only_one-1);
     }
 }

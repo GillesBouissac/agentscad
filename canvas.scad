@@ -6,7 +6,7 @@
  *   * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * Description: Canvas on which we can draw B&W images
+ * Description: Canvas on which we can draw Grayscale images
  * Design:      Gilles Bouissac
  * Author:      Gilles Bouissac
  */
@@ -34,7 +34,7 @@ use <agentscad/mesh.scad>
 //
 
 // ----------------------------------------
-//           B&W Images
+//           Grayscale Images
 // ----------------------------------------
 
 //
@@ -54,35 +54,6 @@ function imageCrop ( image, size=undef, start=undef ) = let (
 ) [ for ( y=[sy:ey] ) [ for ( x=[sx:ex] ) image[y][x] ] ];
 
 //
-// Interpolate image data to compute the level at random position
-//
-//   image:      image levels data
-//   size:       size [size.x, size.y] of the image
-//   pos:        position [pos.x, pos.y] in the image where we need the level
-//   outerlevel: level to return if pos is not in the image
-//
-function getLevelAt( image, size, pos, outerlevel=255 ) = let (
-    nx  = len(image[0]),
-    ny  = len(image),
-    ixc = floor( (nx-1-0.0001)*pos.x/size.x ),
-    iyc = floor( (ny-1-0.0001)*pos.y/size.y ),
-    ix  = ixc==nx-1?nx-2:ixc,
-    iy  = iyc==ny-1?ny-2:iyc,
-    dx  = size.x/(nx-1),
-    dy  = size.y/(ny-1),
-    x1  = ix*dx,
-    y1  = iy*dy,
-    x2  = x1 + dx,
-    y2  = y1 + dy
-) ix<0||iy<0||ix>nx-1||iy>ny-1?outerlevel:
-    interpolateBilinear ( pos,
-        [ x1, y1, image[iy][ix] ],
-        [ x1, y2, image[iy+1][ix] ],
-        [ x2, y1, image[iy][ix+1] ],
-        [ x2, y2, image[iy+1][ix+1] ]
-    );
-
-//
 // Draw an image on a given canvas and returns a new image
 //
 // Placement of the image in the canvas:
@@ -97,6 +68,7 @@ function getLevelAt( image, size, pos, outerlevel=255 ) = let (
 //     and that do not have a previous value
 //
 function drawImage ( image, canvas, size=undef, start=undef, preserve=true, outerlevel=255 ) = let (
+    class  = assertClass(canvas,classCanvas()),
     nx     = len(image[0]),
     ny     = len(image),
     npx    = getCanvasNbPointx(canvas)-1,
@@ -112,13 +84,14 @@ function drawImage ( image, canvas, size=undef, start=undef, preserve=true, oute
     szy    = preserve?(yratio<tmpszy?yratio:tmpszy):tmpszy,
     cx     = forceValueInRange(start.x,minv=0,maxv=cansz.x-szx,defv=(cansz.x-szx)/2),
     cy     = forceValueInRange(start.y,minv=0,maxv=cansz.y-szy,defv=(cansz.y-szy)/2)
-) [ cansz, pixsz, [
+) [ classCanvas(),
+    cansz, pixsz, [
     for ( iy=[0:npy] ) [
         for ( ix=[0:npx] ) let (
                 x = ix*pixsz.x,
                 y = iy*pixsz.y
             )
-            [ x, y, getLevelAt(image,[szx,szy],[x-cx,szy-(y-cy)],outerlevel=outerlevel) ]
+            [ x, y, __getLevelAt(image,[szx,szy],[x-cx,szy-(y-cy)],outerlevel=outerlevel) ]
         ]
     ]
 ];
@@ -133,13 +106,12 @@ function drawImage ( image, canvas, size=undef, start=undef, preserve=true, oute
 //
 //   canvas: canvas filled with image
 //
+
 function canvas2mesh (
-    canvas,
-    minlayer=0.01,
-    thickness=1,
-    skin=false,
-    positive=true
+    canvas, minlayer=0.01, thickness=1,
+    skin=false, positive=true
 ) = let (
+    class = assertClass(canvas,classCanvas()),
     nx    = getCanvasNbPointx(canvas),
     ny    = getCanvasNbPointy(canvas),
     size  = getCanvasSize(canvas),
@@ -156,13 +128,13 @@ function canvas2mesh (
         for ( iy=[0:ny-1] )
             for ( ix=[0:nx-1] )
                 let ( elevation = lmin + szz*(positive ? 1-image[iy][ix].z/255 : image[iy][ix].z/255 ))
-                [ ix*dx, iy*dy, elevation ]
+                [ image[iy][ix].x, image[iy][ix].y, elevation ]
         ,
         // Flat lower surface
         if ( !skin )
             for ( iy=[0:ny-1] )
                 for ( ix=[0:nx-1] )
-                    [ ix*dx, iy*dy, 0 ]
+                    [ image[iy][ix].x, image[iy][ix].y, 0 ]
     ],
     volumefaces = skin ? []:[
         // Lower surface
@@ -197,27 +169,65 @@ function canvas2mesh (
 //   level:   Default level of the image in the canvas
 //
 function newCanvas ( size=undef, nbpixel=undef, level=255 ) = let (
-    szx = forceValueInRange(size.x,1e-6),
-    szy = forceValueInRange(size.y,1e-6),
-    npx = forceValueInRange(nbpixel.x,1,1e6),
-    npy = forceValueInRange(nbpixel.y,1,1e6),
-    px  = szx/npx,
-    py  = szy/npy
-) [ [szx,szy], [px,py], [
+    szx  = forceValueInRange(size.x,1e-6),
+    szy  = forceValueInRange(size.y,1e-6),
+    npx  = forceValueInRange(nbpixel.x,1,1e6),
+    npy  = forceValueInRange(nbpixel.y,1,1e6),
+    szpx = szx/npx,
+    szpy = szy/npy
+) [ classCanvas(),
+    [szx,szy], [szpx,szpy], [
     for ( iy=[0:npy] ) [
             for ( ix=[0:npx] ) let (
-                x = ix*px,
-                y = iy*py
+                x = ix*szpx,
+                y = iy*szpy
             ) [ x, y, level ]
         ]
     ]
 ];
 
-function getCanvasSize(canvas)       = canvas[0];
-function getCanvasPixelSize(canvas)  = canvas[1];
-function getCanvasPoints(canvas)     = canvas[2];
-function getCanvasNbPointx(canvas)   = len(canvas[2][0]);
-function getCanvasNbPointy(canvas)   = len(canvas[2]);
+function getCanvasSize(canvas)       = canvas[1];
+function getCanvasPixelSize(canvas)  = canvas[2];
+function getCanvasPoints(canvas)     = canvas[3];
+function getCanvasNbPointx(canvas)   = len(canvas[3][0]);
+function getCanvasNbPointy(canvas)   = len(canvas[3]);
+
+
+
+// ----------------------------------------
+//           Implementation
+// ----------------------------------------
+function classCanvas()      = "canvas";
+
+//
+// Interpolate image data to compute the level at random position
+//
+//   image:      image levels data
+//   size:       size [size.x, size.y] of the image
+//   pos:        position [pos.x, pos.y] in the image where we need the level
+//   outerlevel: level to return if pos is not in the image
+//
+function __getLevelAt( image, size, pos, outerlevel=255 ) = let (
+    nx  = len(image[0]),
+    ny  = len(image),
+    ixc = floor( (nx-1-0.0001)*pos.x/size.x ),
+    iyc = floor( (ny-1-0.0001)*pos.y/size.y ),
+    ix  = ixc==nx-1?nx-2:ixc,
+    iy  = iyc==ny-1?ny-2:iyc,
+    dx  = size.x/(nx-1),
+    dy  = size.y/(ny-1),
+    x1  = ix*dx,
+    y1  = iy*dy,
+    x2  = x1 + dx,
+    y2  = y1 + dy
+) ix<0||iy<0||ix>nx-1||iy>ny-1?outerlevel:
+    interpolateBilinear ( pos,
+        [ x1, y1, image[iy][ix] ],
+        [ x1, y2, image[iy+1][ix] ],
+        [ x2, y1, image[iy][ix+1] ],
+        [ x2, y2, image[iy+1][ix+1] ]
+    );
+
 
 
 
@@ -226,16 +236,17 @@ function getCanvasNbPointy(canvas)   = len(canvas[2]);
 // ----------------------------------------
 
 module showLithophane() {
-    levels = [
+    image = [
         [ 100, 90,   70, 140 ],
         [ 255, 160, 170,  45 ],
         [ 110, 120,  30, 140 ],
         [ 160, 170, 120,  60 ]
     ];
-    canvas     = newCanvas( [10,10], [30,30] );
-    image      = drawImage ( levels, canvas );
-    lithophane = canvas2mesh( image, skin=false, thickness=10 );
-    render() meshPolyhedron ( lithophane );
+    empty      = newCanvas( [10,10], [30,30] );
+    canvas     = drawImage ( image, empty );
+    lithophane = canvas2mesh( canvas, skin=false, thickness=10 );
+    echo(getCanvasNbPointy(canvas));
+    meshPolyhedron ( lithophane );
 }
 
 showLithophane();
