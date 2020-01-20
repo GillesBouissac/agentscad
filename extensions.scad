@@ -21,8 +21,8 @@ use <scad-utils/transformations.scad>
 MFG = 0.01;
 function mfg(mult=1) = is_undef($mfg) ? mult*MFG : mult*$mfg;
 
-// Step in range [0:1] from $fn
-function getStep() = 1/($fn<=0 ? 10 : $fn );
+// Step in range [0:1] from $fn/ratio
+function getStep(ratio=1) = ratio/($fn<=0 ? 10 : $fn );
 
 // Check if given value is defined and in range [minv:maxv],
 // If not returns the closest range limit,
@@ -31,8 +31,8 @@ function getStep() = 1/($fn<=0 ? 10 : $fn );
 function forceValueInRange ( value, minv, maxv, defv ) = let (
     _min = is_undef(minv)?-1e6:minv,
     _max = is_undef(maxv)?+1e6:maxv,
-    _def = is_undef(defv)?(minv?minv:0):defv
-) is_undef(value)?_def:value<_min?_min:(value>_max?_max:value) ;
+    _def = is_undef(defv)?_min:defv
+) is_undef(value)?_def:(value<_min?_min:(value>_max?_max:value)) ;
 
 // Object class accessors/control
 function getClass(object) = is_list(object) ? object[0] : undef;
@@ -69,6 +69,12 @@ function sortNum(arr) = [ for ( e=sortIndexed(arr) ) e[0] ];
 function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
     indexed = [ for ( i=[0:len(arr)-1] ) [ arr[i], i ]  ]
 ) __sortIndexed( indexed );
+
+// Sum all the numbers at column 'col' of every element from list
+//   only elements at indexes [start:end] are taken into account
+//   if col=undef then elements from list are considered as numbers
+function columnSum ( list, col=undef, start=undef, end=undef ) =
+    __columnSum(list,col,start,end,0);
 
 // ----------------------------------------
 //           Euclidean space functions
@@ -258,9 +264,9 @@ module oblong ( r, h=1, i=0, center=false ) {
 
 // Rotates a shape from [0,0,1] to given vector
 module alignOnVector(v) {
-    length = norm([v.x,v.y,v.z]);  // radial distance
-    b = acos(v.z/length);          // inclination angle
-    c = atan2(v.y,v.x);            // azimuthal angle
+    length = norm([v.x,v.y,v.z]);    // radial distance
+    b = sign(v.x)*acos(v.z/length);  // inclination angle
+    c = v.y==0 ? 0 : atan2(v.y,v.x); // azimuthal angle
     rotate([0, b, c])
         children();
 }
@@ -277,6 +283,15 @@ function __sortIndexed(arr) = !(len(arr)>0) ? [] : let(
     __sortIndexed(lesser), equal, __sortIndexed(greater)
 );
 function __sum(l,i=0) = i<len(l)-1 ? l[i] + __sum(l,i+1) : l[i];
+
+function __columnSum ( list, col, start, end, current ) =
+let(
+    maxEnd   = len(list)-1,
+    startIdx = is_undef(start) ? 0      : (start<0    ? 0:start),
+    endIdx   = is_undef(end)   ? maxEnd : (end>maxEnd ? maxEnd : end),
+    curValue = forceValueInRange ( current, 0 ),
+    itemVal  = is_undef(col)     ? list[startIdx] : list[startIdx][col]
+) startIdx>endIdx ? curValue : itemVal+__columnSum(list,col,startIdx+1,endIdx,curValue);
 
 // ----------------------------------------
 //                Showcase

@@ -9,7 +9,8 @@
  * Description: Metric screw modelisation
  * Author:      Gilles Bouissac
  */
-use <../mx-screw.scad>
+use <agentscad/mx-screw.scad>
+use <agentscad/extensions.scad>
 
 // ----------------------------------------
 //
@@ -23,23 +24,16 @@ SCREW_DISTANCE=3;
 
 WALL1_H=4;
 WALL2_H=136;
-WALL_W=100+cumulate( SCREWS_HDP, mxGetDataLength()-1 )+(mxGetDataLength()-1)*SCREW_DISTANCE;
+WALL_W=100+columnSum( SCREWS_HDP, end=mxGetDataLength()-1 )+(mxGetDataLength()-1)*SCREW_DISTANCE;
 WALL_P=100;
 
-function cumulate ( vect, end=-1, nexti=0, current=-1 ) =
-let(
-    endIdx   = end==-1 ? len(vect)-1 : end,
-    curCumul = current==-1 ? 0 : current,
-    res = nexti>endIdx ? curCumul : vect[nexti]+cumulate(vect,endIdx,nexti+1,curCumul)
-)res;
-
 module showcaseScrewPassage ( t, tlp ) {
-    translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-WALL_W/2,0,0] ) {
+    translate( [ t[0]*SCREW_DISTANCE + columnSum( SCREWS_HDP, end=t[0] )-WALL_W/2,0,0] ) {
         mxBoltPassage ( mxClone(t, tlp=tlp) );
     }
 }
 module showcaseScrew ( t ) {
-    translate( [ t[0]*SCREW_DISTANCE + cumulate( SCREWS_HDP, t[0] )-WALL_W/2,0,0] ) {
+    translate( [ t[0]*SCREW_DISTANCE + columnSum( SCREWS_HDP, end=t[0] )-WALL_W/2,0,0] ) {
         color( "silver", 0.7 ) {
             if ( mxGetIdx(t)%2 ) {
                 mxBoltAllen ( t );

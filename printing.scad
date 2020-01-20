@@ -20,7 +20,7 @@
 GAP      = 0.2;
 NOZZLE   = 0.4;
 LAYER    = 0.2;
-OVERHANG = 60;
+OVERHANG = 70;
 
 VOLUME_MK3S = [250,210,210];
 
