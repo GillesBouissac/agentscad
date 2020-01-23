@@ -24,48 +24,77 @@ use <agentscad/wrench.scad>
 SMOOTH  = 100;
 FAST    = 30;
 LOWPOLY = 6;
-taswStand ( WRENCHES, WRENCH_GROUP_SIZE, 1, $fn=FAST );
+
+
+// wrenches: The stand will be designed for this list of wrenches
+// groups:   The stand can be splited into groups
+//           This array contains one number per group, this number is the number of
+//             wrenches in the group, the count start from first wrench in WRENCHES
+//           Set this to undef is you want a single part stand
+taswStand (
+    wrenches     = 16_WRENCHES,
+    groups       = 16_WRENCHES_GROUPS,
+    group_num    = undef,
+    numbers_only = false,
+    $fn          = FAST );
 
 
 // ----------------------------------------
 //                API
 // ----------------------------------------
 
-// The stand will be designed for this variable list of wrenches (metric sizes)
-WRENCHES          = [ 8, 9, 11, 12, 13, 14, 15, 16, 17, 17, 19, 19 ];
+// 10 Tubular Angled Socket Wrenches set
+10_WRENCHES        = [ 8,10,11,12,13,14,16,17,18,19 ];
+10_WRENCHES_GROUPS = [ 6,4 ];
 
-// The stand can be splited into parts, this is the maximum number of wrenches in each part
-//   undef for 1 group with all wrenches
-WRENCH_GROUP_SIZE = 7;
+// 14 Tubular Angled Socket Wrenches set
+14_WRENCHES        = [ 8,9,10,11,12,13,14,15,16,17,18,19,20,21 ];
+14_WRENCHES_GROUPS = [ 6,4,4 ];
+
+// 16 Tubular Angled Socket Wrenches set
+16_WRENCHES        = [ 8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24 ];
+16_WRENCHES_GROUPS = [ 7,5,4 ];
+
+
+// Special 12 Tubular Angled Socket Wrenches set for PL
+12_WRENCHES        = [ 8, 9, 11, 12, 13, 14, 15, 16, 17, 17, 19, 19 ];
+12_WRENCHES_GROUPS = [ 7,5 ];
+
 
 // Vertical offsets between wrenches (perpendicular to ROD axis)
-VOFFSET           = 10;
+VOFFSET            = 10;
 
 // Horizontal offsets between wrenches (along ROD axis)
-HOFFSET           = 10;
+HOFFSET            = 5;
 
 // Control the distance of right stand from wrench strait socket
-RIGHT_STAND_SHIFT = 5;
+RIGHT_STAND_SHIFT  = 5;
 
 // Distance between wrenches and wall
-WALL_DISTANCE     = 5;
+WALL_DISTANCE      = 5;
 
 // Stand thickness
-STAND_THIKNESS    = 3;
+STAND_THIKNESS     = 3;
 
 // Hook thickness
-HOOK_THIKNESS     = 5;
+HOOK_THIKNESS      = 5;
 
 // Hook width around wrenches
-HOOK_WIDTH        = 6;
+HOOK_WIDTH         = 6;
 
 // Angle of hook opening
 // We use overhang because the hook is printed back on bed
-HOOK_SLOPE        = 90-overhang();
+HOOK_SLOPE         = 90-overhang();
 
 // Horinzontal distance between hooks and screws
-SCREW_2_HOOK      = 15;
+SCREW_2_HOOK       = 15;
 
+// Text control
+TEXT_SIZE         = 10;
+TEXT_THICKNESS    = 0.9;
+
+// Back plate screws control
+BACK_PLATE_SCREW = M4();
 
 // ----------------------------------------
 //             Implementation
@@ -87,7 +116,7 @@ function movedElbowCenter( list, i ) = let(
 
 // Creates matrix from vector to a new wrench position
 function taswShear(v) = [
-	[1,0,v.x/v.z,0],
+	[1,0,v.z==0?0:v.x/v.z,0],
 	[0,1,0,0],
 	[0,0,1,0],
 	[0,0,0,1],
@@ -149,8 +178,9 @@ function halfHookElbow(wrenchList) = HOOK_THIKNESS/2 ;
 
 function halfHookRod(wrenchList) = let (
     n            = len(wrenchList)-1,
-    rodOriginV_n = rodHookVector(wrenchList, n)
-) (HOOK_THIKNESS/2)/sin(atan2(rodOriginV_n.z,rodOriginV_n.x)) ;
+    rodOriginV_n = rodHookVector(wrenchList, n),
+    sinangle     = sin(atan2(rodOriginV_n.z,rodOriginV_n.x))
+) sinangle==0 ? 0 : (HOOK_THIKNESS/2)/sinangle ;
 
 function backPlateTopPt1( wrenchList, i, gap=0 ) = let (
     w      = wrenchList[i],
@@ -201,24 +231,24 @@ module taswBackPlateHollow ( wrenchList, i0, i1 ) {
     profileCenterH0 = -hookProfileHB(w0)+(hookProfileHB(w0)+hookProfileHA(w0))/2;
     profileCenterH1 = -hookProfileHB(w1)+(hookProfileHB(w1)+hookProfileHA(w1))/2;
 
-    screw = M4();
+    screw = BACK_PLATE_SCREW;
     translate ( take3(translation([+SCREW_2_HOOK,0,0])*
         rodHookShear( wrenchList, i0 )*[0,0,profileCenterH0,1]) )
-    rotate( [90,0,0] )
-    mxBoltAllenPassage( screw );
+        rotate( [90,0,0] )
+        mxBoltAllenPassage( screw );
     translate ( take3(translation([-SCREW_2_HOOK,0,0])*
         elbowHookShear( wrenchList, i0 )*[0,0,profileCenterH0,1]) )
-    rotate( [90,0,0] )
-    mxBoltAllenPassage( screw );
+        rotate( [90,0,0] )
+        mxBoltAllenPassage( screw );
 
     translate ( take3(translation([+SCREW_2_HOOK,0,0])*
         rodHookShear( wrenchList, i1 )*[0,0,profileCenterH1,1]) )
-    rotate( [90,0,0] )
-    mxBoltAllenPassage( screw );
+        rotate( [90,0,0] )
+        mxBoltAllenPassage( screw );
     translate ( take3(translation([-SCREW_2_HOOK,0,0])*
         elbowHookShear( wrenchList, i1 )*[0,0,profileCenterH1,1]) )
-    rotate( [90,0,0] )
-    mxBoltAllenPassage( screw );
+        rotate( [90,0,0] )
+        mxBoltAllenPassage( screw );
 }
 
 module taswBackPlate ( wrenchList, i0, i1, color ) {
@@ -250,15 +280,64 @@ module taswBackPlate ( wrenchList, i0, i1, color ) {
     }
 }
 
-module taswStand ( wrenches, group_size=1, group_num ) {
+function groupColor(g,n) = [0,g/n,0.4];
+
+module taswStand ( wrenches, numbers_only=false, groups=undef, group_num ) {
     wrenchList = [ for ( a=wrenches ) newTasWrench(a) ];
     n    = len(wrenchList)-1;
 
-    if ( is_undef(group_num) )
-        for ( g=[0:group_size:n] ) let ( end=g+group_size-1>n?n:g+group_size-1 )
-            taswStandGroup ( wrenchList, g, end, [0,(50+20*g)/(50+20*n),0.4] );
-    else let ( g=group_num*group_size, check=assert(g<=n), end=g+group_size-1>n?n:g+group_size-1 )
-        taswStandGroup ( wrenchList, g, end, [0,(50+20*g)/(50+20*n),0.4] );
+    lgroups = is_undef(groups)?[len(wrenchList)]:groups;
+
+    // Sanity check: The groups must consume all the wrenches
+    assert( columnSum(lgroups)==len(wrenchList),
+        "When groups is not equal to undef, the sum of number in this array must be equal to the number of elements in wrenches" );
+
+    elbowOriginV_n = movedElbowCenter(wrenchList,n);
+    alignOnVector([-elbowOriginV_n.x,0,elbowOriginV_n.z]) {
+
+        if ( is_undef(group_num) )
+            for ( g=[0:len(lgroups)-1] ) let (
+                start = columnSum(lgroups,end=g-1),
+                end=start+lgroups[g]-1>n?n:start+lgroups[g]-1 )
+                if ( numbers_only ) 
+                    taswStandGroupNumbers( wrenchList, start, end );
+                else
+                    difference() {
+                        taswStandGroup ( wrenchList, start, end, groupColor(g,len(lgroups)) );
+                        taswStandGroupNumbers( wrenchList, start, end );
+                    }
+        else let ( g=group_num,
+            check=assert(g>=0 && g<=len(lgroups)-1, str("group_num must be in range [",0,"-",len(lgroups)-1,"]") ),
+            start = columnSum(lgroups,end=g-1),
+            end=start+lgroups[g]-1>n?n:start+lgroups[g]-1 )
+            if ( numbers_only ) 
+                taswStandGroupNumbers( wrenchList, start, end );
+            else
+                difference() {
+                    taswStandGroup ( wrenchList, start, end, groupColor(g,len(lgroups)) );
+                    taswStandGroupNumbers( wrenchList, start, end );
+                }
+    }
+}
+
+module taswStandGroupNumbers ( wrenchList, i0, i1 ) {
+    n          = len(wrenchList)-1;
+    wn         = wrenchList[n];
+
+    for ( i=[i0:i1] ) {
+        w    = wrenchList[i];
+
+        profileCenterH = -hookProfileHB(w)+(hookProfileHB(w)+hookProfileHA(w))/2;
+        elbowCenter = elbowHookShear( wrenchList, i )*[0,0,profileCenterH,1];
+        rodCenter = rodHookShear( wrenchList, i )*[0,0,profileCenterH,1];
+        translate ( take3((elbowCenter+rodCenter)/2)-[0,TEXT_THICKNESS-mfg(),0] )
+            rotate( [90,0,180] )
+            linear_extrude(TEXT_THICKNESS)
+            text( str(getTasWrenchA(w)),
+                font="Calibri:style=Bold",
+                size=TEXT_SIZE,
+                valign="center", halign="center" );
+    }
 }
 
 module taswStandGroup ( wrenchList, i0, i1, color="yellow" ) {
@@ -278,67 +357,66 @@ module taswStandGroup ( wrenchList, i0, i1, color="yellow" ) {
     echo ( "diagonal of the group: ", diagonal_group );
     echo ( "diagonal of the complete stand: ", diagonal_total );
 
-    alignOnVector([-elbowOriginV_n.x,0,elbowOriginV_n.z]) {
+    // Draw elbow hooks
+    elbowOriginV_n = movedElbowCenter(wrenchList,n);
+    elbowShear     = taswShear(elbowOriginV_n);
+    color( color )
+    for ( i=[i0:i1] )
+        let (
+            w       = wrenchList[i],
+            profile = hookProfile(w,getTasWrenchDE2(w)+2*gap()),
+            half_t  = halfHookElbow()
+        )
+        skin([
+            transform ( elbowHookRotation(wrenchList,i)*translation([+half_t,0,0]),profile),
+            transform ( elbowHookRotation(wrenchList,i)*translation([-half_t,0,0]),profile),
+        ]);
 
-        // Draw elbow hooks
-        elbowOriginV_n = movedElbowCenter(wrenchList,n);
-        elbowShear     = taswShear(elbowOriginV_n);
-        color( color )
-        for ( i=[i0:i1] )
-            let (
-                w       = wrenchList[i],
-                profile = hookProfile(w,getTasWrenchDE2(w)+2*gap()),
-                half_t  = halfHookElbow()
-            )
-            skin([
-                transform ( elbowHookRotation(wrenchList,i)*translation([+half_t,0,0]),profile),
-                transform ( elbowHookRotation(wrenchList,i)*translation([-half_t,0,0]),profile),
-            ]);
+    // Draw rod hooks
+    // The rod hook origin is called rodOrigin
+    color( color )
+    for ( i=[i0:i1] )
+        let (
+            w            = wrenchList[i],
+            profile      = hookProfile(w,getTasWrenchDE1(w)+2*gap()),
+            half_t       = halfHookRod(wrenchList)
+        )
+        skin([
+            transform ( rodHookShear(wrenchList,i)*translation([+half_t,0,0]),profile),
+            transform ( rodHookShear(wrenchList,i)*translation([-half_t,0,0]),profile),
+        ]);
 
-        // Draw rod hooks
-        // The rod hook origin is called rodOrigin
-        color( color )
-        for ( i=[i0:i1] )
-            let (
-                w            = wrenchList[i],
-                profile      = hookProfile(w,getTasWrenchDE1(w)+2*gap()),
-                half_t       = halfHookRod(wrenchList)
-            )
-            skin([
-                transform ( rodHookShear(wrenchList,i)*translation([+half_t,0,0]),profile),
-                transform ( rodHookShear(wrenchList,i)*translation([-half_t,0,0]),profile),
-            ]);
+    // Draw the backplates
+    taswBackPlate ( wrenchList, i0, i1, color );
 
-        // Draw the backplates
-        taswBackPlate ( wrenchList, i0, i1, color );
+    // Draw the wrenches for visual check
+%   for ( i=[i0:i1] )
+        let (
+            w=wrenchList[i],
+            elbowCenteri = movedElbowCenter(wrenchList,i),
+            elbowTranslation=taswTranslation(elbowCenteri),
+            origin = take3(elbowShear*elbowTranslation*[0,0,0,1])
+        )
+        translate( origin )
+        translate( [0,getTasWrenchB(w)/2+WALL_DISTANCE,0] )
+        scale( [1,1,1] )
+            rotate( [0,90,0] )
+            tasWrench(w);
 
-        // Draw the wrenches for visual check
-    %   for ( i=[i0:i1] )
-            let (
-                w=wrenchList[i],
-                elbowCenteri = movedElbowCenter(wrenchList,i),
-                elbowTranslation=taswTranslation(elbowCenteri),
-                origin = take3(elbowShear*elbowTranslation*[0,0,0,1])
-            )
-            translate( origin )
-            translate( [0,getTasWrenchB(w)/2+WALL_DISTANCE,0] )
-            scale( [1,1,1] )
-                rotate( [0,90,0] )
-                tasWrench(w);
-
-    }
 }
 
 // Profile height above and below 0
+PROFILE_STOP_A = 80;
 function hookProfileHA( w, dy ) = let(
     ldy=forceValueInRange(dy,1,defv=getTasWrenchDE1(w)+2*gap()),
     ry=ldy/2,
     h=getTasWrenchB(w)/2+WALL_DISTANCE-ry
 ) h ;
 function hookProfileHB( w, dz ) = let(
-    ldz=forceValueInRange(dz,1,defv=getTasWrenchDE1(w)+2*gap()),
-    rz=ldz/2,
-    h=rz+HOOK_WIDTH+getTasWrenchB(w)/2
+    ldz = forceValueInRange(dz,1,defv=getTasWrenchDE1(w)+2*gap()),
+    rz  = ldz/2,
+    r5  = getTasWrenchB(w)/2,
+    h   = rz+HOOK_WIDTH+getTasWrenchB(w)/2-r5*sin(90-PROFILE_STOP_A)
 ) h ;
 
 function hookProfile( w, dy=undef, dz=undef ) = let (
@@ -373,7 +451,7 @@ function hookProfile( w, dy=undef, dz=undef ) = let (
         c4 + [0,r4y*cos(da-ra*s),r4z*sin(da-ra*s)]
     ,
     for ( s=[0:getStep(2):1] )
-        c5 + [0,r5*cos(90+90*s),r5*sin(90+90*s)]
+        c5 + [0,r5*cos(90+PROFILE_STOP_A*s),r5*sin(90+PROFILE_STOP_A*s)]
     ,
     [0,-STAND_THIKNESS,c5.z],
 ];

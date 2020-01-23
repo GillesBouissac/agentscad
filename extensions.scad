@@ -264,9 +264,9 @@ module oblong ( r, h=1, i=0, center=false ) {
 
 // Rotates a shape from [0,0,1] to given vector
 module alignOnVector(v) {
-    length = norm([v.x,v.y,v.z]);    // radial distance
-    b = sign(v.x)*acos(v.z/length);  // inclination angle
-    c = v.y==0 ? 0 : atan2(v.y,v.x); // azimuthal angle
+    length = norm([v.x,v.y,v.z]);                    // radial distance
+    b = length==0 ? 0 : sign(v.x)*acos(v.z/length);  // inclination angle
+    c = v.y==0 ? 0 : atan2(v.y,v.x);                 // azimuthal angle
     rotate([0, b, c])
         children();
 }
