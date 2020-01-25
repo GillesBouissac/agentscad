@@ -32,8 +32,8 @@ LOWPOLY = 6;
 //             wrenches in the group, the count start from first wrench in WRENCHES
 //           Set this to undef is you want a single part stand
 taswStand (
-    wrenches     = 16_WRENCHES,
-    groups       = 16_WRENCHES_GROUPS,
+    wrenches     = 10_WRENCHES,
+    groups       = 10_WRENCHES_GROUPS,
     group_num    = undef,
     numbers_only = false,
     $fn          = FAST );
@@ -292,8 +292,7 @@ module taswStand ( wrenches, numbers_only=false, groups=undef, group_num ) {
     assert( columnSum(lgroups)==len(wrenchList),
         "When groups is not equal to undef, the sum of number in this array must be equal to the number of elements in wrenches" );
 
-    elbowOriginV_n = movedElbowCenter(wrenchList,n);
-    alignOnVector([-elbowOriginV_n.x,0,elbowOriginV_n.z]) {
+    rotate( [90,0,180] ) {
 
         if ( is_undef(group_num) )
             for ( g=[0:len(lgroups)-1] ) let (
