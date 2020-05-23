@@ -9,8 +9,7 @@
  * Description: 3D printable metric screws taking into account printer precision
  * Author:      Gilles Bouissac
  */
-use <extensions.scad>
-use <printing.scad>
+use <agentscad/lib-screw.scad>
 
 // ----------------------------------------
 //
@@ -18,424 +17,111 @@ use <printing.scad>
 //
 // ----------------------------------------
 
-// Bolt orientation is:
-//      Head bottom at [0,0,0]
-//      Head goes Z-
-//      Thread goes Z+
-// Nut orientation is opposite:
-//      Head top at [0,0,0]
-//      Head goes Z+
-
 // Bolt passage loose on head to fit any type of head
-//  p   :  bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : This passage will NOT block the bolt
-module mxBoltPassage( p=M2() ) {
-    drill     = p[I_TD]-p[I_TP]+gap() ;
-    local_tl  = p[I_TL] ;
-    local_tlp = p[I_TLP] ;
-    local_hlp = p[I_HLP] ;
-    local_hdp = p[I_HDP] ;
-    mxBoltImpl (
-        drill,            local_tl,
-        p[I_TDP],         local_tlp,
-        local_hdp,        local_hlp
-    );
-}
+module mxBoltPassage( p=M2() ) { libBoltPassage(p); }
 
 // Nut passage loose on head to fit any type of nut
-//  p    : nut params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : This passage will NOT block the nut
-module mxNutPassage( p=M2() ) {
-    local_hdp = p[I_HDP] ;
-    local_hlp = p[I_HLP] ;
-    translate( [0,0,+local_hlp ] )
-        mxBoltImpl (
-            0,         0,
-            0,         0,
-            local_hdp, local_hlp
-        );
-}
+module mxNutPassage( p=M2() ) { libNutPassage(p); }
 
 // Hexagonal nut passage
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : his passage will block the nut
-module mxNutHexagonalPassage( p=M2() ) {
-    local_hhd = p[I_HHD] ;
-    local_hlp = p[I_HHL]+2*gap() ;
-    translate( [0,0,+local_hlp/2 ] )
-        cylinder( r=local_hhd/2+gap(), h=local_hlp, center=true, $fn=6 );
-}
+module mxNutHexagonalPassage( p=M2() ) { libNutHexagonalPassage(p); }
 
 // Hexagonal nut passage
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : This passage will block the nut
-module mxNutSquarePassage( p=M2() ) {
-    local_shw = p[I_HTS] ;
-    local_slp = p[I_HHL]+2*gap() ;
-    translate( [0,0,+local_slp/2 ] )
-        cube( [local_shw+gap(),local_shw+gap(),local_slp], center=true );
-}
+module mxNutSquarePassage( p=M2() ) { libNutSquarePassage(p); }
 
 // Bolt passage Tight on head for Allen head
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-module mxBoltAllenPassage( p=M2() ) {
-    drill     = p[I_TD]-p[I_TP]+gap() ;
-    local_tl  = p[I_TL] ;
-    local_tlp = p[I_TLP] ;
-    union() {
-        mxBoltImpl (
-            drill,             local_tl+gap(),
-            p[I_TDP],          local_tlp,
-            p[I_AHD]+2*gap(),  p[I_HLP]
-        );
-    }
-}
+module mxBoltAllenPassage( p=M2() ) { libBoltAllenPassage(p); }
 
 // Bolt passage Tight on head for Hexagonal head
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : This passage will block the bolt
-module mxBoltHexagonalPassage( p=M2() ) {
-    drill     = p[I_TD]-p[I_TP]+gap() ;
-    local_tl  = p[I_TL] ;
-    local_tlp = p[I_TLP] ;
-    union() {
-        mxBoltImpl (
-            drill,             local_tl+gap(),
-            p[I_TDP],          local_tlp,
-            0,       0
-        );
-        translate( [0,0,-p[I_HLP]/2 ] )
-            cylinder( r=p[I_HHD]/2+gap(), h=p[I_HLP], center=true, $fn=6 );
-    }
-}
+module mxBoltHexagonalPassage( p=M2() ) { libBoltHexagonalPassage(p); }
 
 // Bolt with Allen head
-//  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  bt   : Bevel top of head
-module mxBoltAllen( p=M2(), bt=true ) {
-    // +gap() for easier fitting with the tool
-    tool_r   = p[I_ATS]/(2*cos(30))+gap();
-    cone_h   = tool_r/2*tan(30);
-    tool_l   = p[I_AHL]*2/3;
-    local_tl = p[I_TL] ;
-    difference() {
-        union() {
-            mxBoltImpl (
-                p[I_TD],   local_tl,
-                0,         0,
-                0,         0
-            );
-            translate( [0,0,-p[I_AHL]/2] )
-            intersection() {
-                cylinder( r=p[I_AHD]/2, h=p[I_AHL], center=true );
-                mxBevelShape(
-                    p[I_AHL],
-                    p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A),
-                    a=BEVEL_ALLEN_A,
-                    t=false,
-                    b=bt);
-            }
-        }
-        translate( [0,0,-p[I_AHL]-VGG] ) {
-            cylinder( r=tool_r, h=tool_l, $fn=6 );
-            translate( [0,0,tool_l] )
-            cylinder( r1=tool_r, r2=0, h=cone_h, $fn=6 );
-
-        }
-    }
-}
+module mxBoltAllen( p=M2(), bt=true ) { libBoltAllen(p,bt); }
 
 // Bolt with Hexagonal head
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  bt   : Bevel top of head
-//  bb   : Bevel bottom of head
-module mxBoltHexagonal( p=M2(), bt=true, bb=true ) {
-    local_tl  = p[I_TL] ;
-    local_hhd = p[I_HHD] ;
-    local_hhl = p[I_HHL] ;
-    union() {
-        mxBoltImpl (
-            p[I_TD], local_tl,
-            0,       0,
-            0,       0
-        );
-        translate( [0,0,-local_hhl/2 ] )
-        intersection() {
-            // -gap() for easier fitting with the tool
-            cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
-            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
-        }
-    }
-}
+module mxBoltHexagonal( p=M2(), bt=true, bb=true ) { libBoltHexagonal(p,bt,bb); }
 
 // Hexagonal nut
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : This passage will prevent nut from turning
-module mxNutHexagonal( p=M2(), bt=true, bb=true ) {
-    local_hhd = p[I_HHD] ;
-    local_hhl = p[I_HHL] ;
-    translate( [0,0,+local_hhl/2 ] )
-        intersection() {
-            difference() {
-                // -gap() for easier fitting with the tool
-                cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
-                cylinder( r=p[I_TAP]/2,  h=local_hhl+VGG, center=true );
-            }
-            mxBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
-        }
-}
+module mxNutHexagonal( p=M2(), bt=true, bb=true ) { libNutHexagonal(p,bt,bb); }
 
 // Square nut
-//  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  shl  : square head length, <0 means use default hexagonal head length from p
-//  Note : This passage will prevent nut from turning
-module mxNutSquare( p=M2(), bt=true, bb=true ) {
-    local_shd = p[I_HTS] ;
-    local_shl = p[I_HHL] ;
-    translate( [0,0,+local_shl/2 ] )
-        intersection() {
-            difference() {
-                // -gap() for easier fitting with the tool
-                cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
-                cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
-            }
-            //mxBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
-            mxBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
-            cylinder( r=(local_shd-gap())/2/cos(45)-p[I_TD]/10,  h=local_shl, center=true );
-        }
-}
-
-// l    : head length
-// d    : diameter or tangent circle on top of head
-// a    : beveling angle
-// t    : true to get the top bevel
-// b    : true to get the bottom bevel
-module mxBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
-    h  = (d/2)*tan(a);
-    r  = (l+h)/tan(a);
-    intersection() {
-        if ( t ) {
-            translate([0,0,-l/2])
-            cylinder( r1=r, r2=0, h=(l+h) );
-        }
-        if ( b ) {
-            translate([0,0,-h-l/2])
-            cylinder( r1=0, r2=r, h=(l+h) );
-        }
-    }
-}
+module mxNutSquare( p=M2(), bt=true, bb=true ) { libNutSquare(p,bt,bb); }
 
 // Mx constructors
-//   tl:  Thread length,                    -1 = use common value
-//   tlp: Thread length passage,            -1 = tl
-//   hl:  Head length for all type of head, -1 = use standard values
-//   hlp: Head length passage,              -1 = use common value
-//   tdp: Thread diameter passage,          -1 = computed from td and gap()
-//   hd:  Head external diameter,           -1 = use standard value
-//   hdp: Head external diameter,           -1 = use common value
-function M1_6 (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M2   (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M2_5 (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M3   (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(3 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M4   (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(4 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M5   (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(5 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M6   (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(6 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M8   (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(7 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M10  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(8 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M12  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(9 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M14  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(10,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M16  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(11,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M18  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(12,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M20  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(13,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M22  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(14,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M24  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(15,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M27  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(16,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M30  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(17,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M33  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(18,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M36  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(19,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M39  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(20,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M42  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(21,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M45  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(22,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M48  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(23,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M52  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(24,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M56  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(25,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M60  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(26,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function M64  (tl=-1,tlp=-1,ahl=-1,hhl=-1,hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) = mxData(27,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+//   tl:  Thread length,                    undef = use common value
+//   tlp: Thread length passage,            undef = tl
+//   hl:  Head length for all type of head, undef = use standard values
+//   hlp: Head length passage,              undef = use common value
+//   tdp: Thread diameter passage,          undef = computed from td and gap()
+//   hd:  Head external diameter,           undef = use standard value
+//   hdp: Head external diameter,           undef = use common value
+function M1_6 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M2   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M2_5 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M3   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(3 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(4 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M5   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(5 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M6   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(6 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(7 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M10  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(8 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M12  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(9 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M14  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(10,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(11,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M18  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(12,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M20  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(13,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M22  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(14,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M24  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(15,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M27  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(16,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M30  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(17,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M33  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(18,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M36  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(19,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M39  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(20,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M42  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(21,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M45  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(22,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M48  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(23,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M52  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(24,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M56  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(25,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M60  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(26,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function M64  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(27,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 
 // Guess what is the better standard thread from the given one
 //   if td>0: will pick the first screw larger than the given value
 //   if td<0: will pick the first screw smaller than the given value
-function mxGuess ( td, tl=-1,tlp=-1, ahl=-1, hhl=-1, hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) =
-let (
-    dists    = [ for( i=[0:len(MXDATA)-1] ) let ( diff=MXDATA[i][CTD]-abs(td) )
-        ( diff==0 || sign(td)==0 || sign(td)==sign(diff) ) ? abs(diff) : 1e100 ],
-    sorted   = sortIndexed(dists),
-    filtered = [ for (a=sorted) if (a[0]!=1e100) a ],
-    idx      = len(filtered)==0 ? undef : filtered[0][1]
-)
-mxData(
-    idx = idx,
-    tl  = tl,
-    tlp = tlp,
-    ahl = ahl,
-    hhl = hhl,
-    hlp = hlp,
-    tdp = tdp,
-    ahd = ahd,
-    hhd = hhd,
-    hdp = hdp
-);
+function mxGuess ( td, tl=undef,tlp=undef, ahl=undef, hhl=undef, hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) =
+    libGuess( MXDATA,td=td,tl=tl,tlp=tlp,ahl=ahl,hhl=hhl,hlp=hlp,tdp=tdp,ahd=ahd,hhd=hhd,hdp=hdp);
 
 // Clones a screw allowing to overrides some characteristics
-function mxClone (p,tl=-1,tlp=-1, ahl=-1, hhl=-1, hlp=-1,tdp=-1,ahd=-1,hhd=-1,hdp=-1) =
-mxData(
-    idx = p[I_IDX],
-    tl  = tl<0  ? p[I_TL]  : tl,
-    tlp = tlp<0 ? p[I_TLP] : tlp,
-    ahl = ahl<0 ? p[I_AHL] : ahl,
-    hhl = hhl<0 ? p[I_HHL] : hhl,
-    hlp = hlp<0 ? p[I_HLP] : hlp,
-    tdp = tdp<0 ? p[I_TDP] : tdp,
-    ahd = ahd<0 ? p[I_AHD] : ahd,
-    hhd = hhd<0 ? p[I_HHD] : hhd,
-    hdp = hdp<0 ? p[I_HDP] : hdp
-);
+function mxClone (p,tl=undef,tlp=undef, ahl=undef, hhl=undef, hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) =
+    screwClone( MXDATA,p=p,tl=tl,tlp=tlp,ahl=ahl,hhl=hhl,hlp=hlp,tdp=tdp,ahd=ahd,hhd=hhd,hdp=hdp);
 
 // Data accessors on data
-function mxGetIdx(s)                 = s[I_IDX];
-function mxGetName(s)                = s[I_NAME];
-function mxGetTapD(s)                = s[I_TAP];
-function mxGetPitch(s)               = s[I_TP];
-function mxGetThreadD(s)             = s[I_TD];
-function mxGetThreadDP(s)            = s[I_TDP];
-function mxGetThreadL(s)             = s[I_TL];
-function mxGetThreadLP(s)            = s[I_TLP];
-function mxGetHeadDP(s)              = s[I_HDP];
-function mxGetHeadLP(s)              = s[I_HLP];
+function mxGetIdx(s)                 = screwGetIdx(s);
+function mxGetName(s)                = screwGetName(s);
+function mxGetTapD(s)                = screwGetTapD(s);
+function mxGetPitch(s)               = screwGetPitch(s);
+function mxGetThreadD(s)             = screwGetThreadD(s);
+function mxGetThreadDP(s)            = screwGetThreadDP(s);
+function mxGetThreadL(s)             = screwGetThreadL(s);
+function mxGetThreadLP(s)            = screwGetThreadLP(s);
+function mxGetHeadDP(s)              = screwGetHeadDP(s);
+function mxGetHeadLP(s)              = screwGetHeadLP(s);
 
-function mxGetAllenHeadD(s)          = s[I_AHD];
-function mxGetAllenHeadL(s)          = s[I_AHL];
-function mxGetAllenToolSize(s)       = s[I_ATS];
+function mxGetAllenHeadD(s)          = screwGetAllenHeadD(s);
+function mxGetAllenHeadL(s)          = screwGetAllenHeadL(s);
+function mxGetAllenToolSize(s)       = screwGetAllenToolSize(s);
 
-function mxGetHexagonalHeadD(s)      = s[I_HHD];
-function mxGetHexagonalHeadL(s)      = s[I_HHL];
-function mxGetHexagonalToolSize(s)   = s[I_HTS];
+function mxGetHexagonalHeadD(s)      = screwGetHexagonalHeadD(s);
+function mxGetHexagonalHeadL(s)      = screwGetHexagonalHeadL(s);
+function mxGetHexagonalToolSize(s)   = screwGetHexagonalToolSize(s);
 
-function mxGetSquareHeadD(s)         = s[I_HTS];
-function mxGetSquareHeadL(s)         = s[I_HHL];
-function mxGetSquareToolSize(s)      = s[I_HTS];
-
-// Values helpfull to draw threads
-function mxGetFunctionalRadiuses(s)  = s[I_RADF];
-function mxGetGlobalRadiuses(s)      = s[I_RADG];
-function mxGetSmoothRadiuses(s)      = s[I_RADS];
-function mxGetSmoothCenters(s)       = s[I_CENTR];
-function mxGetFlatHalfLenght(s)      = s[I_FLAT];
-function mxGetFlankAngle(s)          = s[I_ANGLE];
-
-
-// ----------------------------------------
-//
-//    Implementation
-//
-// ----------------------------------------
-
-// Renders a bolt with given parameters for Thread, Thread passage and Head
-module mxBoltImpl( td, tl, tdp, tlp, hd, hl ) {
-    translate( [0,0,+(tl+tlp)/2 ] )
-        cylinder( r=td/2, h=tl-tlp, center=true );
-    translate( [0,0,+tlp/2 ] )
-        cylinder( r=tdp/2, h=tlp+VGG, center=true );
-    if ( hl>0 ) {
-        translate( [0,0,-hl/2 ] )
-            cylinder( r=hd/2, h=hl, center=true );
-    }
-}
-
-VGG            = 0.01;  // Visual Glich Guard
-MFG            = 0.001; // Manifold Guard
-MXANGLE        = 60;    // Metric thread flanks V angle
-BEVEL_HEXA_A   = 30;    // Hexagonal head bevel angle
-BEVEL_SQUARE_A = 30;    // Square head bevel angle
-BEVEL_ALLEN_A  = 30;    // Allen head bevel angle
-
-I_IDX   =  0;
-I_NAME  =  1;
-I_TP    =  2; // Thread Pitch: Distance between threads
-I_TAP   =  3; // Tap diameter
-I_TD    =  4; // Thread Diameter
-I_TDP   =  5; // Thread Passage Diameter
-I_TL    =  6; // Thread Length
-I_TLP   =  7; // Thread Passage Length
-I_HDP   =  8; // Head Passage Diameter
-I_HLP   =  9; // Head Passage Length
-I_AHD   = 10; // Head Diameter for Allen head
-I_AHL   = 11; // Head Length for Allen head
-I_ATS   = 12; // Allen Tool Size
-I_HHD   = 13; // Head Diameter for Hexagonal head
-I_HHL   = 14; // Head Length for Hexagonal head
-I_HTS   = 15; // Hexagonal Tool Size
-I_RADF  = 16; // Functional thread enclosing radiuses (between flat parts)
-I_RADG  = 17; // Global thread enclosing radiuses (with round parts)
-I_FLAT  = 18; // Flat parts HALF length
-I_RADS  = 19; // Smoothing parts Radiuses (circular parts)
-I_CENTR = 20; // Centers of round parts
-I_ANGLE = 21; // Thread flanks V angle
+function mxGetSquareHeadD(s)         = screwGetSquareHeadD(s);
+function mxGetSquareHeadL(s)         = screwGetSquareHeadL(s);
+function mxGetSquareToolSize(s)      = screwGetSquareToolSize(s);
 
 function mxGetDataLength() = len(MXDATA);
-function mxData( idx, tl=-1, tlp=-1, ahl=-1, hhl=-1, hlp=-1, tdp=-1, ahd=-1, hhd=-1, hdp=-1 ) = let (
-    local_tl  = tl<0 ? MXDATA[idx][CTL] : tl,
-    local_tlp = (tlp<0 || tlp>local_tl) ? local_tl : tlp,
-    local_hhl = hhl<0  ? MXDATA[idx][CHHL] : hhl,
-    local_ahl = ahl<0  ? MXDATA[idx][CAHL] : ahl,
-    local_hlp = hlp<0  ? MXDATA[idx][CHLP] : hlp,
-    local_ahd = ahd<0  ? MXDATA[idx][CAHD] : ahd,
-    local_hhd = hhd<0  ? MXDATA[idx][CHTS]/cos(30) : hhd,
-    local_hts = hhd<0  ? MXDATA[idx][CHTS] : hhd*cos(30),
-    local_hdp = hdp<0  ? MXDATA[idx][CHDP] : hdp,
-
-    // Metric screw profile is well defined by wikipedia:
-    //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
-    p         = MXDATA[idx][CPITCH],
-    Theta     = MXANGLE/2,
-    H         = p/(2*tan(Theta)),
-    Rmaj      = MXDATA[idx][CTD]/2,
-    Rmin      = Rmaj - 5*H/8,
-    Fmin      = p/8, // Flat part half length on Dmin
-    Fmaj      = p/16,
-    RRmin     = Fmin/cos(Theta),
-    RRmaj     = Fmaj/cos(Theta),
-    Cmin      = [ Fmin+MFG, Rmin+RRmin*sin(Theta) ],
-    Cmaj      = [ Fmin+p/2, Rmaj-RRmaj*sin(Theta) ],
-    RTop      = Cmaj.y+RRmaj,
-    RBot      = Cmin.y-RRmin,
-
-    // gap(): see mx-thread
-    local_tdp = tdp<0 ? 2*(RTop+gap()) : tdp
-) [
-    idx,
-    MXDATA[idx][CNAME],
-    p,                         // TP
-    MXDATA[idx][CTD]-p,        // TAP
-    MXDATA[idx][CTD],          // TD
-    local_tdp,                 // TDP
-    local_tl,                  // TL
-    local_tlp,                 // TLP
-    local_hdp,                 // HDP
-    local_hlp,                 // HLP
-    local_ahd,                 // AHD 
-    local_ahl,                 // AHL
-    MXDATA[idx][CATS],         // ATS
-    local_hhd,                 // HHD
-    local_hhl,                 // HHL
-    local_hts,                 // HTS
-    [ Rmin,  Rmaj  ],          // RADF
-    [ RBot,  RTop  ],          // RADE
-    [ Fmin,  Fmaj  ],          // FLAT
-    [ RRmin, RRmaj ],          // RADR
-    [ Cmin,  Cmaj  ],          // CENTR
-    MXANGLE                    // ANGLE
-];
+function mxData( idx, tl=undef, tlp=undef, ahl=undef, hhl=undef, hlp=undef, tdp=undef, ahd=undef, hhd=undef, hdp=undef ) = 
+    libScrewDataCompletion( MXDATA,idx,n=undef,p=undef,tl=tl,tlp=tlp,ahl=ahl,hhl=hhl,hlp=hlp,tdp=tdp,ahd=ahd,hhd=hhd,hdp=hdp)
+;
 
 //
 // Raw data
@@ -451,6 +137,7 @@ function mxData( idx, tl=-1, tlp=-1, ahl=-1, hhl=-1, hlp=-1, tdp=-1, ahd=-1, hhd
 //
 // PITCH is Standard coarse pitch
 //
+
 MXDATA = [
 //| Name   | PITCH  |  TD  |  TL  | HDP  | HLP  |  AHD  | AHL  | ATS  |  HHL | HTS |
 // idx=0
@@ -485,18 +172,6 @@ MXDATA = [
   [ "M60"  ,   5.5  ,   60 ,  130 ,  100 , 64.0 ,  90.0 , 60   , 41.0 , 38.0 ,  90 ],
   [ "M64"  ,   6.0  ,   64 ,  138 ,  105 , 68.0 ,  96.0 , 64   , 46.0 , 40.0 ,  95 ]
 ];
-CNAME    =  0;
-CPITCH   =  1;
-CTD      =  2;
-CTL      =  3;
-CHDP     =  4;
-CHLP     =  5;
-CAHD     =  6;
-CAHL     =  7;
-CATS     =  8;
-// CHHD  = Computed from CHTS: CHTS/cos(30)
-CHHL     =  9;
-CHTS     = 10;
 
 // HDP extrapolation from HTS
 // According to C1 (HDP) from https://shop.hpceurope.com/pdf/fr/CHC.pdf:
