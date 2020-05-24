@@ -50,11 +50,16 @@ module mxNutSquare( p=M2(), bt=true, bb=true ) { libNutSquare(p,bt,bb); }
 // Mx constructors
 //   tl:  Thread length,                    undef = use common value
 //   tlp: Thread length passage,            undef = tl
-//   hl:  Head length for all type of head, undef = use standard values
-//   hlp: Head length passage,              undef = use common value
-//   tdp: Thread diameter passage,          undef = computed from td and gap()
-//   hd:  Head external diameter,           undef = use standard value
-//   hdp: Head external diameter,           undef = use common value
+//   ahl: Allen Head Length                 undef = use common value
+//   hhl: Hexagonal Head Length             undef = use common value
+//   hlp: Head Length Passage,              undef = use common value
+//   tdp: Thread Diameter Passage,          undef = computed from td and gap()
+//   ahd: Allen Head diameter,              undef = use common value
+//   hhd: Hexagonal Head diameter,          undef = use standard value
+//   hdp: Head Diameter Passage,            undef = use common value
+//
+// Dimensions must be given in mm
+//
 function M1_6 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 function M2   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 function M2_5 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
@@ -88,7 +93,7 @@ function M64  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=un
 //   if td>0: will pick the first screw larger than the given value
 //   if td<0: will pick the first screw smaller than the given value
 function mxGuess ( td, tl=undef,tlp=undef, ahl=undef, hhl=undef, hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) =
-    libGuess( MXDATA,td=td,tl=tl,tlp=tlp,ahl=ahl,hhl=hhl,hlp=hlp,tdp=tdp,ahd=ahd,hhd=hhd,hdp=hdp);
+    screwGuess( MXDATA,td=td,tl=tl,tlp=tlp,ahl=ahl,hhl=hhl,hlp=hlp,tdp=tdp,ahd=ahd,hhd=hhd,hdp=hdp);
 
 // Clones a screw allowing to overrides some characteristics
 function mxClone (p,tl=undef,tlp=undef, ahl=undef, hhl=undef, hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) =
@@ -135,16 +140,26 @@ function mxData( idx, tl=undef, tlp=undef, ahl=undef, hhl=undef, hlp=undef, tdp=
 //   https://www.newfastener.com/wp-content/uploads/2013/03/DIN-912.pdf
 //   https://www.fastenerdata.co.uk/fasteners/nuts/square.html
 //
-// PITCH is Standard coarse pitch
+// WARNING: Dimensions are given in mm
+//   PITCH: Standard coarse pitch value
+//   TD:    Thread external Diameter
+//   TL:    Thread Length default value
+//   HDP:   Head Diameter Passage enough for any tool
+//   HLP:   Head Length Passage default value
+//   AHD:   Allen Head Diameter tight, do not allow tool passage, only head
+//   AHL:   Allen Head Length tight
+//   ATS:   Allen Tool Size
+//   HHL:   Hexagonal Head Length tight
+//   HTS:   Hexagonal Tool Size
 //
 
 MXDATA = [
 //| Name   | PITCH  |  TD  |  TL  | HDP  | HLP  |  AHD  | AHL  | ATS  |  HHL | HTS |
 // idx=0
-  [ "M1.6" ,   0.35 ,  1.6 ,    4 ,    5 ,  2.0 ,   3.0 ,  1.6 ,  1.5 ,  1.1 , 3.2 ],
-  [ "M2"   ,   0.4  ,    2 ,    6 ,    6 ,  2.5 ,   3.8 ,  2   ,  1.5 ,  1.4 ,   4 ],
-  [ "M2.5" ,   0.45 ,  2.5 ,    8 ,    7 ,  3.0 ,   4.5 ,  2.5 ,  2.0 ,  1.7 ,   5 ],
-  [ "M3"   ,   0.5  ,    3 ,   16 ,    8 ,  3.5 ,   5.5 ,  3   ,  2.5 ,  2.0 , 5.5 ],
+  [ "M1.6" ,   0.35 ,  1.6 ,   13 ,    5 ,  2.0 ,   3.0 ,  1.6 ,  1.5 ,  1.1 , 3.2 ],
+  [ "M2"   ,   0.4  ,    2 ,   14 ,    6 ,  2.5 ,   3.8 ,  2   ,  1.5 ,  1.4 ,   4 ],
+  [ "M2.5" ,   0.45 ,  2.5 ,   16 ,    7 ,  3.0 ,   4.5 ,  2.5 ,  2.0 ,  1.7 ,   5 ],
+  [ "M3"   ,   0.5  ,    3 ,   17 ,    8 ,  3.5 ,   5.5 ,  3   ,  2.5 ,  2.0 , 5.5 ],
   [ "M4"   ,   0.7  ,    4 ,   20 ,   10 ,  4.5 ,   7.0 ,  4   ,  3.0 ,  2.8 ,   7 ],
   [ "M5"   ,   0.8  ,    5 ,   22 ,   11 ,  5.5 ,   8.5 ,  5   ,  4.0 ,  3.5 ,   8 ],
   [ "M6"   ,   1.0  ,    6 ,   24 ,   13 ,  6.5 ,  10.0 ,  6   ,  5.0 ,  4.0 ,  10 ],

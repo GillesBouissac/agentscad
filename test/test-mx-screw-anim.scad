@@ -9,7 +9,7 @@
  * Description: Metric screw modelisation
  * Author:      Gilles Bouissac
  */
-use <../mx-screw.scad>
+use <agentscad/mx-screw.scad>
 
 // ----------------------------------------
 //          Animation params:

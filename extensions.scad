@@ -56,6 +56,24 @@ function mod(a,m) = a - m*floor(a/m);
 // Sums all the elements of a list of elements
 function sum(l) = __sum(l,0);
 
+INCH=25.4;
+
+// millimeter to inch conversion
+// - if d is a vector every number will be converted, non number are preserved unchanged
+function mm2inch(d) =
+    is_list(d) ?
+    [ for ( e=d ) is_num(e) ? e/INCH : e ]
+    :
+    is_num(d) ? d/INCH : d ;
+
+// inch to millimeter conversion
+// - if d is a vector every number will be converted, non number are preserved unchanged
+function inch2mm(d) =
+    is_list(d) ?
+    [ for ( e=d ) is_num(e) ? e*INCH : e ]
+    :
+    is_num(d) ? d*INCH : d ;
+
 // ----------------------------------------
 //           Lists 
 // ----------------------------------------

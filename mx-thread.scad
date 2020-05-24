@@ -99,3 +99,10 @@ if (0) {
         mxBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
 }
 
+// Test thread profile
+if (0) {
+    !union() {
+        polygon ( screwThreadProfile ( M4(), 1, I=false, $gap=0.01, $fn=50 ) );
+        polygon ( screwThreadProfile ( M4(), 1, I=true,  $gap=0.01, $fn=50 ) );
+    }
+}

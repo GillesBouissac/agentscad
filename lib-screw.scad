@@ -195,6 +195,7 @@ module libNutHexagonal( p, bt=true, bb=true ) {
 module libNutSquare( p, bt=true, bb=true ) {
     local_shd = p[I_HTS] ;
     local_shl = p[I_HHL] ;
+
     translate( [0,0,+local_shl/2 ] )
         intersection() {
             difference() {
@@ -204,7 +205,7 @@ module libNutSquare( p, bt=true, bb=true ) {
             }
             // libBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
             libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
-            cylinder( r=(local_shd-gap())/2/cos(45)-p[I_TD]/10,  h=local_shl, center=true );
+            cylinder( r=(local_shd-gap())/(2*cos(45))-p[I_TD]/10,  h=local_shl, center=true );
         }
 }
 
@@ -231,12 +232,13 @@ module libBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
 // Guess what is the better standard thread from the given one
 //   if td>0: will pick the first screw larger than the given value
 //   if td<0: will pick the first screw smaller than the given value
-function libGuess ( data,td,tl=-1,hdp=-1,hlp=-1,ahd=-1,ahl=-1,hhd=-1,hhl=-1,tdp=-1,tlp=-1) =
+EXCLUDED=1e100;
+function screwGuess ( data,td,tl=-1,hdp=-1,hlp=-1,ahd=-1,ahl=-1,hhd=-1,hhl=-1,tdp=-1,tlp=-1) =
 let (
     dists    = [ for( i=[0:len(data)-1] ) let ( diff=data[i][CTD]-abs(td) )
-        ( diff==0 || sign(td)==0 || sign(td)==sign(diff) ) ? abs(diff) : 1e100 ],
+        ( diff==0 || sign(td)==0 || sign(td)==sign(diff) ) ? abs(diff) : EXCLUDED ],
     sorted   = sortIndexed(dists),
-    filtered = [ for (a=sorted) if (a[0]!=1e100) a ],
+    filtered = [ for (a=sorted) if (a[0]!=EXCLUDED) a ],
     idx      = len(filtered)==0 ? undef : filtered[0][1]
 )
 libScrewDataCompletion(
@@ -450,14 +452,14 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_p    = is_undef(p)   ? data[idx][CPITCH] : p,
     local_td   = is_undef(td)  ? data[idx][CTD]    : td,
     local_tl   = is_undef(tl)  ? data[idx][CTL]    : tl,
-    local_hdp  = is_undef(hdp) ? data[idx][CHDP]   : hdp,
-    local_hlp  = is_undef(hlp) ? data[idx][CHLP]   : hlp,
-    local_ahd  = is_undef(ahd) ? data[idx][CAHD]   : ahd,
-    local_ahl  = is_undef(ahl) ? data[idx][CAHL]   : ahl,
-    local_ats  = is_undef(ats) ? data[idx][CATS]   : ats,
-    local_hhd  = is_undef(hhd) ? data[idx][CHTS]/cos(30) : hhd,
-    local_hhl  = is_undef(hhl) ? data[idx][CHHL]   : hhl,
-    local_hts  = is_undef(hhd) ? data[idx][CHTS]   : hhd*cos(30),
+    local_ahl  = is_undef(ahl) ? ( is_undef(data[idx][CAHL]) ? local_td                : data[idx][CAHL] ) : ahl,
+    local_ats  = is_undef(ats) ? ( is_undef(data[idx][CATS]) ? local_td*3/4            : data[idx][CATS] ) : ats,
+    local_hhl  = is_undef(hhl) ? ( is_undef(data[idx][CHHL]) ? local_td*7/10           : data[idx][CHHL] ) : hhl,
+    local_hts  = is_undef(hhd) ? ( is_undef(data[idx][CHTS]) ? local_td*cos(30)*26/15  : data[idx][CHTS] ) : hhd*cos(30),
+    local_ahd  = is_undef(ahd) ? ( is_undef(data[idx][CAHD]) ? local_hts               : data[idx][CAHD] ) : ahd,
+    local_hdp  = is_undef(hdp) ? ( is_undef(data[idx][CHDP]) ? local_hts/cos(45)       : data[idx][CHDP] ) : hdp,
+    local_hlp  = is_undef(hlp) ? ( is_undef(data[idx][CHLP]) ? local_ahl               : data[idx][CHLP] ) : hlp,
+    local_hhd  = is_undef(hhd) ? local_hts/cos(30) : hhd,
     local_tlp  = (is_undef(tlp) || tlp>local_tl)   ? local_tl : tlp,
 
     // Metric screw profile is well defined by wikipedia:
@@ -518,8 +520,7 @@ CATS     =  8; // Allen Tool Size (mm)
 CHHL     =  9; // Hexagonal Head Length tight (mm)
 CHTS     = 10; // Hexagonal Tool Size (mm)
 
-
-MXANGLE = 60;
+MXANGLE  = 60;
 
 // Metric screw profile is well defined by wikipedia:
 //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
@@ -530,7 +531,7 @@ function screwThreadProfile( data, t=-1, I=false ) =
     let (
         Theta  = screwGetFlankAngle(data)/2,
         p      = screwGetPitch(data),
-        delta  = I ? +gap() : -gap(1/2),
+        delta  = I ? +gap() : -gap(3/4),
         Rmaj   = screwGetFunctionalRadiuses(data)[1] + delta,
         Rmin   = screwGetFunctionalRadiuses(data)[0] + delta,
         RBot   = screwGetGlobalRadiuses(data)[0],
@@ -578,11 +579,3 @@ function screwThreadSlices( profile, pitch, rotations=1 ) = [
     for ( a=[-step/2:step:rotations*360+step/2] )
         transform(translation([a*pitch/360,0,0])*rotation([a,0,0]), profile )
 ];
-
-// Test thread profile
-if (0) {
-    !union() {
-        polygon ( mxThreadProfile ( M5(), 1, I=false, $gap=0.01, $fn=50 ) );
-        polygon ( mxThreadProfile ( M5(), 1, I=true,  $gap=0.01, $fn=50 ) );
-    }
-}
