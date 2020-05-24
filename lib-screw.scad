@@ -233,7 +233,7 @@ module libBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
 //   if td>0: will pick the first screw larger than the given value
 //   if td<0: will pick the first screw smaller than the given value
 EXCLUDED=1e100;
-function screwGuess ( data,td,tl=-1,hdp=-1,hlp=-1,ahd=-1,ahl=-1,hhd=-1,hhl=-1,tdp=-1,tlp=-1) =
+function screwGuess ( data,td,tl=undef,hdp=undef,hlp=undef,ahd=undef,ahl=undef,hhd=undef,hhl=undef,tdp=undef,tlp=undef,prf=undef) =
 let (
     dists    = [ for( i=[0:len(data)-1] ) let ( diff=data[i][CTD]-abs(td) )
         ( diff==0 || sign(td)==0 || sign(td)==sign(diff) ) ? abs(diff) : EXCLUDED ],
@@ -256,27 +256,29 @@ libScrewDataCompletion(
     hhd  = hhd,
     hhl  = hhl,
     tdp  = tdp,
-    tlp  = tlp
+    tlp  = tlp,
+    prf  = prf
 );
 
 // Clones a screw allowing to overrides some characteristics
-function screwClone (data,p,tl=-1,hdp=-1,hlp=-1,ahd=-1,ahl=-1,hhd=-1,hhl=-1,tdp=-1,tlp=-1) =
+function screwClone (data,p,tl=undef,hdp=undef,hlp=undef,ahd=undef,ahl=undef,hhd=undef,hhl=undef,tdp=undef,tlp=undef) =
 libScrewDataCompletion(
     data = data,
     idx  = p[I_IDX],
     n    = p[I_NAME],
     p    = p[I_TP],
     td   = p[I_TD],
-    tl   = tl<0  ? p[I_TL]  : tl,
-    hdp  = hdp<0 ? p[I_HDP] : hdp,
-    hlp  = hlp<0 ? p[I_HLP] : hlp,
-    ahd  = ahd<0 ? p[I_AHD] : ahd,
-    ahl  = ahl<0 ? p[I_AHL] : ahl,
+    tl   = is_undef(tl)  ? p[I_TL]  : tl,
+    hdp  = is_undef(hdp) ? p[I_HDP] : hdp,
+    hlp  = is_undef(hlp) ? p[I_HLP] : hlp,
+    ahd  = is_undef(ahd) ? p[I_AHD] : ahd,
+    ahl  = is_undef(ahl) ? p[I_AHL] : ahl,
     ats  = p[I_ATS],
-    hhd  = hhd<0 ? p[I_HHD] : hhd,
-    hhl  = hhl<0 ? p[I_HHL] : hhl,
-    tdp  = tdp<0 ? p[I_TDP] : tdp,
-    tlp  = tlp<0 ? p[I_TLP] : tlp
+    hhd  = is_undef(hhd) ? p[I_HHD] : hhd,
+    hhl  = is_undef(hhl) ? p[I_HHL] : hhl,
+    tdp  = is_undef(tdp) ? p[I_TDP] : tdp,
+    tlp  = is_undef(tlp) ? p[I_TLP] : tlp,
+    prf  = p[I_PRF]
 );
 
 // Data accessors on data
@@ -302,14 +304,6 @@ function screwGetHexagonalToolSize(s)   = s[I_HTS];
 function screwGetSquareHeadD(s)         = s[I_HTS];
 function screwGetSquareHeadL(s)         = s[I_HHL];
 function screwGetSquareToolSize(s)      = s[I_HTS];
-
-// Values helpfull to draw threads
-function screwGetFunctionalRadiuses(s)  = s[I_RADF];
-function screwGetGlobalRadiuses(s)      = s[I_RADG];
-function screwGetSmoothRadiuses(s)      = s[I_RADS];
-function screwGetSmoothCenters(s)       = s[I_CENTR];
-function screwGetFlatHalfLenght(s)      = s[I_FLAT];
-function screwGetFlankAngle(s)          = s[I_ANGLE];
 
 // ----------------------------------------
 //
@@ -419,35 +413,40 @@ module libBoltImpl( td, tl, tdp, tlp, hd, hl ) {
 
 VGG            = 0.01;  // Visual Glich Guard
 MFG            = 0.001; // Manifold Guard
-THREAD_ANGLE   = 60;    // Thread flanks V angle
+M_ANGLE        = 60;    // Thread flanks V angle for M profile
+W_ANGLE        = 55;    // Thread flanks V angle for Whitworth profile
 BEVEL_HEXA_A   = 30;    // Hexagonal head bevel angle
 BEVEL_SQUARE_A = 30;    // Square head bevel angle
 BEVEL_ALLEN_A  = 30;    // Allen head bevel angle
 
-I_IDX   =  0;
-I_NAME  =  1;
-I_TP    =  2; // Thread Pitch: Distance between threads
-I_TAP   =  3; // Tap diameter
-I_TD    =  4; // Thread Diameter
-I_TDP   =  5; // Thread Passage Diameter
-I_TL    =  6; // Thread Length
-I_TLP   =  7; // Thread Passage Length
-I_HDP   =  8; // Head Diameter Passage
-I_HLP   =  9; // Head Length Passage
-I_AHD   = 10; // Head Diameter for Allen head
-I_AHL   = 11; // Head Length for Allen head
-I_ATS   = 12; // Allen Tool Size
-I_HHD   = 13; // Head Diameter for Hexagonal head
-I_HHL   = 14; // Head Length for Hexagonal head
-I_HTS   = 15; // Hexagonal Tool Size
-I_RADF  = 16; // Functional thread enclosing radiuses (between flat parts)
-I_RADG  = 17; // Global thread enclosing radiuses (with round parts)
-I_FLAT  = 18; // Flat parts HALF length
-I_RADS  = 19; // Smoothing parts Radiuses (circular parts)
-I_CENTR = 20; // Centers of round parts
-I_ANGLE = 21; // Thread flanks V angle
+I_IDX    =  0;
+I_NAME   =  1;
+I_TP     =  2; // Thread Pitch: Distance between threads
+I_TAP    =  3; // Tap diameter
+I_TD     =  4; // Thread Diameter
+I_TDP    =  5; // Thread Passage Diameter
+I_TL     =  6; // Thread Length
+I_TLP    =  7; // Thread Passage Length
+I_HDP    =  8; // Head Diameter Passage
+I_HLP    =  9; // Head Length Passage
+I_AHD    = 10; // Head Diameter for Allen head
+I_AHL    = 11; // Head Length for Allen head
+I_ATS    = 12; // Allen Tool Size
+I_HHD    = 13; // Head Diameter for Hexagonal head
+I_HHL    = 14; // Head Length for Hexagonal head
+I_HTS    = 15; // Hexagonal Tool Size
+I_PRF    = 16; // Profile type
+I_RADF   = 17; // Functional thread enclosing radiuses (between flat parts)
+I_RADG   = 18; // Global thread enclosing radiuses (with round parts)
+I_FLAT   = 19; // Flat parts HALF length
+I_RADS   = 20; // Smoothing parts Radiuses (circular parts)
+I_CENTR  = 21; // Centers of round parts
+I_WPRF   = 22; // Whitworth profile data
 
-function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=undef,hlp=undef,ahd=undef,ahl=undef,ats=undef,hhd=undef,hhl=undef,tdp=undef,tlp=undef ) = let (
+PROFILE_M = "M";
+PROFILE_W = "W";
+
+function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=undef,hlp=undef,ahd=undef,ahl=undef,ats=undef,hhd=undef,hhl=undef,tdp=undef,tlp=undef,prf=undef ) = let (
     local_name = is_undef(n)   ? data[idx][CNAME]  : n,
     local_p    = is_undef(p)   ? data[idx][CPITCH] : p,
     local_td   = is_undef(td)  ? data[idx][CTD]    : td,
@@ -461,10 +460,11 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_hlp  = is_undef(hlp) ? ( is_undef(data[idx][CHLP]) ? local_ahl               : data[idx][CHLP] ) : hlp,
     local_hhd  = is_undef(hhd) ? local_hts/cos(30) : hhd,
     local_tlp  = (is_undef(tlp) || tlp>local_tl)   ? local_tl : tlp,
+    local_prf  = is_undef(prf) ? PROFILE_M : prf,
 
-    // Metric screw profile is well defined by wikipedia:
+    // M screw profile:
     //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
-    Theta     = THREAD_ANGLE/2,
+    Theta     = M_ANGLE/2,
     H         = local_p/(2*tan(Theta)),
     Rmaj      = local_td/2,
     Rmin      = Rmaj - 5*H/8,
@@ -476,6 +476,15 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     Cmaj      = [ Fmin+local_p/2, Rmaj-RRmaj*sin(Theta) ],
     RTop      = Cmaj.y+RRmaj,
     RBot      = Cmin.y-RRmin,
+
+    // Whitworth screw profile:
+    //   https://www.fastenerdata.co.uk/whitworth
+    WH        = 1/( 2*tan(W_ANGLE/2) )*local_p,
+    WH6       = WH/6,
+    WRadius   = WH6/(1/sin(W_ANGLE/2)-1),
+    WRpitch   = local_td/2-WH/3,
+    WCmin     = [ local_p*1/4, WRpitch-(WH/2-(WH6+WRadius)) ],
+    WCmaj     = [ local_p*3/4, WRpitch+(WH/2-(WH6+WRadius)) ],
 
     // reason for gap(): see thread drawing functions
     local_tdp = is_undef(tdp) ? 2*(RTop+gap()) : tdp
@@ -496,12 +505,15 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_hhd,                 // HHD
     local_hhl,                 // HHL
     local_hts,                 // HTS
-    [ Rmin,  Rmaj  ],          // RADF
-    [ RBot,  RTop  ],          // RADE
-    [ Fmin,  Fmaj  ],          // FLAT
-    [ RRmin, RRmaj ],          // RADR
-    [ Cmin,  Cmaj  ],          // CENTR
-    THREAD_ANGLE               // ANGLE
+    local_prf,                 // PRF
+    // M screw profile data
+    [ Rmin,  Rmaj  ],          // RADF   Functional radiuses (Radius of flat parts from thread axis)
+    [ RBot,  RTop  ],          // RADG   Global radiuses (Radius of rounded parts from thread axis)
+    [ Fmin,  Fmaj  ],          // FLAT   Parts half length
+    [ RRmin, RRmaj ],          // RADS   Radius of smoothing circles
+    [ Cmin,  Cmaj  ],          // CENTR  Center position of smoothing circles
+    // WPRF Whitworth profile data
+    [ WH,  WRadius, WCmin, WCmaj ]
 ];
 
 //
@@ -520,27 +532,29 @@ CATS     =  8; // Allen Tool Size (mm)
 CHHL     =  9; // Hexagonal Head Length tight (mm)
 CHTS     = 10; // Hexagonal Tool Size (mm)
 
-MXANGLE  = 60;
+function screwThreadProfile( data, t=-1, I=false ) =
+    data[I_PRF]==PROFILE_M ? screwMetricProfile (data,t,I) : screwWhitworthProfile (data,t,I)
+;
 
-// Metric screw profile is well defined by wikipedia:
+// M screw profile:
 //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
 //
 // T: Optional Thickness of the cylinder holding internal thread (default: NOZZLE)
 // I: Optional Internal (nut) profile if true, External (bolt) if false (default), 
-function screwThreadProfile( data, t=-1, I=false ) =
+function screwMetricProfile( data, t=-1, I=false ) =
     let (
-        Theta  = screwGetFlankAngle(data)/2,
+        Theta  = M_ANGLE/2,
         p      = screwGetPitch(data),
         delta  = I ? +gap() : -gap(3/4),
-        Rmaj   = screwGetFunctionalRadiuses(data)[1] + delta,
-        Rmin   = screwGetFunctionalRadiuses(data)[0] + delta,
-        RBot   = screwGetGlobalRadiuses(data)[0],
-        Fmin   = screwGetFlatHalfLenght(data)[0],
-        Fmaj   = screwGetFlatHalfLenght(data)[1],
-        RRmin  = screwGetSmoothRadiuses(data)[0],
-        RRmaj  = screwGetSmoothRadiuses(data)[1],
-        Cmino  = screwGetSmoothCenters(data)[0],
-        Cmajo  = screwGetSmoothCenters(data)[1],
+        Rmaj   = data[I_RADF][1] + delta,
+        Rmin   = data[I_RADF][0] + delta,
+        RBot   = data[I_RADG][0],
+        Fmin   = data[I_FLAT][0],
+        Fmaj   = data[I_FLAT][1],
+        RRmin  = data[I_RADS][0],
+        RRmaj  = data[I_RADS][1],
+        Cmino  = data[I_CENTR][0],
+        Cmajo  = data[I_CENTR][1],
         Cmin   = [Cmino.x+MFG,Cmino.y+delta],
         Cmaj   = [Cmajo.x,Cmajo.y+delta],
 
@@ -569,13 +583,72 @@ function screwThreadProfile( data, t=-1, I=false ) =
             ,screwThreadRounding( RRmin, Cmin, -(Theta), -(180-Theta) )
         ])
     ;
+
+// Whitworth screw profile:
+//   https://www.fastenerdata.co.uk/whitworth
+//
+// T: Optional Thickness of the cylinder holding internal thread (default: NOZZLE)
+// I: Optional Internal (nut) profile if true, External (bolt) if false (default), 
+function screwWhitworthProfile( data, t=-1, I=false ) =
+    let (
+        Theta   = W_ANGLE/2,
+        p       = screwGetPitch(data),
+        delta   = I ? +gap() : -gap(3/4),
+        Rmaj    = screwGetThreadD(data)/2+delta,
+        WH      = data[I_WPRF][0],
+        WRadius = data[I_WPRF][1],
+        Cmino   = data[I_WPRF][2],
+        Cmajo   = data[I_WPRF][3],
+        Cmin    = [Cmino.x,Cmino.y+delta],
+        Cmaj    = [Cmajo.x,Cmajo.y+delta],
+        WRpitch = Rmaj-WH/3,
+        Tmin    = nozzle(1.5),
+        Tloc    = (t<Tmin ? Tmin : t)
+    )
+    I ?
+        flatten([
+            [
+                 [ p,     WRpitch ]
+                ,[ p,     Rmaj+Tloc ]
+                ,[ 0+MFG, Rmaj+Tloc ]
+                ,[ 0+MFG, WRpitch ]
+            ],
+            screwThreadRounding( WRadius, Cmin, -(180-Theta), -(Theta) ),
+            screwThreadRounding( WRadius, Cmaj, +(180-Theta), +(Theta) )
+        ])
+    :
+        flatten([
+            [
+                 [ 0+MFG, WRpitch ]
+                ,[ 0+MFG, 0+MFG ]
+                ,[ p,     0+MFG ]
+                ,[ p,     WRpitch ]
+            ],
+            screwThreadRounding( WRadius, Cmaj, +(Theta), +(180-Theta) ),
+            screwThreadRounding( WRadius, Cmin, -(Theta), -(180-Theta) )
+        ])
+    ;
+
 function screwThreadRounding( R, C, T1, T2) = [
     let ( range=T2-T1, step=range/($fn<10?1:$fn/10) )
     for ( a=[T1:step:T2] )
         [ C.x+R*cos(a), C.y+R*sin(a) ]
 ];
+
 function screwThreadSlices( profile, pitch, rotations=1 ) = [
     let ( step=360/($fn<3?3:$fn) )
     for ( a=[-step/2:step:rotations*360+step/2] )
         transform(translation([a*pitch/360,0,0])*rotation([a,0,0]), profile )
 ];
+
+// Test thread profile
+if (1) {
+    // Testing Congres thread: BSW 3.8"
+    screw = libScrewDataCompletion([["Test",inch2mm(1/16),inch2mm(3/8),inch2mm(3/8)]],0,prf=PROFILE_W);
+    echo ( "Test thread profile: screw=", screw );
+    !union() {
+        polygon ( screwThreadProfile ( screw, 0, I=false, $gap=0.01, $fn=100) );
+        polygon ( screwThreadProfile ( screw, 1, I=true,  $gap=0.01, $fn=100) );
+    }
+}
+

@@ -14,6 +14,7 @@ use <agentscad/mx-screw.scad>
 use <agentscad/mxf-screw.scad>
 use <agentscad/unf-screw.scad>
 use <agentscad/unc-screw.scad>
+use <agentscad/bsw-screw.scad>
 
 // ----------------------------------------
 //
@@ -24,18 +25,20 @@ module renderThread ( d, x ) {
     translate( [x,0,0] ) {
         libBoltHexagonalThreaded (d);
         color( "gold" )
-            translate( [0,0,-5] )
+            translate( [0,0,-8] )
             rotate( [90,0,0] )
             linear_extrude(1)
             text( screwGetName(d), halign="center", valign="center", size=2, $fn=100 );
     }
 }
 
+INTERVAL=15;
 module showcase() {
-    renderThread ( M4     ( tl=15 ),  0);
-    renderThread ( MF4    ( tl=15 ),  12);
-    renderThread ( UNC_N8 ( tl=15 ),  24);
-    renderThread ( UNF_N8 ( tl=15 ),  36);
+    renderThread ( M6      ( tl=15 ),  0*INTERVAL);
+    renderThread ( MF6     ( tl=15 ),  1*INTERVAL);
+    renderThread ( UNC1_4  ( tl=15 ),  2*INTERVAL);
+    renderThread ( UNF1_4  ( tl=15 ),  3*INTERVAL);
+    renderThread ( BSW1_4  ( tl=15 ),  4*INTERVAL);
 }
 
 showcase ($fn=50);
