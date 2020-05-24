@@ -6,7 +6,7 @@
  *   * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * Description: 3D printable metric screws taking into account printer precision
+ * Description: 3D printable metric coarse screws
  * Author:      Gilles Bouissac
  */
 use <agentscad/lib-screw.scad>
@@ -187,33 +187,6 @@ MXDATA = [
   [ "M60"  ,   5.5  ,   60 ,  130 ,  100 , 64.0 ,  90.0 , 60   , 41.0 , 38.0 ,  90 ],
   [ "M64"  ,   6.0  ,   64 ,  138 ,  105 , 68.0 ,  96.0 , 64   , 46.0 , 40.0 ,  95 ]
 ];
-
-// HDP extrapolation from HTS
-// According to C1 (HDP) from https://shop.hpceurope.com/pdf/fr/CHC.pdf:
-// And ISO Hex nut tool sizes from https://en.wikipedia.org/wiki/ISO_metric_screw_thread
-// 
-//  Screw:    | 1.6 | 2 | 2.5 |  3  |  4 |  5 |  6 |  8 | 10 | 12 |
-//            o-----o---o-----o-----o----o----o----o----o----o----o
-//  C1/HDP:   |   5 | 6 |   7 | 8   | 10 | 11 | 13 | 17 | 20 | 22 |
-//  HTS(ISO): | 3.2 | 4 |   5 | 5.5 |  7 |  8 | 10 | 13 | 16 | 18 |
-//  diff:     | 1.8 | 2 |   2 | 2.5 |  3 |  3 |  3 |  4 |  4 |  4 |
-// 
-// Extrapolation: +1 every 3 screw
-// 
-//  Screw:    | 14 | 16 | 18 | 20 | 22 | 24 | 27 | 30 | 33 | 36 | 39 |
-//            o----o----o----o----o----o----o----o----o----o----o----o
-//  diff:     |  5 |  5 |  5 |  6 |  6 |  6 |  7 |  7 |  7 |  8 |  8 |
-//  HTS(ISO): | 21 | 24 | 27 | 30 | 34 | 36 | 41 | 46 | 50 | 55 | 60 |
-//  C1/HDP:   | 26 | 29 | 32 | 36 | 40 | 42 | 48 | 53 | 57 | 63 | 68 |
-// 
-//  Screw:    | 42 | 45 | 48 | 52 | 56 |  60 |  64 |
-//            o----o----o----o----o----o-----o-----o
-//  diff:     |  8 |  9 |  9 |  9 | 10 |  10 |  10 |
-//  HTS(ISO): | 65 | 70 | 75 | 80 | 85 |  90 |  95 |
-//  C1/HDP:   | 73 | 79 | 84 | 89 | 95 | 100 | 105 |
-
-// TL extrapolation of common thread length, just for a default value
-// Just get b value from https://shop.hpceurope.com/pdf/fr/CHC.pdf:
 
 // ----------------------------------------
 //

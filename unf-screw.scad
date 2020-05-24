@@ -138,7 +138,7 @@ function unfData( idx, tl=undef, tlp=undef, ahl=undef, hhl=undef, hlp=undef, tdp
 //
 // WARNING: For reading convenience and comparison to standards, dimensions are given in inch.
 //          They are converted to mm because the library units are millimeters
-//   PITCH: UNF (Unified National Coarse) pitch value
+//   PITCH: UNF (Unified National Fine) pitch value
 //   TD:    Thread external Diameter
 //   TL:    Thread Length default value
 //   HDP:   Head Diameter Passage enough for any tool
@@ -201,7 +201,7 @@ echo( "unfGuessInch(   1/8   ): expected 'UNF #5': ",  screwGetName(unfGuessInch
 echo( "unfGuessInch(  -1/8   ): expected 'UNF #5': ",  screwGetName(unfGuessInch(-1/8)) ) ;
 echo( "unfGuessInch(  -0.080 ): expected 'UNF #1': ",  screwGetName(unfGuessInch(-0.080)) ) ;
 echo( "unfGuessInch(   0.080 ): expected 'UNF #2': ",  screwGetName(unfGuessInch(0.080)) ) ;
-echo( "unfGuessInch(   0     ): expected 'UNF #1': ",  screwGetName(unfGuessInch(0)) ) ;
+echo( "unfGuessInch(   0     ): expected 'UNF #0': ",  screwGetName(unfGuessInch(0)) ) ;
 echo( "unfGuessInch( 100     ): expected undef:",      screwGetName(unfGuessInch(100)) ) ;
-echo( "unfGuessInch(-100     ): expected 'UNF 4':",    screwGetName(unfGuessInch(-100)) ) ;
+echo( "unfGuessInch(-100     ): expected 'UNF 1 1/2':",    screwGetName(unfGuessInch(-100)) ) ;
 
