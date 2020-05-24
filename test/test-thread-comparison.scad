@@ -32,10 +32,10 @@ module renderThread ( d, x ) {
 }
 
 module showcase() {
-    renderThread ( M4     ( tl=20 ),  -30);
-    renderThread ( MF4    ( tl=20 ),  -10);
-    renderThread ( UNC_N8 ( tl=20 ),  +10);
-    renderThread ( UNF_N8 ( tl=20 ),  +30);
+    renderThread ( M4     ( tl=15 ),  0);
+    renderThread ( MF4    ( tl=15 ),  12);
+    renderThread ( UNC_N8 ( tl=15 ),  24);
+    renderThread ( UNF_N8 ( tl=15 ),  36);
 }
 
 showcase ($fn=50);
