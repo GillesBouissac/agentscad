@@ -21,20 +21,20 @@ My utilities for OpenSCAD
 <a href="https://github.com/GillesBouissac/agentscad/wiki/Snap-Joint">Tutorial for Snap Joint here</a>
 </p>
 
-# Metric bolts
+# Screws, Bolts and Nuts shapes and passages
 
-![MX bolt panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-screw.png)
+![MX bolt panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-screw.png)
 
 <p align="center">
-<a href="https://github.com/GillesBouissac/agentscad/wiki/Screws">Tutorial for screws here</a>
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Screws shapes">Tutorial for screws here</a>
 </p>
 
-# Metric threaded bolts (3D Printable)
+# Threaded Screws, Bolts and Nuts (3D Printable)
 
-![MX threaded panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-mx-thread.png)
+![MX threaded panel](https://raw.githubusercontent.com/wiki/GillesBouissac/agentscad/img/panel-thread.png)
 
 <p align="center">
-<a href="https://github.com/GillesBouissac/agentscad/wiki/Metric threaded">Tutorial for metric threaded bolts</a>
+<a href="https://github.com/GillesBouissac/agentscad/wiki/Screws threaded">Tutorial for threaded bolts</a>
 </p>
 
 # Hirth Joint
