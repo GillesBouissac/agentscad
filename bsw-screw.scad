@@ -208,5 +208,5 @@ echo( "bswGuessInch(  -19/32 ): expected 'BSW 9/16': ", screwGetName(bswGuessInc
 echo( "bswGuessInch(   19/32 ): expected 'BSW 5/8': ",  screwGetName(bswGuessInch( 19/32)) ) ;
 echo( "bswGuessInch(   0     ): expected 'BSW 5/32': ", screwGetName(bswGuessInch( 0)) ) ;
 echo( "bswGuessInch( 100     ): expected undef:",       screwGetName(bswGuessInch( 100)) ) ;
-echo( "bswGuessInch(-100     ): expected 'BSW 1 1/2':", screwGetName(bswGuessInch(-100)) ) ;
+echo( "bswGuessInch(-100     ): expected 'BSW 4':",     screwGetName(bswGuessInch(-100)) ) ;
 
