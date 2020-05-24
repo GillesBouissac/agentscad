@@ -6,7 +6,7 @@
  *   * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * Description: 3D printable metric screws taking into account printer precision
+ * Description: 3D printable UNC screws taking into account printer precision
  * Author:      Gilles Bouissac
  */
 use <agentscad/lib-screw.scad>
@@ -160,7 +160,6 @@ function uncData( idx, tl=undef, tlp=undef, ahl=undef, hhl=undef, hlp=undef, tdp
 
 //| Name        | PITCH  |   TD  |   TL  |  HDP  |  HLP  |  AHD  |  AHL  |  ATS  |   HHL |  HTS  |
 UNCDATA_INCH = [
-//[ "UNF #0"    ,   1/80 , 0.060 ,   1/4 , undef , undef , 0.096 , 0.060 , undef , undef , undef ],
 // idx=0
   [ "UNC #1"    ,   1/64 , 0.073 ,   1/4 , undef , undef , 0.118 , 0.073 ,  1/16 , undef , undef ],
   [ "UNC #2"    ,   1/56 , 0.086 ,   1/4 , undef , undef , 0.140 , 0.086 ,  5/64 , undef , undef ],

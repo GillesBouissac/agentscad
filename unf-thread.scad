@@ -6,11 +6,11 @@
  *   * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * Description: UNC thread modelisation
+ * Description: UNF thread modelisation
  * Author:      Gilles Bouissac
  */
 use <agentscad/lib-screw.scad>
-use <agentscad/unc-screw.scad>
+use <agentscad/unf-screw.scad>
 
 // ----------------------------------------
 //
@@ -19,22 +19,22 @@ use <agentscad/unc-screw.scad>
 // ----------------------------------------
 
 // Renders an external thread (for bolts)
-module uncThreadExternal ( screw, l=-1, f=true ) { libThreadExternal(screw,l,f); }
+module unfThreadExternal ( screw, l=-1, f=true ) { libThreadExternal(screw,l,f); }
 
 // Renders an internal thread (for nuts)
-module uncThreadInternal ( screw, l=-1, t=-1, f=true ) { libThreadInternal(screw,l,t,f); }
+module unfThreadInternal ( screw, l=-1, t=-1, f=true ) { libThreadInternal(screw,l,t,f); }
 
 // Nut with Hexagonal head
-module uncNutHexagonalThreaded( screw, bt=true, bb=true ) { libNutHexagonalThreaded(screw,bt,bb); }
+module unfNutHexagonalThreaded( screw, bt=true, bb=true ) { libNutHexagonalThreaded(screw,bt,bb); }
 
 // Nut with Square head
-module uncNutSquareThreaded( screw, bt=true, bb=true ) { libNutSquareThreaded(screw,bt,bb); }
+module unfNutSquareThreaded( screw, bt=true, bb=true ) { libNutSquareThreaded(screw,bt,bb); }
 
 // Bolt with Hexagonal head
-module uncBoltHexagonalThreaded( screw, bt=true, bb=true ) { libBoltHexagonalThreaded(screw,bt,bb); }
+module unfBoltHexagonalThreaded( screw, bt=true, bb=true ) { libBoltHexagonalThreaded(screw,bt,bb); }
 
 // Bolt with Allen head
-module uncBoltAllenThreaded( screw, bt=true ) { libBoltAllenThreaded(screw,bt); }
+module unfBoltAllenThreaded( screw, bt=true ) { libBoltAllenThreaded(screw,bt); }
 
 // ----------------------------------------
 //
@@ -43,61 +43,61 @@ module uncBoltAllenThreaded( screw, bt=true ) { libBoltAllenThreaded(screw,bt); 
 // ----------------------------------------
 
 if (0) {
-    screw  = UNC4();
+    screw  = UNF4();
     translate([0,0*screwGetHeadDP(screw),0])
-        uncNutHexagonalThreaded(screw, $fn=50);
+        unfNutHexagonalThreaded(screw, $fn=50);
     translate([0,1*screwGetHeadDP(screw),0])
-        uncNutSquareThreaded(screw, $fn=50);
+        unfNutSquareThreaded(screw, $fn=50);
     translate([0,2*screwGetHeadDP(screw),0])
-        uncBoltHexagonalThreaded(screw, $fn=50);
+        unfBoltHexagonalThreaded(screw, $fn=50);
     translate([0,3*screwGetHeadDP(screw),0])
-        uncBoltAllenThreaded(screw, $fn=50);
+        unfBoltAllenThreaded(screw, $fn=50);
 }
 
 if (1) {
-    screw  = UNC1_4();
+    screw  = UNF1_4();
     translate([0,0*screwGetThreadDP(screw),0])
-        uncNutHexagonalThreaded(screw, $fn=50);
+        unfNutHexagonalThreaded(screw, $fn=50);
     translate([0,2*screwGetThreadDP(screw),0])
-        uncNutSquareThreaded(screw, $fn=50);
+        unfNutSquareThreaded(screw, $fn=50);
     translate([0,4*screwGetThreadDP(screw),0])
-        uncBoltHexagonalThreaded(screw, $fn=50);
+        unfBoltHexagonalThreaded(screw, $fn=50);
     translate([0,6*screwGetThreadDP(screw),0])
-        uncBoltAllenThreaded(uncClone(screw,30), $fn=50);
+        unfBoltAllenThreaded(unfClone(screw,30), $fn=50);
     translate([0,8*screwGetThreadDP(screw),0])
-        uncThreadInternal(screw, $fn=50);
+        unfThreadInternal(screw, $fn=50);
     translate([0,10*screwGetThreadDP(screw),0])
-        uncThreadExternal(uncClone(screw,6),$fn=50);
+        unfThreadExternal(unfClone(screw,6),$fn=50);
 }
 
 if (0) {
-    screw  = UNC_R8();
+    screw  = UNF_R8();
     translate([0,0*screwGetHeadDP(screw),0])
-        uncNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
+        unfNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
     translate([0,1*screwGetHeadDP(screw),0])
-        uncNutSquareThreaded(screw,     $gap=0.15, $fn=50);
+        unfNutSquareThreaded(screw,     $gap=0.15, $fn=50);
     translate([0,2*screwGetHeadDP(screw),0])
-        uncBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
+        unfBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
     translate([0,3*screwGetHeadDP(screw),0])
-        uncBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
+        unfBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
 }
 
 if (0) {
-    screw  = UNC_R5();
+    screw  = UNF_R5();
     translate([0,0*screwGetHeadDP(screw),0])
-        uncNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
+        unfNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
     translate([0,1*screwGetHeadDP(screw),0])
-        uncNutSquareThreaded(screw,     $gap=0.15, $fn=50);
+        unfNutSquareThreaded(screw,     $gap=0.15, $fn=50);
     translate([0,2*screwGetHeadDP(screw),0])
-        uncBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
+        unfBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
     translate([0,3*screwGetHeadDP(screw),0])
-        uncBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
+        unfBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
 }
 
 // Test thread profile
 if (0) {
     !union() {
-        polygon ( screwThreadProfile ( UNC1_4(), 1, I=false, $gap=0.01, $fn=50 ) );
-        polygon ( screwThreadProfile ( UNC1_4(), 1, I=true,  $gap=0.01, $fn=50 ) );
+        polygon ( screwThreadProfile ( UNF1_4(), 1, I=false, $gap=0.01, $fn=50 ) );
+        polygon ( screwThreadProfile ( UNF1_4(), 1, I=true,  $gap=0.01, $fn=50 ) );
     }
 }
