@@ -436,12 +436,8 @@ I_HHD    = 13; // Head Diameter for Hexagonal head
 I_HHL    = 14; // Head Length for Hexagonal head
 I_HTS    = 15; // Hexagonal Tool Size
 I_PRF    = 16; // Profile type
-I_RADF   = 17; // Functional thread enclosing radiuses (between flat parts)
-I_RADG   = 18; // Global thread enclosing radiuses (with round parts)
-I_FLAT   = 19; // Flat parts HALF length
-I_RADS   = 20; // Smoothing parts Radiuses (circular parts)
-I_CENTR  = 21; // Centers of round parts
-I_WPRF   = 22; // Whitworth profile data
+I_PRFM   = 17; // Metric or UTS profile data
+I_PRFW   = 18; // Whitworth profile data
 
 PROFILE_M = "M"; // Metric or UTS profile
 PROFILE_W = "W"; // Whitworth profile
@@ -472,8 +468,8 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     Fmaj      = local_p/16,
     RRmin     = Fmin/cos(Theta),
     RRmaj     = Fmaj/cos(Theta),
-    Cmin      = [ Fmin+MFG, Rmin+RRmin*sin(Theta) ],
-    Cmaj      = [ Fmin+local_p/2, Rmaj-RRmaj*sin(Theta) ],
+    Cmin      = [ local_p*1/4, Rmin+RRmin*sin(Theta) ],
+    Cmaj      = [ local_p*3/4, Rmaj-RRmaj*sin(Theta) ],
     RTop      = Cmaj.y+RRmaj,
     RBot      = Cmin.y-RRmin,
 
@@ -507,11 +503,7 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_hts,                 // HTS
     local_prf,                 // PRF
     // M screw profile data
-    [ Rmin,  Rmaj  ],          // RADF   Functional radiuses (Radius of flat parts from thread axis)
-    [ RBot,  RTop  ],          // RADG   Global radiuses (Radius of rounded parts from thread axis)
-    [ Fmin,  Fmaj  ],          // FLAT   Parts half length
-    [ RRmin, RRmaj ],          // RADS   Radius of smoothing circles
-    [ Cmin,  Cmaj  ],          // CENTR  Center position of smoothing circles
+    [ Rmin,Rmaj,RBot,RTop,Fmin,Fmaj,RRmin,RRmaj,Cmin,Cmaj ],
     // WPRF Whitworth profile data
     [ WH,  WRadius, WCmin, WCmaj ]
 ];
@@ -547,40 +539,44 @@ function screwMetricProfile( data, t=-1, I=false ) =
         p      = screwGetPitch(data),
         delta  = I ? +gap() : -gap(3/4),
         Rmax   = screwGetThreadD(data)/2,
-        Rmaj   = data[I_RADF][1] + delta,
-        Rmin   = data[I_RADF][0] + delta,
-        RBot   = data[I_RADG][0],
-        RTop   = data[I_RADG][1],
-        Fmin   = data[I_FLAT][0],
-        Fmaj   = data[I_FLAT][1],
-        RRmin  = data[I_RADS][0],
-        RRmaj  = data[I_RADS][1],
-        Cmino  = data[I_CENTR][0],
-        Cmajo  = data[I_CENTR][1],
+        Rmin   = data[I_PRFM][0] + delta,
+        Rmaj   = data[I_PRFM][1] + delta,
+        RBot   = data[I_PRFM][2],
+        RTop   = data[I_PRFM][3],
+        Fmin   = data[I_PRFM][4],
+        Fmaj   = data[I_PRFM][5],
+        RRmin  = data[I_PRFM][6],
+        RRmaj  = data[I_PRFM][7],
+        Cmino  = data[I_PRFM][8],
+        Cmajo  = data[I_PRFM][9],
         Cmin   = [Cmino.x+MFG,Cmino.y+delta],
         Cmaj   = [Cmajo.x,Cmajo.y+delta],
+        Rpitch = (RTop+RBot)/2+ delta,
 
         Tmin   = (RTop-Rmaj)+delta+MFG,
         Tloc   = (t<Tmin ? Tmin : t)
     )
     I ?
         flatten([
-            [ [0+MFG,Rmaj+Tloc] ],
             [
-                [ 0+MFG,      Rmin ],
-                [ 2*Fmin,     Rmin ]
+                 [ p,          Rpitch ]
+                ,[ p,          Rmaj+Tloc ]
+                ,[ 0+MFG,      Rmaj+Tloc]
+                ,[ 0+MFG,      Rpitch ]
+                ,[ 1*p/4-Fmin, Rmin ]
+                ,[ 1*p/4+Fmin, Rmin ]
             ],
-            screwThreadRounding( RRmaj, Cmaj, +(180-Theta), +(Theta) ),
-            [ [ p, Rmin ], [ p, Rmaj+Tloc ] ]
+            screwThreadRounding( RRmaj, Cmaj, +(180-Theta), +(Theta) )
         ])
     :
         flatten([
             [
-                 [ 0+MFG,         0+MFG ]
-                ,[ p,             0+MFG ]
-                ,[ p,             Rmin ]
-                ,[ Fmin+p/2+Fmaj, Rmaj ]
-                ,[ Fmin+p/2-Fmaj, Rmaj ]
+                 [ 0+MFG,      Rpitch ]
+                ,[ 0+MFG,      0+MFG ]
+                ,[ p,          0+MFG ]
+                ,[ p,          Rpitch ]
+                ,[ 3*p/4+Fmaj, Rmaj ]
+                ,[ 3*p/4-Fmaj, Rmaj ]
             ]
             ,screwThreadRounding( RRmin, Cmin, -(Theta), -(180-Theta) )
         ])
@@ -597,23 +593,23 @@ function screwWhitworthProfile( data, t=-1, I=false ) =
         p       = screwGetPitch(data),
         delta   = I ? +gap() : -gap(3/4),
         Rmaj    = screwGetThreadD(data)/2+delta,
-        WH      = data[I_WPRF][0],
-        WRadius = data[I_WPRF][1],
-        Cmino   = data[I_WPRF][2],
-        Cmajo   = data[I_WPRF][3],
+        WH      = data[I_PRFW][0],
+        WRadius = data[I_PRFW][1],
+        Cmino   = data[I_PRFW][2],
+        Cmajo   = data[I_PRFW][3],
         Cmin    = [Cmino.x,Cmino.y+delta],
         Cmaj    = [Cmajo.x,Cmajo.y+delta],
-        WRpitch = Rmaj-WH/3,
+        Rpitch  = Rmaj-WH/3,
         Tmin    = MFG,
         Tloc    = (t<Tmin ? Tmin : t)
     )
     I ?
         flatten([
             [
-                 [ p,     WRpitch ]
+                 [ p,     Rpitch ]
                 ,[ p,     Rmaj+Tloc ]
                 ,[ 0+MFG, Rmaj+Tloc ]
-                ,[ 0+MFG, WRpitch ]
+                ,[ 0+MFG, Rpitch ]
             ],
             screwThreadRounding( WRadius, Cmin, -(180-Theta), -(Theta) ),
             screwThreadRounding( WRadius, Cmaj, +(180-Theta), +(Theta) )
@@ -621,10 +617,10 @@ function screwWhitworthProfile( data, t=-1, I=false ) =
     :
         flatten([
             [
-                 [ 0+MFG, WRpitch ]
+                 [ 0+MFG, Rpitch ]
                 ,[ 0+MFG, 0+MFG ]
                 ,[ p,     0+MFG ]
-                ,[ p,     WRpitch ]
+                ,[ p,     Rpitch ]
             ],
             screwThreadRounding( WRadius, Cmaj, +(Theta), +(180-Theta) ),
             screwThreadRounding( WRadius, Cmin, -(Theta), -(180-Theta) )
@@ -662,10 +658,13 @@ if (1) {
     screw_w = libScrewDataCompletion([["W",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
     screw_m = libScrewDataCompletion([["M",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
     !union() {
-        polygon ( screwThreadProfile ( screw_m, 0, I=false, $gap=0.01, $fn=200) );
-        polygon ( screwThreadProfile ( screw_m, 1, I=true,  $gap=0.01, $fn=200) );
-        showName(screw_m);
-        translate( [2,0,0] ) {
+        %union() {
+            polygon ( screwThreadProfile ( screw_m, 0, I=false, $gap=0.01, $fn=200) );
+            polygon ( screwThreadProfile ( screw_m, 1, I=true,  $gap=0.01, $fn=200) );
+            showName(screw_m);
+        }
+        translate( [0,0,-2] )
+        union() {
             polygon ( screwThreadProfile ( screw_w, 0, I=false, $gap=0.01, $fn=200) );
             polygon ( screwThreadProfile ( screw_w, 1, I=true,  $gap=0.01, $fn=200) );
             showName(screw_w);
