@@ -64,37 +64,41 @@ module bswNutSquare( p=BSW1_4(), bt=true, bb=true ) { libNutSquare(p,bt,bb); }
 // Dimensions must be given in mm.
 //   See inch2mm() from <agentscad/extensions.scad> to convert inch values to mm before call
 //
-function BSW5_32  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW3_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW7_32  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(3,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW5_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(4,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW3_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(5,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW7_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(6,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_2   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(7,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW9_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(8,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW5_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(9,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3_32  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW5_32  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(3 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(4 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW7_32  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(5 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(6,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW5_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(7,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(8,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW7_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(9,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 
-function BSW3_4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(10,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW7_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(11,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(12,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_1_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(13,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_1_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(14,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_3_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(15,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_1_2 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(16,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_5_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(17,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_3_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(18,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW1_7_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(19,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_2   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(10,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW9_16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(11,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW5_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(12,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3_4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(13,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW7_8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(14,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(15,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_1_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(16,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_1_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(17,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_3_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(18,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_1_2 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(19,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 
-function BSW2     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(20,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW2_1_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(21,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW2_1_2 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(22,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW2_3_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(23,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW3     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(24,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW3_1_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(25,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW3_1_2 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(26,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW3_3_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(27,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function BSW4     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(28,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_5_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(20,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_3_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(21,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW1_7_8 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(22,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW2     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(23,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW2_1_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(24,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW2_1_2 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(25,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW2_3_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(26,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(27,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3_1_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(28,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW3_1_2 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(29,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+
+function BSW3_3_4 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(30,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function BSW4     (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = bswData(31,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 
 // Guess what is the better standard thread from the given one
 //   if td>0: will pick the first screw larger than the given value
@@ -152,6 +156,9 @@ function bswData( idx, tl=undef, tlp=undef, ahl=undef, hhl=undef, hlp=undef, tdp
 //| Name        | PITCH  |   TD  |   TL  |  HDP  |  HLP  |  AHD  |  AHL  |  ATS  |   HHL |  HTS  |
 BSWDATA_INCH = [
 // idx=0
+  [ "BSW 1/16"  ,   1/60 ,  1/16 ,  1/4  , undef , undef , undef ,  1/16 , undef , undef , undef ],
+  [ "BSW 3/32"  ,   1/48 ,  3/32 ,  1/4  , undef , undef , undef ,  3/32 , undef , undef , undef ],
+  [ "BSW 1/8"   ,   1/40 ,  1/8  ,  1/4  , undef , undef , undef ,  1/8  , undef , undef , undef ],
   [ "BSW 5/32"  ,   1/32 ,  5/32 ,  1/4  , undef , undef , undef ,  5/32 , undef , undef , undef ],
   [ "BSW 3/16"  ,   1/24 ,  3/16 ,  1/4  , undef , undef , undef ,  3/16 , undef , undef , undef ],
   [ "BSW 7/32"  ,   1/24 ,  7/32 ,  5/16 , undef , undef , undef ,  7/32 , undef , undef , undef ],
@@ -159,10 +166,10 @@ BSWDATA_INCH = [
   [ "BSW 5/16"  ,   1/18 ,  5/16 ,  1/2  , undef , undef , 0.469 ,  5/16 ,  1/4  , 0.235 ,  1/2  ],
   [ "BSW 3/8"   ,   1/16 ,  3/8  ,  1/2  , undef , undef ,  9/16 ,  3/8  ,  5/16 , 0.268 ,  9/16 ],
   [ "BSW 7/16"  ,   1/14 ,  7/16 ,  3/4  , undef , undef ,  5/8  ,  7/16 ,  3/8  , 0.316 ,  5/8  ],
+// idx=10
   [ "BSW 1/2"   ,   1/12 ,  1/2  ,  3/4  , undef , undef ,  3/4  ,  1/2  ,  3/8  , 0.364 ,  3/4  ],
   [ "BSW 9/16"  ,   1/12 ,  9/16 ,  1    , undef , undef ,  7/8  ,  9/16 ,  7/16 , 0.394 ,  7/8  ],
   [ "BSW 5/8"   ,   1/11 ,  5/8  ,  1    , undef , undef , 15/16 ,  5/8  ,  1/2  , 0.444 , 15/16 ],
-// idx=10
   [ "BSW 3/4"   ,   1/10 ,  3/4  ,  5/4  , undef , undef ,  9/8  ,  3/4  ,  5/8  , 0.524 ,  9/8  ],
   [ "BSW 7/8"   ,   1/9  ,  7/8  ,  5/4  , undef , undef , 21/16 ,  7/8  ,  3/4  , 0.604 , 21/16 ],
   [ "BSW 1"     ,   1/8  ,  1    ,  3/2  , undef , undef ,  3/2  ,  1    ,  3/4  , 0.700 ,  3/2  ],
@@ -170,10 +177,10 @@ BSWDATA_INCH = [
   [ "BSW 1 1/4" ,   1/7  ,  5/4  ,  2    , undef , undef , 15/8  ,  5/4  ,  1    , 0.876 , 15/8  ],
   [ "BSW 1 3/8" ,   1/6  , 11/8  ,  2    , undef , undef , 33/16 , 11/8  ,  9/8  , 0.940 , 33/16 ],
   [ "BSW 1 1/2" ,   1/6  ,  3/2  ,  5/2  , undef , undef ,  9/4  ,  3/2  ,  5/4  , 1.036 ,  9/4  ],
+// idx=20
   [ "BSW 1 5/8" ,   1/5  , 13/8  ,  5/2  , undef , undef , undef , 13/8  , undef , undef , undef ],
   [ "BSW 1 3/4" ,   1/5  ,  7/4  ,  5/2  , undef , undef , 21/8  ,  7/4  ,  5/4  , undef , 21/8  ],
   [ "BSW 1 7/8" ,   2/9  , 15/8  ,  3    , undef , undef , undef , 15/8  , undef , undef , undef ],
-// idx=20
   [ "BSW 2"     ,   2/9  ,  2    ,  3    , undef , undef ,  3    ,  2    ,  3/2  , undef ,  3    ],
   [ "BSW 2 1/4" ,   1/4  ,  9/4  ,  3    , undef , undef , 27/8  ,  9/4  ,  7/4  , undef , 27/8  ],
   [ "BSW 2 1/2" ,   1/4  ,  5/2  ,  7/2  , undef , undef , 15/4  ,  5/2  ,  2    , undef , 15/4  ],
@@ -181,6 +188,7 @@ BSWDATA_INCH = [
   [ "BSW 3"     ,   2/7  ,  3    ,  4    , undef , undef ,  9/2  ,  3    ,  9/4  , undef ,  9/2  ],
   [ "BSW 3 1/4" ,   4/13 , 13/4  ,  4    , undef , undef , 39/8  , 13/4  ,  5/2  , undef , 39/8  ],
   [ "BSW 3 1/2" ,   4/13 ,  7/2  ,  5    , undef , undef , 21/4  ,  7/2  , 11/4  , undef , 21/4  ],
+// idx=30
   [ "BSW 3 3/4" ,   1/3  , 15/4  ,  5    , undef , undef , 45/8  , 15/4  ,  3    , undef , 45/8  ],
   [ "BSW 4"     ,   1/3  ,  4    ,  6    , undef , undef ,  6    ,  4    , 13/4  , undef ,  6    ],
 ];
@@ -206,7 +214,7 @@ echo( "bswGuessInch(   9/64  ): expected 'BSW 3/16': ", screwGetName(bswGuessInc
 echo( "bswGuessInch(  -9/64  ): expected 'BSW 5/32': ", screwGetName(bswGuessInch(-11/64)) ) ;
 echo( "bswGuessInch(  -19/32 ): expected 'BSW 9/16': ", screwGetName(bswGuessInch(-19/32)) ) ;
 echo( "bswGuessInch(   19/32 ): expected 'BSW 5/8': ",  screwGetName(bswGuessInch( 19/32)) ) ;
-echo( "bswGuessInch(   0     ): expected 'BSW 5/32': ", screwGetName(bswGuessInch( 0)) ) ;
+echo( "bswGuessInch(   0     ): expected 'BSW 1/16': ", screwGetName(bswGuessInch( 0)) ) ;
 echo( "bswGuessInch( 100     ): expected undef:",       screwGetName(bswGuessInch( 100)) ) ;
 echo( "bswGuessInch(-100     ): expected 'BSW 4':",     screwGetName(bswGuessInch(-100)) ) ;
 

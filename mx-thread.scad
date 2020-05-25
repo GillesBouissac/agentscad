@@ -42,67 +42,88 @@ module mxBoltAllenThreaded( screw, bt=true ) { libBoltAllenThreaded(screw,bt); }
 //
 // ----------------------------------------
 
-if (0) {
-    // Can be printed with any printer settings :)
-    screw  = M64();
-    translate([0,0*screwGetHeadDP(screw),0])
-        mxNutHexagonalThreaded(screw, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        mxNutSquareThreaded(screw, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        mxBoltHexagonalThreaded(screw, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        mxBoltAllenThreaded(screw, $fn=50);
+color( "DodgerBlue" )
+translate( [50,7,-20] )
+rotate( [90,0,0] )
+linear_extrude(0.1)
+    text( "MC MF",halign="center",valign="center",size=10,$fn=100 );
+
+IX=20;
+module showName( d, z ) {
+    %color( "gold" )
+        translate( [0,-7,z] )
+        rotate( [90,0,0] )
+        linear_extrude(0.1)
+        text( screwGetName(d), halign="center", valign="center", size=2, $fn=100 );
 }
 
 if (1) {
-    // Successfuly printed with 0.2mm layers and 0.4 nozzle on MK3S
-    screw  = M6();
-    translate([0,0*screwGetHeadDP(screw),0])
-        mxNutHexagonalThreaded(screw, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        mxNutSquareThreaded(screw, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        mxBoltHexagonalThreaded(screw, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        mxBoltAllenThreaded(mxClone(screw,30), $fn=50);
-    translate([0,4*screwGetHeadDP(screw),0])
-        mxThreadInternal(screw, $fn=50);
-    translate([0,5*screwGetHeadDP(screw),0])
-        mxThreadExternal(mxClone(screw,6),$fn=50);
+    s1 = M1_6();
+    s2 = M5();
+    s3 = M6(tl=20);
+    s4 = M10(tl=30);
+    s5 = M12();
+    s6 = M22();
+    translate([0,0,0]) {
+        mxNutHexagonalThreaded(s1, $fn=50);
+        showName(s1, -2);
+    }
+    translate([15,0,0]) {
+        mxNutSquareThreaded(s2, $fn=50);
+        showName(s2, -2);
+    }
+    translate([30,0,0]) {
+        mxBoltHexagonalThreaded(s3, $fn=50);
+        showName(s3, -7);
+    }
+    translate([50,0,0]) {
+        mxBoltAllenThreaded(s4, $fn=50);
+        showName(s4, -11);
+    }
+    translate([70,0,0]) {
+        mxThreadInternal(s5, $fn=50);
+        showName(s5, -2);
+    }
+    translate([90,0,0]) {
+        mxThreadExternal(mxClone(s6,16),$fn=50);
+        showName(s6, -4);
+    }
 }
-
 if (0) {
-    // Successfuly printed with 0.1mm layers and 0.4 nozzle on MK3S
-    screw  = M4();
-    translate([0,0*screwGetHeadDP(screw),0])
-        mxNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        mxNutSquareThreaded(screw,     $gap=0.15, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        mxBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        mxBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
+    s1 = M5(tl=20);
+    translate([0*IX,0,0]) {
+        mxNutHexagonalThreaded(s1, $fn=100);
+        showName(s1, -2);
+    }
+    translate([1*IX,0,0]) {
+        mxNutSquareThreaded(s1, $fn=100);
+        showName(s1, -2);
+    }
+    translate([2*IX,0,0]) {
+        mxBoltHexagonalThreaded(s1, $fn=100);
+        showName(s1, -7);
+    }
+    translate([3*IX,0,0]) {
+        mxBoltAllenThreaded(s1, $fn=100);
+        showName(s1, -9);
+    }
 }
-
 if (0) {
-    // Didn't manage to print this one with 0.1mm layers and 0.4 nozzle
-    // Pitch is 0.5 too close to 0.4, need smaller nozzle
-    screw  = M3();
-    translate([0,0*screwGetHeadDP(screw),0])
-        mxNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        mxNutSquareThreaded(screw,     $gap=0.15, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        mxBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        mxBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
-}
-
-// Test thread profile
-if (0) {
-    !union() {
-        polygon ( screwThreadProfile ( M4(), 1, I=false, $gap=0.01, $fn=50 ) );
-        polygon ( screwThreadProfile ( M4(), 1, I=true,  $gap=0.01, $fn=50 ) );
+    s1 = M6(tl=20);
+    translate([0*IX,0,0]) {
+        mxNutHexagonalThreaded(s1, $fn=100);
+        showName(s1, -2);
+    }
+    translate([1*IX,0,0]) {
+        mxNutSquareThreaded(s1, $fn=100);
+        showName(s1, -2);
+    }
+    translate([2*IX,0,0]) {
+        mxBoltHexagonalThreaded(s1, $fn=100);
+        showName(s1, -9);
+    }
+    translate([3*IX,0,0]) {
+        mxBoltAllenThreaded(s1, $fn=100);
+        showName(s1, -11);
     }
 }

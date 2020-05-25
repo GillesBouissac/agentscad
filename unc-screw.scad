@@ -152,10 +152,10 @@ function uncData( idx, tl=undef, tlp=undef, ahl=undef, hhl=undef, hlp=undef, tdp
 //   TL:    Thread Length default value
 //   HDP:   Head Diameter Passage enough for any tool
 //   HLP:   Head Length Passage default value
-//   AHD:   Allen Head Diameter tight, do not allow tool passage, only head
-//   AHL:   Allen Head Length tight
+//   AHD:   Allen Head Diameter
+//   AHL:   Allen Head Length
 //   ATS:   Allen Tool Size
-//   HHL:   Hexagonal Head Length tight
+//   HHL:   Hexagonal Head Length
 //   HTS:   Hexagonal Tool Size
 
 //| Name        | PITCH  |   TD  |   TL  |  HDP  |  HLP  |  AHD  |  AHL  |  ATS  |   HHL |  HTS  |

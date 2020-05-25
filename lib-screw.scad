@@ -449,7 +449,7 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_tl   = is_undef(tl)  ? data[idx][CTL]    : tl,
     local_ahl  = is_undef(ahl) ? ( is_undef(data[idx][CAHL]) ? local_td                : data[idx][CAHL] ) : ahl,
     local_ats  = is_undef(ats) ? ( is_undef(data[idx][CATS]) ? local_td*3/4            : data[idx][CATS] ) : ats,
-    local_hhl  = is_undef(hhl) ? ( is_undef(data[idx][CHHL]) ? local_td*7/10           : data[idx][CHHL] ) : hhl,
+    local_hhl  = is_undef(hhl) ? ( is_undef(data[idx][CHHL]) ? local_td*9/14           : data[idx][CHHL] ) : hhl,
     local_hts  = is_undef(hhd) ? ( is_undef(data[idx][CHTS]) ? local_td*cos(30)*26/15  : data[idx][CHTS] ) : hhd*cos(30),
     local_ahd  = is_undef(ahd) ? ( is_undef(data[idx][CAHD]) ? local_hts               : data[idx][CAHD] ) : ahd,
     local_hdp  = is_undef(hdp) ? ( is_undef(data[idx][CHDP]) ? local_hts/cos(45)       : data[idx][CHDP] ) : hdp,
@@ -483,7 +483,7 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     WCmaj     = [ local_p*3/4, WRpitch+(WH/2-(WH6+WRadius)) ],
 
     // reason for gap(): see thread drawing functions
-    local_tdp = is_undef(tdp) ? 2*(RTop+gap()) : tdp
+    local_tdp = is_undef(tdp) ? (local_prf==PROFILE_M?2*RTop:local_td)+2*gap() : tdp
 ) [
     idx,
     local_name,
@@ -645,29 +645,28 @@ function screwThreadSlices( profile, pitch, rotations=1 ) = [
 //
 // ----------------------------------------
 
-module showName( d ) {
-    color( "gold" )
-        translate( [screwGetPitch(d)/2,screwGetThreadD(d)/4,0.1] )
-        linear_extrude(1)
-        text( screwGetName(d), halign="center", valign="center", size=1, $fn=100 );
+module showName( d, dy=0 ) {
+    translate( [screwGetPitch(d)/2,screwGetThreadD(d)/4+dy,0.1] )
+    linear_extrude(1)
+    text( screwGetName(d), halign="center", valign="center", size=1, $fn=100 );
 }
 
 // Test thread profile
 if (1) {
     // Testing Congres thread: BSW 3.8"
-    screw_w = libScrewDataCompletion([["W",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
-    screw_m = libScrewDataCompletion([["M",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
+    screw_w = libScrewDataCompletion([["BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
+    screw_m = libScrewDataCompletion([["M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
     !union() {
         %union() {
             polygon ( screwThreadProfile ( screw_m, 0, I=false, $gap=0.01, $fn=200) );
             polygon ( screwThreadProfile ( screw_m, 1, I=true,  $gap=0.01, $fn=200) );
-            showName(screw_m);
+            showName(screw_m,+0.5);
         }
         translate( [0,0,-2] )
         union() {
             polygon ( screwThreadProfile ( screw_w, 0, I=false, $gap=0.01, $fn=200) );
             polygon ( screwThreadProfile ( screw_w, 1, I=true,  $gap=0.01, $fn=200) );
-            showName(screw_w);
+            showName(screw_w,-1);
         }
     }
 }

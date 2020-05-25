@@ -42,62 +42,88 @@ module bsfBoltAllenThreaded( screw, bt=true ) { libBoltAllenThreaded(screw,bt); 
 //
 // ----------------------------------------
 
-if (0) {
-    screw  = BSF1_1_2();
-    translate([0,0*screwGetHeadDP(screw),0])
-        bsfNutHexagonalThreaded(screw, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        bsfNutSquareThreaded(screw, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        bsfBoltHexagonalThreaded(screw, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        bsfBoltAllenThreaded(screw, $fn=50);
+color( "silver" )
+translate( [50,7,-20] )
+rotate( [90,0,0] )
+linear_extrude(0.1)
+    text( "BSW BSF",halign="center",valign="center",size=10,$fn=100 );
+
+IX=20;
+module showName( d, z ) {
+    %color( "gold" )
+        translate( [0,-7,z] )
+        rotate( [90,0,0] )
+        linear_extrude(0.1)
+        text( screwGetName(d), halign="center", valign="center", size=2, $fn=100 );
 }
 
 if (1) {
-    screw  = BSF1_4();
-    translate([0,0*screwGetThreadDP(screw),0])
-        bsfNutHexagonalThreaded(screw, $fn=50);
-    translate([0,2*screwGetThreadDP(screw),0])
-        bsfNutSquareThreaded(screw, $fn=50);
-    translate([0,4*screwGetThreadDP(screw),0])
-        bsfBoltHexagonalThreaded(screw, $fn=50);
-    translate([0,6*screwGetThreadDP(screw),0])
-        bsfBoltAllenThreaded(bsfClone(screw,30), $fn=50);
-    translate([0,8*screwGetThreadDP(screw),0])
-        bsfThreadInternal(screw, $fn=50);
-    translate([0,10*screwGetThreadDP(screw),0])
-        bsfThreadExternal(bsfClone(screw,6),$fn=50);
+    s1 = BSF3_16();
+    s2 = BSF7_32();
+    s3 = BSF1_4(tl=20);
+    s4 = BSF3_8(tl=30);
+    s5 = BSF1_2();
+    s6 = BSF7_8();
+    translate([0,0,0]) {
+        bsfNutHexagonalThreaded(s1, $fn=50);
+        showName(s1, -2);
+    }
+    translate([15,0,0]) {
+        bsfNutSquareThreaded(s2, $fn=50);
+        showName(s2, -2);
+    }
+    translate([30,0,0]) {
+        bsfBoltHexagonalThreaded(s3, $fn=50);
+        showName(s3, -7);
+    }
+    translate([50,0,0]) {
+        bsfBoltAllenThreaded(s4, $fn=50);
+        showName(s4, -11);
+    }
+    translate([70,0,0]) {
+        bsfThreadInternal(s5, $fn=50);
+        showName(s5, -2);
+    }
+    translate([90,0,0]) {
+        bsfThreadExternal(bsfClone(s6,16),$fn=50);
+        showName(s6, -4);
+    }
 }
-
 if (0) {
-    screw  = BSF5_32();
-    translate([0,0*screwGetHeadDP(screw),0])
-        bsfNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        bsfNutSquareThreaded(screw,     $gap=0.15, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        bsfBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        bsfBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
+    s1 = BSF1_4(tl=20);
+    translate([0*IX,0,0]) {
+        bsfNutHexagonalThreaded(s1, $fn=50);
+        showName(s1, -2);
+    }
+    translate([1*IX,0,0]) {
+        bsfNutSquareThreaded(s1, $fn=50);
+        showName(s1, -2);
+    }
+    translate([2*IX,0,0]) {
+        bsfBoltHexagonalThreaded(s1, $fn=50);
+        showName(s1, -7);
+    }
+    translate([3*IX,0,0]) {
+        bsfBoltAllenThreaded(s1, $fn=50);
+        showName(s1, -9);
+    }
 }
-
 if (0) {
-    screw  = BSF1();
-    translate([0,0*screwGetHeadDP(screw),0])
-        bsfNutHexagonalThreaded(screw,  $gap=0.15, $fn=50);
-    translate([0,1*screwGetHeadDP(screw),0])
-        bsfNutSquareThreaded(screw,     $gap=0.15, $fn=50);
-    translate([0,2*screwGetHeadDP(screw),0])
-        bsfBoltHexagonalThreaded(screw, $gap=0.15, $fn=50);
-    translate([0,3*screwGetHeadDP(screw),0])
-        bsfBoltAllenThreaded(screw,     $gap=0.15, $fn=50);
-}
-
-// Test thread profile
-if (0) {
-    !union() {
-        polygon ( screwThreadProfile ( BSF1_4(), 1, I=false, $gap=0.01, $fn=50 ) );
-        polygon ( screwThreadProfile ( BSF1_4(), 1, I=true,  $gap=0.01, $fn=50 ) );
+    s1 = BSF3_8(tl=20);
+    translate([0*IX,0,0]) {
+        bsfNutHexagonalThreaded(s1, $fn=50);
+        showName(s1, -2);
+    }
+    translate([1*IX,0,0]) {
+        bsfNutSquareThreaded(s1, $fn=50);
+        showName(s1, -2);
+    }
+    translate([2*IX,0,0]) {
+        bsfBoltHexagonalThreaded(s1, $fn=50);
+        showName(s1, -9);
+    }
+    translate([3*IX,0,0]) {
+        bsfBoltAllenThreaded(s1, $fn=50);
+        showName(s1, -11);
     }
 }
