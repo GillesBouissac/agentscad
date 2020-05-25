@@ -539,7 +539,7 @@ function screwThreadProfile( data, t=-1, I=false ) =
 // M screw profile:
 //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
 //
-// T: Optional Thickness of the cylinder holding internal thread (default: NOZZLE)
+// T: Optional Thickness of the cylinder holding internal thread (default: MFG)
 // I: Optional Internal (nut) profile if true, External (bolt) if false (default), 
 function screwMetricProfile( data, t=-1, I=false ) =
     let (
@@ -589,7 +589,7 @@ function screwMetricProfile( data, t=-1, I=false ) =
 // Whitworth screw profile:
 //   https://www.fastenerdata.co.uk/whitworth
 //
-// T: Optional Thickness of the cylinder holding internal thread (default: NOZZLE)
+// T: Optional Thickness of the cylinder holding internal thread (default: MFG)
 // I: Optional Internal (nut) profile if true, External (bolt) if false (default), 
 function screwWhitworthProfile( data, t=-1, I=false ) =
     let (
