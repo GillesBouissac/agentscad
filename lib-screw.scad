@@ -646,7 +646,7 @@ function screwThreadSlices( profile, pitch, rotations=1 ) = [
 // ----------------------------------------
 
 module showName( d, dy=0 ) {
-    translate( [screwGetPitch(d)/2,screwGetThreadD(d)/4+dy,0.1] )
+    translate( [screwGetPitch(d)/2,dy,0.1] )
     linear_extrude(1)
     text( screwGetName(d), halign="center", valign="center", size=1, $fn=100 );
 }
@@ -654,19 +654,19 @@ module showName( d, dy=0 ) {
 // Test thread profile
 if (1) {
     // Testing Congres thread: BSW 3.8"
-    screw_w = libScrewDataCompletion([["BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
-    screw_m = libScrewDataCompletion([["M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
+    screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
+    screw_m = libScrewDataCompletion([["Profile M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
     !union() {
         %union() {
             polygon ( screwThreadProfile ( screw_m, 0, I=false, $gap=0.01, $fn=200) );
             polygon ( screwThreadProfile ( screw_m, 1, I=true,  $gap=0.01, $fn=200) );
-            showName(screw_m,+0.5);
+            showName(screw_m,-0.6);
         }
         translate( [0,0,-2] )
         union() {
             polygon ( screwThreadProfile ( screw_w, 0, I=false, $gap=0.01, $fn=200) );
             polygon ( screwThreadProfile ( screw_w, 1, I=true,  $gap=0.01, $fn=200) );
-            showName(screw_w,-1);
+            showName(screw_w,-1.7);
         }
     }
 }
