@@ -503,7 +503,7 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_hts,                 // HTS
     local_prf,                 // PRF
     // M screw profile data
-    [ Rmin,Rmaj,RBot,RTop,Fmin,Fmaj,RRmin,RRmaj,Cmin,Cmaj ],
+    [ Rmin,Rmaj,RBot,RTop,Fmin,Fmaj,RRmin,RRmaj,Cmin,Cmaj,Rmaj-3*H/8 ],
     // WPRF Whitworth profile data
     [ WH,  WRadius, WCmin, WCmaj ]
 ];
@@ -549,9 +549,9 @@ function screwMetricProfile( data, t=-1, I=false ) =
         RRmaj  = data[I_PRFM][7],
         Cmino  = data[I_PRFM][8],
         Cmajo  = data[I_PRFM][9],
+        Rpitch = data[I_PRFM][10] + delta,
         Cmin   = [Cmino.x+MFG,Cmino.y+delta],
         Cmaj   = [Cmajo.x,Cmajo.y+delta],
-        Rpitch = (RTop+RBot)/2+ delta,
 
         Tmin   = (RTop-Rmaj)+delta+MFG,
         Tloc   = (t<Tmin ? Tmin : t)

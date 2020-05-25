@@ -57,7 +57,7 @@ module showName( d, z ) {
         text( screwGetName(d), halign="center", valign="center", size=2, $fn=100 );
 }
 
-if (1) {
+if (0) {
     s1 = UNC_N1();
     s2 = UNC_N5();
     s3 = UNC1_4(tl=20);
@@ -92,38 +92,38 @@ if (1) {
 if (0) {
     s1 = UNC1_4(tl=20);
     translate([0*IX,0,0]) {
-        uncNutHexagonalThreaded(s1, $fn=50);
+        uncNutHexagonalThreaded(s1, $fn=100);
         showName(s1, -2);
     }
     translate([1*IX,0,0]) {
-        uncNutSquareThreaded(s1, $fn=50);
+        uncNutSquareThreaded(s1, $fn=100);
         showName(s1, -2);
     }
     translate([2*IX,0,0]) {
-        uncBoltHexagonalThreaded(s1, $fn=50);
+        uncBoltHexagonalThreaded(s1, $fn=100);
         showName(s1, -7);
     }
     translate([3*IX,0,0]) {
-        uncBoltAllenThreaded(s1, $fn=50);
+        uncBoltAllenThreaded(s1, $fn=100);
         showName(s1, -9);
     }
 }
-if (0) {
+if (1) {
     s1 = UNC3_8(tl=20);
     translate([0*IX,0,0]) {
-        uncNutHexagonalThreaded(s1, $fn=50);
+        uncNutHexagonalThreaded(s1, $fn=100);
         showName(s1, -2);
     }
     translate([1*IX,0,0]) {
-        uncNutSquareThreaded(s1, $fn=50);
+        uncNutSquareThreaded(s1, $fn=100);
         showName(s1, -2);
     }
     translate([2*IX,0,0]) {
-        uncBoltHexagonalThreaded(s1, $fn=50);
+        uncBoltHexagonalThreaded(s1, $fn=100);
         showName(s1, -9);
     }
-    translate([3*IX,0,0]) {
-        uncBoltAllenThreaded(s1, $fn=50);
+!    translate([3*IX,0,0]) {
+        uncBoltAllenThreaded(s1, $fn=100);
         showName(s1, -11);
     }
 }
