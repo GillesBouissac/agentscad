@@ -443,8 +443,8 @@ I_RADS   = 20; // Smoothing parts Radiuses (circular parts)
 I_CENTR  = 21; // Centers of round parts
 I_WPRF   = 22; // Whitworth profile data
 
-PROFILE_M = "M";
-PROFILE_W = "W";
+PROFILE_M = "M"; // Metric or UTS profile
+PROFILE_W = "W"; // Whitworth profile
 
 function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=undef,hlp=undef,ahd=undef,ahl=undef,ats=undef,hhd=undef,hhl=undef,tdp=undef,tlp=undef,prf=undef ) = let (
     local_name = is_undef(n)   ? data[idx][CNAME]  : n,
@@ -546,9 +546,11 @@ function screwMetricProfile( data, t=-1, I=false ) =
         Theta  = M_ANGLE/2,
         p      = screwGetPitch(data),
         delta  = I ? +gap() : -gap(3/4),
+        Rmax   = screwGetThreadD(data)/2,
         Rmaj   = data[I_RADF][1] + delta,
         Rmin   = data[I_RADF][0] + delta,
         RBot   = data[I_RADG][0],
+        RTop   = data[I_RADG][1],
         Fmin   = data[I_FLAT][0],
         Fmaj   = data[I_FLAT][1],
         RRmin  = data[I_RADS][0],
@@ -558,7 +560,7 @@ function screwMetricProfile( data, t=-1, I=false ) =
         Cmin   = [Cmino.x+MFG,Cmino.y+delta],
         Cmaj   = [Cmajo.x,Cmajo.y+delta],
 
-        Tmin   = (Rmin-RBot)+nozzle(1.5),
+        Tmin   = (RTop-Rmaj)+delta+MFG,
         Tloc   = (t<Tmin ? Tmin : t)
     )
     I ?
@@ -602,7 +604,7 @@ function screwWhitworthProfile( data, t=-1, I=false ) =
         Cmin    = [Cmino.x,Cmino.y+delta],
         Cmaj    = [Cmajo.x,Cmajo.y+delta],
         WRpitch = Rmaj-WH/3,
-        Tmin    = nozzle(1.5),
+        Tmin    = MFG,
         Tloc    = (t<Tmin ? Tmin : t)
     )
     I ?
@@ -641,14 +643,33 @@ function screwThreadSlices( profile, pitch, rotations=1 ) = [
         transform(translation([a*pitch/360,0,0])*rotation([a,0,0]), profile )
 ];
 
+// ----------------------------------------
+//
+//                  Showcase
+//
+// ----------------------------------------
+
+module showName( d ) {
+    color( "gold" )
+        translate( [screwGetPitch(d)/2,screwGetThreadD(d)/4,0.1] )
+        linear_extrude(1)
+        text( screwGetName(d), halign="center", valign="center", size=1, $fn=100 );
+}
+
 // Test thread profile
 if (1) {
     // Testing Congres thread: BSW 3.8"
-    screw = libScrewDataCompletion([["Test",inch2mm(1/16),inch2mm(3/8),inch2mm(3/8)]],0,prf=PROFILE_W);
-    echo ( "Test thread profile: screw=", screw );
+    screw_w = libScrewDataCompletion([["W",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
+    screw_m = libScrewDataCompletion([["M",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
     !union() {
-        polygon ( screwThreadProfile ( screw, 0, I=false, $gap=0.01, $fn=100) );
-        polygon ( screwThreadProfile ( screw, 1, I=true,  $gap=0.01, $fn=100) );
+        polygon ( screwThreadProfile ( screw_m, 0, I=false, $gap=0.01, $fn=200) );
+        polygon ( screwThreadProfile ( screw_m, 1, I=true,  $gap=0.01, $fn=200) );
+        showName(screw_m);
+        translate( [2,0,0] ) {
+            polygon ( screwThreadProfile ( screw_w, 0, I=false, $gap=0.01, $fn=200) );
+            polygon ( screwThreadProfile ( screw_w, 1, I=true,  $gap=0.01, $fn=200) );
+            showName(screw_w);
+        }
     }
 }
 
