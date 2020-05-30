@@ -14,6 +14,8 @@ use <scad-utils/transformations.scad>
 use <list-comprehension-demos/skin.scad>
 use <extensions.scad>
 use <printing.scad>
+use <mesh.scad>
+use <lib-spiral.scad>
 
 // ----------------------------------------
 //
@@ -288,6 +290,7 @@ function screwGetTapD(s)                = s[I_TAP];
 function screwGetPitch(s)               = s[I_TP];
 function screwGetThreadD(s)             = s[I_TD];
 function screwGetThreadDP(s)            = s[I_TDP];
+function screwGetThreadMaxD(s)          = s[I_TMX];
 function screwGetThreadL(s)             = s[I_TL];
 function screwGetThreadLP(s)            = s[I_TLP];
 function screwGetHeadDP(s)              = s[I_HDP];
@@ -314,42 +317,44 @@ function screwGetSquareToolSize(s)      = s[I_HTS];
 // Renders an external thread (for bolts)
 //   l: Thread length
 //   f: Generates flat faces if true
-module libThreadExternal ( screw, l=-1, f=true ) {
-    local_l   = l<0 ? screwGetThreadL(screw) : l ;
-    rotations = local_l/screwGetPitch(screw) + (f ? 1:-1) ;
-    profile   = screwThreadProfile ( screw, I=false );
-    clipL     = local_l;
-    clipW     = screwGetThreadD(screw)+10;
-    rotate([0,-90,0])
-        translate([f?-screwGetPitch(screw):0,0,0])
-        intersection() {
-            skin( screwThreadSlices(profile, screwGetPitch(screw), rotations) );
-            if ( f ) {
-                translate([screwGetPitch(screw)+clipL/2,0,0])
-                    cube([clipL, clipW, clipW],center=true);
-            }
+module libThreadExternal ( screw, l=undef, f=true ) {
+    local_l     = is_undef(l) ? screwGetThreadL(screw) : l ;
+    rotations   = local_l/screwGetPitch(screw) + (f ? 1:-1) ;
+    profile     = screwThreadProfile ( screw, I=false );
+    clipL       = local_l;
+    clipW       = screwGetThreadD(screw)+10;
+    profile_gap = [ for(p=profile) [p.x-gap(3/4),p.y] ];
+    spiral      = meshSpiralExternal ( profile_gap, rotations, screwGetPitch(screw) );
+    translate([0,0,f?-screwGetPitch(screw):0])
+    intersection() {
+        meshPolyhedron( spiral, convexity=10);
+        if ( f ) {
+            translate([0,0,screwGetPitch(screw)+clipL/2])
+                cube([clipW, clipW, clipL ],center=true);
         }
+    }
 }
 
 // Renders an internal thread (for nuts)
 //   l: Thread length
 //   t: Thickness of cylinder containing the thread
 //   f: Generates flat faces if true
-module libThreadInternal ( screw, l=-1, t=-1, f=true ) {
-    local_l   = l<0 ? screwGetThreadL(screw): l;
-    rotations = local_l/screwGetPitch(screw) + (f ? 1:-1) ;
-    profile   = screwThreadProfile ( screw, t=t, I=true );
-    clipL     = local_l;
-    clipW     = screwGetThreadD(screw)+10;
-    rotate([0,-90,0])
-        translate([f?-screwGetPitch(screw):0,0,0])
-        intersection() {
-            skin( screwThreadSlices(profile, screwGetPitch(screw), rotations) );
-            if ( f ) {
-                translate([screwGetPitch(screw)+clipL/2,0,0])
-                    cube([clipL, clipW, clipW],center=true);
-            }
+module libThreadInternal ( screw, l=undef, f=true, t=0 ) {
+    local_l     = is_undef(l) ? screwGetThreadL(screw): l;
+    rotations   = local_l/screwGetPitch(screw) + (f ? 1:-1) ;
+    profile     = screwThreadProfile ( screw, I=true );
+    clipL       = local_l;
+    clipW       = screwGetThreadD(screw)+10;
+    profile_gap = [ for(p=profile) [p.x+gap(),p.y] ];
+    spiral      = meshSpiralInternal ( profile_gap, rotations, screwGetPitch(screw), radius=screwGetThreadMaxD(screw)/2+t );
+    translate([0,0,f?-screwGetPitch(screw):0])
+    intersection() {
+        meshPolyhedron( spiral, convexity=10);
+        if ( f ) {
+            translate([0,0,screwGetPitch(screw)+clipL/2])
+                cube([clipW, clipW, clipL ],center=true);
         }
+    }
 }
 
 // Nut with Hexagonal head
@@ -412,7 +417,6 @@ module libBoltImpl( td, tl, tdp, tlp, hd, hl ) {
 }
 
 VGG            = 0.01;  // Visual Glich Guard
-MFG            = 0.001; // Manifold Guard
 M_ANGLE        = 60;    // Thread flanks V angle for M profile
 W_ANGLE        = 55;    // Thread flanks V angle for Whitworth profile
 BEVEL_HEXA_A   = 30;    // Hexagonal head bevel angle
@@ -436,8 +440,9 @@ I_HHD    = 13; // Head Diameter for Hexagonal head
 I_HHL    = 14; // Head Length for Hexagonal head
 I_HTS    = 15; // Hexagonal Tool Size
 I_PRF    = 16; // Profile type
-I_PRFM   = 17; // Metric or UTS profile data
-I_PRFW   = 18; // Whitworth profile data
+I_TMX    = 17; // Thread Maximal Diameter
+I_PRFM   = 18; // Metric or UTS profile data
+I_PRFW   = 19; // Whitworth profile data
 
 PROFILE_M = "M"; // Metric or UTS profile
 PROFILE_W = "W"; // Whitworth profile
@@ -460,18 +465,18 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
 
     // M screw profile:
     //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
-    Theta     = M_ANGLE/2,
-    H         = local_p/(2*tan(Theta)),
-    Rmaj      = local_td/2,
-    Rmin      = Rmaj - 5*H/8,
-    Fmin      = local_p/8, // Flat part half length on Dmin
-    Fmaj      = local_p/16,
-    RRmin     = Fmin/cos(Theta),
-    RRmaj     = Fmaj/cos(Theta),
-    Cmin      = [ local_p*1/4, Rmin+RRmin*sin(Theta) ],
-    Cmaj      = [ local_p*3/4, Rmaj-RRmaj*sin(Theta) ],
-    RTop      = Cmaj.y+RRmaj,
-    RBot      = Cmin.y-RRmin,
+    MH        = local_p/(2*tan(M_ANGLE/2)),
+    MRmaj     = local_td/2,
+    MRmin     = MRmaj - 5*MH/8,
+    MFmin     = local_p/8, // Flat part half length on Dmin
+    MFmaj     = local_p/16,
+    MRRmin    = MFmin/cos(M_ANGLE/2),
+    MRRmaj    = MFmaj/cos(M_ANGLE/2),
+    MCmin     = [ MRmin+MRRmin*sin(M_ANGLE/2), local_p*1/4 ],
+    MCmaj     = [ MRmaj-MRRmaj*sin(M_ANGLE/2), local_p*3/4 ],
+    MRTop     = MCmaj.x+MRRmaj,
+    MRBot     = MCmin.x-MRRmin,
+    MRpitch   = local_td/2-3*MH/8,
 
     // Whitworth screw profile:
     //   https://www.fastenerdata.co.uk/whitworth
@@ -479,11 +484,16 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     WH6       = WH/6,
     WRadius   = WH6/(1/sin(W_ANGLE/2)-1),
     WRpitch   = local_td/2-WH/3,
-    WCmin     = [ local_p*1/4, WRpitch-(WH/2-(WH6+WRadius)) ],
-    WCmaj     = [ local_p*3/4, WRpitch+(WH/2-(WH6+WRadius)) ],
+    WRTop     = local_td/2,
+    WRBot     = local_td/2-2*WH/3,
+    WCmin     = [ WRBot+WRadius, local_p*1/4 ],
+    WCmaj     = [ WRTop-WRadius, local_p*3/4 ],
 
-    // reason for gap(): see thread drawing functions
-    local_tdp = is_undef(tdp) ? (local_prf==PROFILE_M?2*RTop:local_td)+2*gap() : tdp
+    // Thread maximal diameter
+    local_tmx = local_prf==PROFILE_M ? 2*MRTop : 2*WRTop,
+
+    // Passage is +gap() on thread maximal radius
+    local_tdp = is_undef(tdp) ? local_tmx+2*gap() : tdp
 ) [
     idx,
     local_name,
@@ -502,10 +512,11 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_hhl,                 // HHL
     local_hts,                 // HTS
     local_prf,                 // PRF
+    local_tmx,                 // TMX
     // M screw profile data
-    [ Rmin,Rmaj,RBot,RTop,Fmin,Fmaj,RRmin,RRmaj,Cmin,Cmaj,Rmaj-3*H/8 ],
+    [ MRmin,MRmaj,MFmin,MFmaj,MRRmin,MRRmaj,MCmin,MCmaj,MRpitch ],
     // WPRF Whitworth profile data
-    [ WH,  WRadius, WCmin, WCmaj ]
+    [ WRpitch, WRadius, WCmin, WCmaj ]
 ];
 
 //
@@ -524,110 +535,70 @@ CATS     =  8; // Allen Tool Size (mm)
 CHHL     =  9; // Hexagonal Head Length tight (mm)
 CHTS     = 10; // Hexagonal Tool Size (mm)
 
-function screwThreadProfile( data, t=-1, I=false ) =
-    data[I_PRF]==PROFILE_M ? screwMetricProfile (data,t,I) : screwWhitworthProfile (data,t,I)
+function screwThreadProfile( data, I=false ) =
+    data[I_PRF]==PROFILE_M ? screwMetricProfile (data,I) : screwWhitworthProfile (data,I)
 ;
 
 // M screw profile:
 //   https://en.wikipedia.org/wiki/ISO_metric_screw_thread
 //
-// T: Optional Thickness of the cylinder holding internal thread (default: MFG)
 // I: Optional Internal (nut) profile if true, External (bolt) if false (default), 
-function screwMetricProfile( data, t=-1, I=false ) =
+function screwMetricProfile( data, I=false ) =
     let (
         Theta  = M_ANGLE/2,
         p      = screwGetPitch(data),
-        delta  = I ? +gap() : -gap(3/4),
-        Rmax   = screwGetThreadD(data)/2,
-        Rmin   = data[I_PRFM][0] + delta,
-        Rmaj   = data[I_PRFM][1] + delta,
-        RBot   = data[I_PRFM][2],
-        RTop   = data[I_PRFM][3],
-        Fmin   = data[I_PRFM][4],
-        Fmaj   = data[I_PRFM][5],
-        RRmin  = data[I_PRFM][6],
-        RRmaj  = data[I_PRFM][7],
-        Cmino  = data[I_PRFM][8],
-        Cmajo  = data[I_PRFM][9],
-        Rpitch = data[I_PRFM][10] + delta,
-        Cmin   = [Cmino.x+MFG,Cmino.y+delta],
-        Cmaj   = [Cmajo.x,Cmajo.y+delta],
-
-        Tmin   = (RTop-Rmaj)+delta+MFG,
-        Tloc   = (t<Tmin ? Tmin : t)
+        Rmin   = data[I_PRFM][0],
+        Rmaj   = data[I_PRFM][1],
+        Fmin   = data[I_PRFM][2],
+        Fmaj   = data[I_PRFM][3],
+        RRmin  = data[I_PRFM][4],
+        RRmaj  = data[I_PRFM][5],
+        Cmin   = data[I_PRFM][6],
+        Cmaj   = data[I_PRFM][7],
+        Rpitch = data[I_PRFM][8]
     )
     I ?
         flatten([
             [
-                 [ p,          Rpitch ]
-                ,[ p,          Rmaj+Tloc ]
-                ,[ 0+MFG,      Rmaj+Tloc]
-                ,[ 0+MFG,      Rpitch ]
-                ,[ 1*p/4-Fmin, Rmin ]
-                ,[ 1*p/4+Fmin, Rmin ]
+                 [ Rpitch, 0 ]
+                ,[ Rmin, 1*p/4-Fmin ]
+                ,[ Rmin, 1*p/4+Fmin ]
             ],
-            screwThreadRounding( RRmaj, Cmaj, +(180-Theta), +(Theta) )
+            screwThreadArc( RRmaj, Cmaj, -90+Theta, +90-Theta )
         ])
     :
         flatten([
             [
-                 [ 0+MFG,      Rpitch ]
-                ,[ 0+MFG,      0+MFG ]
-                ,[ p,          0+MFG ]
-                ,[ p,          Rpitch ]
-                ,[ 3*p/4+Fmaj, Rmaj ]
-                ,[ 3*p/4-Fmaj, Rmaj ]
-            ]
-            ,screwThreadRounding( RRmin, Cmin, -(Theta), -(180-Theta) )
+                [ Rpitch, 0 ]
+            ],
+            screwThreadArc( RRmin, Cmin, -90-Theta, -270+Theta ),
+            [
+                [ Rmaj,   3*p/4-Fmaj ],
+                [ Rmaj,   3*p/4+Fmaj ]
+            ],
         ])
     ;
 
 // Whitworth screw profile:
 //   https://www.fastenerdata.co.uk/whitworth
 //
-// T: Optional Thickness of the cylinder holding internal thread (default: MFG)
 // I: Optional Internal (nut) profile if true, External (bolt) if false (default), 
-function screwWhitworthProfile( data, t=-1, I=false ) =
+function screwWhitworthProfile( data, I=false ) =
     let (
         Theta   = W_ANGLE/2,
-        p       = screwGetPitch(data),
-        delta   = I ? +gap() : -gap(3/4),
-        Rmaj    = screwGetThreadD(data)/2+delta,
-        WH      = data[I_PRFW][0],
+        Rpitch  = data[I_PRFW][0],
         WRadius = data[I_PRFW][1],
-        Cmino   = data[I_PRFW][2],
-        Cmajo   = data[I_PRFW][3],
-        Cmin    = [Cmino.x,Cmino.y+delta],
-        Cmaj    = [Cmajo.x,Cmajo.y+delta],
-        Rpitch  = Rmaj-WH/3,
-        Tmin    = MFG,
-        Tloc    = (t<Tmin ? Tmin : t)
+        Cmin    = data[I_PRFW][2],
+        Cmaj    = data[I_PRFW][3]
     )
-    I ?
-        flatten([
-            [
-                 [ p,     Rpitch ]
-                ,[ p,     Rmaj+Tloc ]
-                ,[ 0+MFG, Rmaj+Tloc ]
-                ,[ 0+MFG, Rpitch ]
-            ],
-            screwThreadRounding( WRadius, Cmin, -(180-Theta), -(Theta) ),
-            screwThreadRounding( WRadius, Cmaj, +(180-Theta), +(Theta) )
-        ])
-    :
-        flatten([
-            [
-                 [ 0+MFG, Rpitch ]
-                ,[ 0+MFG, 0+MFG ]
-                ,[ p,     0+MFG ]
-                ,[ p,     Rpitch ]
-            ],
-            screwThreadRounding( WRadius, Cmaj, +(Theta), +(180-Theta) ),
-            screwThreadRounding( WRadius, Cmin, -(Theta), -(180-Theta) )
-        ])
-    ;
+    flatten([
+        [ [ Rpitch, 0 ] ],
+        screwThreadArc( WRadius, Cmin, -90-Theta, -270+Theta ),
+        screwThreadArc( WRadius, Cmaj, -90+Theta,   90-Theta )
+    ])
+;
 
-function screwThreadRounding( R, C, T1, T2) = [
+function screwThreadArc( R, C, T1, T2) = [
     let ( range=T2-T1, step=range/($fn<10?1:$fn/10) )
     for ( a=[T1:step:T2] )
         [ C.x+R*cos(a), C.y+R*sin(a) ]
@@ -646,28 +617,62 @@ function screwThreadSlices( profile, pitch, rotations=1 ) = [
 // ----------------------------------------
 
 module showName( d, dy=0 ) {
-    translate( [screwGetPitch(d)/2,dy,0.1] )
+    translate( [screwGetPitch(d),dy,0.1] )
     linear_extrude(1)
     text( screwGetName(d), halign="center", valign="center", size=1, $fn=100 );
 }
 
-// Test thread profile
+// Thread profiles visualisation
 if (1) {
-    // Testing Congres thread: BSW 3.8"
-    screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
-    screw_m = libScrewDataCompletion([["Profile M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
+    screw_w = libScrewDataCompletion([["Profile BSW / BSF",     6,12,1]],0,prf=PROFILE_W);
+    screw_m = libScrewDataCompletion([["Profile M / UNC / UNF", 6,12,1]],0,prf=PROFILE_M);
     !union() {
-        %union() {
-            polygon ( screwThreadProfile ( screw_m, 0, I=false, $gap=0.01, $fn=200) );
-            polygon ( screwThreadProfile ( screw_m, 1, I=true,  $gap=0.01, $fn=200) );
+        color("white")
+        union() {
+            intersection() {
+                rotate( [90,0,90] )
+                union() {
+                    libThreadExternal(screw_m,l=2*screwGetPitch(screw_m),f=true,$fn=100);
+                    libThreadInternal(screw_m,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
+                }
+                cube( [100,100,0.01], center=true );
+            }
             showName(screw_m,-0.6);
         }
         translate( [0,0,-2] )
+        color("lightblue")
         union() {
-            polygon ( screwThreadProfile ( screw_w, 0, I=false, $gap=0.01, $fn=200) );
-            polygon ( screwThreadProfile ( screw_w, 1, I=true,  $gap=0.01, $fn=200) );
-            showName(screw_w,-1.7);
+            intersection() {
+                rotate( [90,0,90] )
+                union() {
+                    libThreadExternal(screw_w,l=2*screwGetPitch(screw_m),f=true,$fn=100);
+                    libThreadInternal(screw_w,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
+                }
+                cube( [100,100,0.01], center=true );
+            }
+            showName(screw_w,-0.6);
         }
+    }
+}
+
+// CPU torture
+if (0) {
+    screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
+    screw_m = libScrewDataCompletion([["Profile M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
+    screw_hole = libScrewDataCompletion([["B",2,6,1]],0,prf=PROFILE_W);
+
+    difference() {
+        union() {
+            libThreadExternal( screw_w, 10, f=false, $fn=100 );
+            libThreadInternal( screw_w, 10, f=false, t=1, $fn=100 );
+        }
+#
+        translate( [-1,0,3] )
+        rotate( [ 60, 20, 30 ] )
+            translate( [0,0,-6] )
+            libThreadExternal( screw_hole, 16, $fn=100 );
+        translate( [5,5,0] )
+            cylinder( r=4.5,10, $fn=100 );
     }
 }
 

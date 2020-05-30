@@ -19,9 +19,9 @@ use <agentscad/extensions.scad>
 
 function classMesh()      = "mesh";
 
-module meshPolyhedron ( mesh ) {
+module meshPolyhedron ( mesh, convexity=undef ) {
     class = assertClass(mesh,classMesh());
-    polyhedron ( points=getMeshVertices(mesh), faces=getMeshFaces(mesh) );
+    polyhedron ( points=getMeshVertices(mesh), faces=getMeshFaces(mesh), convexity=convexity );
 }
 
 function newMesh( vertices, faces ) = [ classMesh(), vertices, faces ];
