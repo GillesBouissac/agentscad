@@ -18,34 +18,34 @@ use <agentscad/lib-screw.scad>
 // ----------------------------------------
 
 // Bolt passage loose on head to fit any type of head
-module mxfBoltPassage( p=MXF2() ) { libBoltPassage(p); }
+module mxfBoltPassage( p=MF2() ) { libBoltPassage(p); }
 
 // Nut passage loose on head to fit any type of nut
-module mxfNutPassage( p=MXF2() ) { libNutPassage(p); }
+module mxfNutPassage( p=MF2() ) { libNutPassage(p); }
 
 // Hexagonal nut passage
-module mxfNutHexagonalPassage( p=MXF2() ) { libNutHexagonalPassage(p); }
+module mxfNutHexagonalPassage( p=MF2() ) { libNutHexagonalPassage(p); }
 
 // Hexagonal nut passage
-module mxfNutSquarePassage( p=MXF2() ) { libNutSquarePassage(p); }
+module mxfNutSquarePassage( p=MF2() ) { libNutSquarePassage(p); }
 
 // Bolt passage Tight on head for Allen head
-module mxfBoltAllenPassage( p=MXF2() ) { libBoltAllenPassage(p); }
+module mxfBoltAllenPassage( p=MF2() ) { libBoltAllenPassage(p); }
 
 // Bolt passage Tight on head for Hexagonal head
-module mxfBoltHexagonalPassage( p=MXF2() ) { libBoltHexagonalPassage(p); }
+module mxfBoltHexagonalPassage( p=MF2() ) { libBoltHexagonalPassage(p); }
 
 // Bolt with Allen head
-module mxfBoltAllen( p=MXF2(), bt=true ) { libBoltAllen(p,bt); }
+module mxfBoltAllen( p=MF2(), bt=true ) { libBoltAllen(p,bt); }
 
 // Bolt with Hexagonal head
-module mxfBoltHexagonal( p=MXF2(), bt=true, bb=true ) { libBoltHexagonal(p,bt,bb); }
+module mxfBoltHexagonal( p=MF2(), bt=true, bb=true ) { libBoltHexagonal(p,bt,bb); }
 
 // Hexagonal nut
-module mxfNutHexagonal( p=MXF2(), bt=true, bb=true ) { libNutHexagonal(p,bt,bb); }
+module mxfNutHexagonal( p=MF2(), bt=true, bb=true ) { libNutHexagonal(p,bt,bb); }
 
 // Square nut
-module mxfNutSquare( p=MXF2(), bt=true, bb=true ) { libNutSquare(p,bt,bb); }
+module mxfNutSquare( p=MF2(), bt=true, bb=true ) { libNutSquare(p,bt,bb); }
 
 // MXF constructors
 //   tl:  Thread length,                    undef = use common value
@@ -60,34 +60,34 @@ module mxfNutSquare( p=MXF2(), bt=true, bb=true ) { libNutSquare(p,bt,bb); }
 //
 // Dimensions must be given in mm
 //
-function MXF1_6 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF2   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF2_5 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF3   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(3 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(4 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF5   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(5 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF6   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(6 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(7 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF10  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(8 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF12  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(9 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF14  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(10,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(11,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF18  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(12,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF20  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(13,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF22  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(14,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF24  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(15,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF27  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(16,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF30  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(17,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF33  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(18,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF36  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(19,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF39  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(20,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF42  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(21,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF45  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(22,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF48  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(23,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF52  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(24,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF56  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(25,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF60  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(26,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
-function MXF64  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(27,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF1_6 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(0 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF2   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(1 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF2_5 (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(2 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF3   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(3 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF4   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(4 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF5   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(5 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF6   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(6 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF8   (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(7 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF10  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(8 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF12  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(9 ,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF14  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(10,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF16  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(11,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF18  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(12,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF20  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(13,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF22  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(14,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF24  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(15,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF27  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(16,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF30  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(17,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF33  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(18,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF36  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(19,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF39  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(20,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF42  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(21,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF45  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(22,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF48  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(23,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF52  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(24,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF56  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(25,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF60  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(26,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
+function MF64  (tl=undef,tlp=undef,ahl=undef,hhl=undef,hlp=undef,tdp=undef,ahd=undef,hhd=undef,hdp=undef) = mxfData(27,tl,tlp,ahl,hhl,hlp,tdp,ahd,hhd,hdp);
 
 // Guess what is the better standard thread from the given one
 //   if td>0: will pick the first screw larger than the given value
@@ -163,22 +163,22 @@ MXFDATA = [
 //                  Showcase
 //
 // ----------------------------------------
-mxfBoltHexagonal( MXF64(), $fn=100 );
-translate([0,0,+screwGetThreadL(MXF64())] )
+mxfBoltHexagonal( MF64(), $fn=100 );
+translate([0,0,+screwGetThreadL(MF64())] )
     color( "silver", 0.5 )
-    mxfNutHexagonal( MXF64(), $fn=100 );
+    mxfNutHexagonal( MF64(), $fn=100 );
 translate([60,0]) {
     color( "gold" )
-        mxfBoltAllen( MXF1_6(), $fn=100 );
+        mxfBoltAllen( MF1_6(), $fn=100 );
     color( "silver", 0.5 )
-        mxfNutSquare( MXF1_6(), $fn=100 );
+        mxfNutSquare( MF1_6(), $fn=100 );
 }
 
-echo( "mxfGuess(   2):    expected M2: ",   screwGetName(mxfGuess(2)) ) ;
-echo( "mxfGuess(  -2):    expected M2: ",   screwGetName(mxfGuess(-2)) ) ;
-echo( "mxfGuess(  -1.99): expected M1.6: ", screwGetName(mxfGuess(-1.99)) ) ;
-echo( "mxfGuess(   2.1):  expected M2.5: ", screwGetName(mxfGuess(2.1)) ) ;
-echo( "mxfGuess(   0):    expected M1.6: ", screwGetName(mxfGuess(0)) ) ;
+echo( "mxfGuess(   2):    expected MF2: ",   screwGetName(mxfGuess(2)) ) ;
+echo( "mxfGuess(  -2):    expected MF2: ",   screwGetName(mxfGuess(-2)) ) ;
+echo( "mxfGuess(  -1.99): expected MF1.6: ", screwGetName(mxfGuess(-1.99)) ) ;
+echo( "mxfGuess(   2.1):  expected MF2.5: ", screwGetName(mxfGuess(2.1)) ) ;
+echo( "mxfGuess(   0):    expected MF1.6: ", screwGetName(mxfGuess(0)) ) ;
 echo( "mxfGuess( 100):    expected undef:", screwGetName(mxfGuess(100)) ) ;
-echo( "mxfGuess(-100):    expected M64:",   screwGetName(mxfGuess(-100)) ) ;
+echo( "mxfGuess(-100):    expected MF64:",   screwGetName(mxfGuess(-100)) ) ;
 

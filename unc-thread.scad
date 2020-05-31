@@ -19,10 +19,10 @@ use <agentscad/unc-screw.scad>
 // ----------------------------------------
 
 // Renders an external thread (for bolts)
-module uncThreadExternal ( screw, l=-1, f=true ) { libThreadExternal(screw,l,f); }
+module uncThreadExternal ( screw, l=undef, f=true ) { libThreadExternal(screw,l,f); }
 
 // Renders an internal thread (for nuts)
-module uncThreadInternal ( screw, l=-1, t=-1, f=true ) { libThreadInternal(screw,l,t,f); }
+module uncThreadInternal ( screw, l=undef, f=true, t=undef ) { libThreadInternal(screw,l,f,t); }
 
 // Nut with Hexagonal head
 module uncNutHexagonalThreaded( screw, bt=true, bb=true ) { libNutHexagonalThreaded(screw,bt,bb); }
@@ -57,7 +57,7 @@ module showName( d, z ) {
         text( screwGetName(d), halign="center", valign="center", size=2, $fn=100 );
 }
 
-if (0) {
+if (1) {
     s1 = UNC_N1();
     s2 = UNC_N5();
     s3 = UNC1_4(tl=20);
@@ -108,7 +108,7 @@ if (0) {
         showName(s1, -9);
     }
 }
-if (1) {
+if (0) {
     s1 = UNC3_8(tl=20);
     translate([0*IX,0,0]) {
         uncNutHexagonalThreaded(s1, $fn=100);

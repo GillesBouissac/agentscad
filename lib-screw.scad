@@ -337,8 +337,8 @@ module libThreadExternal ( screw, l=undef, f=true ) {
 
 // Renders an internal thread (for nuts)
 //   l: Thread length
-//   t: Thickness of cylinder containing the thread
 //   f: Generates flat faces if true
+//   t: Thickness of cylinder containing the thread
 module libThreadInternal ( screw, l=undef, f=true, t=0 ) {
     local_l     = is_undef(l) ? screwGetThreadL(screw): l;
     rotations   = local_l/screwGetPitch(screw) + (f ? 1:-1) ;

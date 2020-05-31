@@ -19,10 +19,10 @@ use <agentscad/mxf-screw.scad>
 // ----------------------------------------
 
 // Renders an external thread (for bolts)
-module mxfThreadExternal ( screw, l=-1, f=true ) { libThreadExternal(screw,l,f); }
+module mxfThreadExternal ( screw, l=undef, f=true ) { libThreadExternal(screw,l,f); }
 
 // Renders an internal thread (for nuts)
-module mxfThreadInternal ( screw, l=-1, t=-1, f=true ) { libThreadInternal(screw,l,t,f); }
+module mxfThreadInternal ( screw, l=undef, f=true, t=undef ) { libThreadInternal(screw,l,f,t); }
 
 // Nut with Hexagonal head
 module mxfNutHexagonalThreaded( screw, bt=true, bb=true ) { libNutHexagonalThreaded(screw,bt,bb); }
@@ -58,12 +58,12 @@ module showName( d, z ) {
 }
 
 if (1) {
-    s1 = MXF1_6();
-    s2 = MXF5();
-    s3 = MXF6(tl=20);
-    s4 = MXF10(tl=30);
-    s5 = MXF12();
-    s6 = MXF22();
+    s1 = MF1_6();
+    s2 = MF5();
+    s3 = MF6(tl=20);
+    s4 = MF10(tl=30);
+    s5 = MF12();
+    s6 = MF22();
     translate([0,0,0]) {
         mxfNutHexagonalThreaded(s1, $fn=50);
         showName(s1, -2);
@@ -90,7 +90,7 @@ if (1) {
     }
 }
 if (0) {
-    s1 = MXF5(tl=20);
+    s1 = MF5(tl=20);
     translate([0*IX,0,0]) {
         mxfNutHexagonalThreaded(s1, $fn=100);
         showName(s1, -2);
@@ -109,7 +109,7 @@ if (0) {
     }
 }
 if (0) {
-    s1 = MXF6(tl=20);
+    s1 = MF6(tl=20);
     translate([0*IX,0,0]) {
         mxfNutHexagonalThreaded(s1, $fn=100);
         showName(s1, -2);

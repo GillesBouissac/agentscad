@@ -19,10 +19,10 @@ use <agentscad/bsw-screw.scad>
 // ----------------------------------------
 
 // Renders an external thread (for bolts)
-module bswThreadExternal ( screw, l=-1, f=true ) { libThreadExternal(screw,l,f); }
+module bswThreadExternal ( screw, l=undef, f=true ) { libThreadExternal(screw,l,f); }
 
 // Renders an internal thread (for nuts)
-module bswThreadInternal ( screw, l=-1, t=-1, f=true ) { libThreadInternal(screw,l,t,f); }
+module bswThreadInternal ( screw, l=undef, f=true, t=undef ) { libThreadInternal(screw,l,f,t); }
 
 // Nut with Hexagonal head
 module bswNutHexagonalThreaded( screw, bt=true, bb=true ) { libNutHexagonalThreaded(screw,bt,bb); }
@@ -81,7 +81,7 @@ if (1) {
         showName(s4, -11);
     }
     translate([70,0,0]) {
-        bswThreadInternal(s5, $fn=50);
+        bswThreadInternal(screw=s5,$fn=50);
         showName(s5, -2);
     }
     translate([90,0,0]) {
