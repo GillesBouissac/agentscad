@@ -12,10 +12,10 @@
 use <scad-utils/lists.scad>
 use <scad-utils/transformations.scad>
 use <list-comprehension-demos/skin.scad>
-use <extensions.scad>
-use <printing.scad>
-use <mesh.scad>
-use <lib-spiral.scad>
+use <agentscad/extensions.scad>
+use <agentscad/printing.scad>
+use <agentscad/mesh.scad>
+use <agentscad/lib-spiral.scad>
 
 // ----------------------------------------
 //
@@ -319,7 +319,8 @@ function screwGetSquareToolSize(s)      = s[I_HTS];
 //   f: Generates flat faces if true
 module libThreadExternal ( screw, l=undef, f=true ) {
     local_l     = is_undef(l) ? screwGetThreadL(screw) : l ;
-    rotations   = local_l/screwGetPitch(screw) + (f ? 1:-1) ;
+    margin      = f ? screwGetPitch(screw) : 0;
+    rotations   = (local_l + 2*margin)/screwGetPitch(screw);
     profile     = screwThreadProfile ( screw, I=false );
     clipL       = local_l;
     clipW       = screwGetThreadD(screw)+10;
@@ -327,7 +328,8 @@ module libThreadExternal ( screw, l=undef, f=true ) {
     spiral      = meshSpiralExternal ( profile_gap, rotations, screwGetPitch(screw) );
     translate([0,0,f?-screwGetPitch(screw):0])
     intersection() {
-        meshPolyhedron( spiral, convexity=10);
+        translate([0,0,-margin])
+            meshPolyhedron( spiral, convexity=10);
         if ( f ) {
             translate([0,0,screwGetPitch(screw)+clipL/2])
                 cube([clipW, clipW, clipL ],center=true);
@@ -339,17 +341,20 @@ module libThreadExternal ( screw, l=undef, f=true ) {
 //   l: Thread length
 //   f: Generates flat faces if true
 //   t: Thickness of cylinder containing the thread
-module libThreadInternal ( screw, l=undef, f=true, t=0 ) {
+module libThreadInternal ( screw, l=undef, f=true, t=undef ) {
+    local_t     = is_undef(t) || t<0.2 ? 0.2 : t;
     local_l     = is_undef(l) ? screwGetThreadL(screw): l;
-    rotations   = local_l/screwGetPitch(screw) + (f ? 1:-1) ;
+    margin      = f ? screwGetPitch(screw) : 0;
+    rotations   = (local_l + 2*margin)/screwGetPitch(screw);
     profile     = screwThreadProfile ( screw, I=true );
     clipL       = local_l;
     clipW       = screwGetThreadD(screw)+10;
     profile_gap = [ for(p=profile) [p.x+gap(),p.y] ];
-    spiral      = meshSpiralInternal ( profile_gap, rotations, screwGetPitch(screw), radius=screwGetThreadMaxD(screw)/2+t );
+    spiral      = meshSpiralInternal ( profile_gap, rotations, screwGetPitch(screw), radius=screwGetThreadMaxD(screw)/2+local_t );
     translate([0,0,f?-screwGetPitch(screw):0])
     intersection() {
-        meshPolyhedron( spiral, convexity=10);
+        translate([0,0,-margin])
+            meshPolyhedron( spiral, convexity=10);
         if ( f ) {
             translate([0,0,screwGetPitch(screw)+clipL/2])
                 cube([clipW, clipW, clipL ],center=true);
@@ -361,11 +366,15 @@ module libThreadInternal ( screw, l=undef, f=true, t=0 ) {
 //  bt   : Bevel top of head
 //  bb   : Bevel bottom of head
 module libNutHexagonalThreaded( screw, bt=true, bb=true ) {
-    length = screwGetHexagonalHeadL(screw);
-    libThreadInternal ( screw, length );
-    difference() {
-        libNutHexagonal(screw,bt=bt,bb=bb);
-        libBoltPassage(screw);
+    local_hhd = screw[I_HHD] ;
+    local_hhl = screw[I_HHL] ;
+    intersection() {
+        // -gap() for easier fitting with the tool
+        translate( [0,0,local_hhl/2 ] )
+            cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
+        translate( [0,0,local_hhl/2 ] )
+            libBevelShape( local_hhl, screw[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
+        libThreadInternal ( screw, local_hhl, t=10*local_hhd );
     }
 }
 
@@ -373,11 +382,18 @@ module libNutHexagonalThreaded( screw, bt=true, bb=true ) {
 //  bt   : Bevel top of head
 //  bb   : Bevel bottom of head
 module libNutSquareThreaded( screw, bt=true, bb=true ) {
-    length = screwGetSquareHeadL(screw);
-    libThreadInternal ( screw, length );
-    difference() {
-        libNutSquare(screw,bt=bt,bb=bb);
-        libBoltPassage(screw);
+    local_shd = screw[I_HTS] ;
+    local_shl = screw[I_HHL] ;
+    intersection() {
+        // -gap() for easier fitting with the tool
+        translate( [0,0,+local_shl/2 ] )
+        cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
+        // libBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
+        translate( [0,0,+local_shl/2 ] )
+        libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*screw[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
+        translate( [0,0,+local_shl/2 ] )
+        cylinder( r=(local_shd-gap())/(2*cos(45))-screw[I_TD]/10,  h=local_shl, center=true );
+        libThreadInternal ( screw, local_shl, t=10*local_shd );
     }
 }
 
@@ -406,10 +422,12 @@ module libBoltAllenThreaded( screw, bt=true ) {
 
 // Renders a bolt with given parameters for Thread, Thread passage and Head
 module libBoltImpl( td, tl, tdp, tlp, hd, hl ) {
-    translate( [0,0,+(tl+tlp)/2 ] )
-        cylinder( r=td/2, h=tl-tlp, center=true );
-    translate( [0,0,+tlp/2 ] )
-        cylinder( r=tdp/2, h=tlp+VGG, center=true );
+    if ( tl-tlp>0 )
+        translate( [0,0,+(tl+tlp)/2 ] )
+            cylinder( r=td/2, h=tl-tlp, center=true );
+    if ( tlp>0 )
+        translate( [0,0,+tlp/2 ] )
+            cylinder( r=tdp/2, h=tlp+VGG, center=true );
     if ( hl>0 ) {
         translate( [0,0,-hl/2 ] )
             cylinder( r=hd/2, h=hl, center=true );
@@ -655,7 +673,7 @@ if (1) {
     }
 }
 
-// CPU torture
+// Complex structure
 if (0) {
     screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
     screw_m = libScrewDataCompletion([["Profile M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
