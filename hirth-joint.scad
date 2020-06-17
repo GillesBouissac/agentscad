@@ -30,8 +30,7 @@ module hirthJointSinus ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
-    hirthJoint ( hirthJointProfileSinus(teeth), rmax, teeth, height, shoulder, inlay, shift )
-        hirthJointProfileSinus(teeth);
+    hirthJoint ( hirthJointProfileSinus(teeth), rmax, teeth, height, shoulder, inlay, shift );
 }
 
 // Hirth Joint with triangular profile
@@ -40,8 +39,7 @@ module hirthJointTriangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) 
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
-    hirthJoint ( hirthJointProfileTriangle(), rmax, teeth, height, shoulder, inlay, shift )
-        hirthJointProfileTriangle ();
+    hirthJoint ( hirthJointProfileTriangle(), rmax, teeth, height, shoulder, inlay, shift );
 }
 
 // Hirth Joint with rectangular profile
@@ -50,8 +48,7 @@ module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 )
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
-    hirthJoint ( hirthJointProfileRectangle(), rmax, teeth, height, shoulder, inlay, shift )
-        hirthJointProfileRectangle ();
+    hirthJoint ( hirthJointProfileRectangle(), rmax, teeth, height, shoulder, inlay, shift );
 }
 
 module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
@@ -82,14 +79,13 @@ module hirthJoint ( profile, rmax, teeth, height, shoulder=0, inlay=0, shift=0 )
         rotate ([0,0,shift*step])
         for ( a=[0:step:360] ) {
             rotate( [0,0,a] )
-                if ( $children>0 ) {
-                    hirthJointTooth( profile, teeth, rmax, angle, height )
-                        children(0);
-                }
-                else {
+                if ( is_undef(profile) ) {
                     alpha = atan( (height/2)/rmax );
                     th = (rmax*tan(2*alpha)/cos(alpha))/2;
                     hirthJointTooth( hirthJointProfileSinus(teeth), teeth, rmax, angle, height );
+                }
+                else {
+                    hirthJointTooth( profile, teeth, rmax, angle, height );
                 }
         }
         translate( [0,0,+height/2] )
@@ -186,6 +182,7 @@ module hirthJointTooth ( profile, teeth, radius, angle, height ) {
 //                 Showcase
 // ----------------------------------------
 PRECISION=100;
+
 translate( [0,0,0] ) {
     difference() {
         hirthJointSinus( 5, 11, 2, 1, 1, shift=0.5, $fn=PRECISION );
@@ -193,6 +190,7 @@ translate( [0,0,0] ) {
     }
     %hirthJointPassage( 5, 2, 1, 1, $fn=PRECISION );
 }
+
 translate( [15,0,0] ) {
     difference() {
         hirthJointRectangle( 5, 11, 1, 1, 1, shift=0, $fn=PRECISION );
