@@ -73,7 +73,8 @@ function meshSpiralInternal ( profile, loops=1, layer=undef, radius=undef ) =
 // Implementation of meshSpiralExternal
 //
 function meshSpiralExternalImpl ( profile, loops=1, layer=undef ) = let(
-    profile3d = [ for (i=[0:len(profile)-1])  [profile[i].x,0,profile[i].y] ],
+    bot_z              = min ( [for(p=profile) p.y] ),
+    profile3d = [ for (i=[0:len(profile)-1])  [profile[i].x,0,profile[i].y-bot_z] ],
     loop_h        = is_undef(layer) ? abs(profile3d[0].z-profile3d[len(profile3d)-1].z) : layer,
     step            = getStep(),
     step_h          = step*loop_h,
@@ -81,7 +82,6 @@ function meshSpiralExternalImpl ( profile, loops=1, layer=undef ) = let(
     nb_slice_loop   = floor ( 1/step ),
     nb_slice_facets = len ( profile3d ),
     nb_slice_cap    = nb_slice<nb_slice_loop ? nb_slice:nb_slice_loop,
-    bot_z           = min ( [ for(p=profile3d) p.z ]  ),
 
     points_profiles = flatten([ for (i=[0:nb_slice])
         transform (
@@ -99,14 +99,14 @@ function meshSpiralExternalImpl ( profile, loops=1, layer=undef ) = let(
     // Bottom pole (index of first point: pole_bot_pt_idx)
     pole_bot_pt_idx = cap_pt_idx + len(cap_points),
     bottom_points = [
-        for ( i=[0:nb_slice_cap] ) [0,0,bot_z+(i+1)*step_h]
-        ,[0,0,bot_z+loop_h] // Last point for complete Bottom face
+        for ( i=[0:nb_slice_cap] ) [0,0,(i+1)*step_h]
+        ,[0,0,loop_h] // Last point for complete Bottom face
     ],
     // Top pole (index of first point: pole_top_pt_idx)
     pole_top_pt_idx = pole_bot_pt_idx + len(bottom_points),
     top_points = [
-        [0,0,bot_z+nb_slice*step_h], // First point for complete Top face
-        for ( i=[0:nb_slice_cap] ) let (is=cap_sl_idx+i) [0,0,bot_z+is*step_h]
+        [0,0,nb_slice*step_h], // First point for complete Top face
+        for ( i=[0:nb_slice_cap] ) let (is=cap_sl_idx+i) [0,0,is*step_h]
     ],
 
     points = concat( points_profiles, cap_points, bottom_points, top_points ),
@@ -158,7 +158,8 @@ function meshSpiralExternalImpl ( profile, loops=1, layer=undef ) = let(
 // Implementation of meshSpiralInternal
 //
 function meshSpiralInternalImpl ( profile, loops, layer, radius ) = let(
-    profile3d = [ for (i=[0:len(profile)-1])  [profile[i].x,0,profile[i].y] ],
+    bot_z              = min ( [for(p=profile) p.y] ),
+    profile3d = [ for (i=[0:len(profile)-1])  [profile[i].x,0,profile[i].y-bot_z] ],
     loop_h             = is_undef(layer) ? abs(profile3d[0].z-profile3d[len(profile3d)-1].z) : layer,
     step               = getStep(),
     step_h             = step*loop_h,
@@ -166,8 +167,8 @@ function meshSpiralInternalImpl ( profile, loops, layer, radius ) = let(
     nb_slice_loop      = floor ( 1/step ),
     nb_slice_facets    = len ( profile3d ),
     nb_slice_cap       = nb_slice<nb_slice_loop ? nb_slice:nb_slice_loop,
-    nb_slice_overlap   = nb_slice>nb_slice_loop ? nb_slice%nb_slice_loop:0,
-    bot_z              = min ( [for(p=profile3d)p.z] ),
+    overlaps           = nb_slice>nb_slice_loop,
+    nb_slice_overlap   = overlaps ? nb_slice%nb_slice_loop:0,
     min_r              = max ( [for(p=profile3d)p.x] ),
     loc_r              = is_undef(radius) || radius<min_r ? min_r : radius,
 
@@ -187,27 +188,20 @@ function meshSpiralInternalImpl ( profile, loops, layer, radius ) = let(
     // Cylinder bottom points
     cyl_bot_pt_idx = cap_pt_idx + len(cap_points),
     bottom_points = flatten([ for ( i=[0:nb_slice_cap] ) let (is=i)
-        transform ( translation([0,0,is*step_h])*rotation([0,0,is*step*360]), [[loc_r,0,bot_z]])
+        transform ( translation([0,0,is*step_h])*rotation([0,0,is*step*360]), [[loc_r,0,0]])
     ]),
     // Cylinder top points
     cyl_ovl_pt_idx = cyl_bot_pt_idx + len(bottom_points),
     overlap_points = flatten([
-        if (nb_slice_overlap>0) for ( i=[-nb_slice_overlap:0] ) let (is=cap_sl_idx+nb_slice_loop+i)
-            transform ( translation([0,0,is*step_h])*rotation([0,0,is*step*360]), [[loc_r,0,bot_z]])
+        if (overlaps) for ( i=[-nb_slice_overlap:0] ) let (is=cap_sl_idx+nb_slice_loop+i)
+            transform ( translation([0,0,is*step_h])*rotation([0,0,is*step*360]), [[loc_r,0,0]])
         ]),
     cyl_top_pt_idx = cyl_ovl_pt_idx + len(overlap_points),
     top_points = flatten([
         for ( i=[0:nb_slice_cap-nb_slice_overlap] ) let (is=cap_sl_idx+i)
-            transform ( translation([0,0,is*step_h])*rotation([0,0,is*step*360]), [[loc_r,0,bot_z]])
+            transform ( translation([0,0,is*step_h])*rotation([0,0,is*step*360]), [[loc_r,0,0]])
         ]),
-    spec_pt_idx = cyl_top_pt_idx + len(top_points),
-    special_points = flatten([
-        // Special point for complete Bottom face
-        [[loc_r,0,bot_z+loop_h]],
-        // Special point for complete Top face
-        transform ( translation([0,0,nb_slice*step_h])*rotation([0,0,nb_slice*step*360]), [[loc_r,0,bot_z]])
-    ]),
-    points = concat( points_profiles,cap_points,bottom_points,overlap_points,top_points,special_points ),
+    points = concat( points_profiles,cap_points,bottom_points,overlap_points,top_points ),
     faces = [
         // Profile sweeping
         for ( s=[0:nb_slice-1], f=[0:nb_slice_facets-2] ) [
@@ -241,13 +235,22 @@ function meshSpiralInternalImpl ( profile, loops, layer, radius ) = let(
                 )
                 concat(
                     [offs1+s+1,offs1+s+0],
-                    is_first ? [spec_pt_idx+0]:[],
+                    is_first ? [cyl_bot_pt_idx+nb_slice_cap]:[],
                     [offs2+s+0, offs2+s+1],
-                    is_last  ? [spec_pt_idx+1]:[]
+                    is_last  ? [cyl_top_pt_idx]:[]
                 ),
-        for ( s=[0:nb_slice_cap-nb_slice_overlap-1] )
-            let ( offs1=cyl_bot_pt_idx+nb_slice_overlap, offs2=cyl_top_pt_idx )
-            [ offs1+s+1 ,offs1+s+0 ,offs2+s+0 ,offs2+s+1 ],
+        for ( s=[0:nb_slice_cap-nb_slice_overlap-1] ) let (
+                    offs1=cyl_bot_pt_idx+nb_slice_overlap,
+                    offs2=cyl_top_pt_idx,
+                    is_first = nb_slice_overlap==0 && s==0,
+                    is_last  = nb_slice_overlap==0 && s==nb_slice_cap-1
+            )
+            concat(
+                [offs1+s+1,offs1+s+0],
+                is_first ? [cyl_bot_pt_idx+nb_slice_cap]:[],
+                [offs2+s+0,offs2+s+1],
+                is_last  ? [cyl_top_pt_idx]:[]
+            ),
         // Bottom cap
         for ( s=[0:nb_slice_cap-1] ) let ( mult1=nb_slice_facets, offs2=cyl_bot_pt_idx )
             [ (s+1)*mult1, (s+0)*mult1, offs2+s+0, offs2+s+1 ],
@@ -260,16 +263,16 @@ function meshSpiralInternalImpl ( profile, loops, layer, radius ) = let(
         // Bottom wall
         [
             for ( i=[0:nb_slice_facets-1] )  i,
-            nb_slice_overlap>0 ? nb_slice_cap*nb_slice_facets: cap_pt_idx,
-            spec_pt_idx+0,
+            overlaps ? nb_slice_cap*nb_slice_facets : cap_pt_idx,
+            overlaps ? cyl_bot_pt_idx+nb_slice_cap  : cyl_top_pt_idx,
             cyl_bot_pt_idx+0
         ],
         // Top wall
         [
             cap_pt_idx+nb_slice_cap,
             for ( i=[nb_slice_facets-1:-1:0] )  len(points_profiles)-nb_slice_facets+i,
-            nb_slice_overlap>0 ? cyl_top_pt_idx: spec_pt_idx+1,
-            nb_slice_overlap>0 ? cyl_ovl_pt_idx+len(overlap_points)-1: cyl_top_pt_idx+nb_slice_cap,
+            overlaps ? cyl_top_pt_idx : nb_slice_overlap==0?cyl_top_pt_idx:cyl_bot_pt_idx+nb_slice_cap,
+            overlaps ? cyl_ovl_pt_idx+len(overlap_points)-1: cyl_top_pt_idx+nb_slice_cap,
         ]
     ]
 ) newMesh ( points, faces );
@@ -282,24 +285,26 @@ function meshSpiralInternalImpl ( profile, loops, layer, radius ) = let(
 // ----------------------------------------
 
 module showcase() {
-    profile = [ for ( i=[0:0.05:1]) [2+0.2*sin(i*360),0.05+2*i] ];
+    height = 4;
+    layer  = 2;
+    loops  = height/layer+0*getStep();
+    gap    = 0.05;
+
+    profile = [ for ( i=[0:0.05:1]) [2+0.2*sin(i*360),0.05+(layer-0.05)*i] ];
 //    profile = [ [2,0.1], [1,1], [2,2] ];
 
-    loops = 5+20*getStep();
-    gap   = 0.05;
-
-    meshe = meshSpiralExternal ( profile=[for(p=profile)[p.x-gap,p.y]], loops=loops, layer=2 );
-    meshi = meshSpiralInternal ( profile=[for(p=profile)[p.x+gap,p.y]], loops=loops, layer=2, radius=4 );
+    meshe = meshSpiralExternal(profile=[for(p=profile)[p.x-gap,p.y]],loops=loops,layer=layer );
+    meshi = meshSpiralInternal(profile=[for(p=profile)[p.x+gap,p.y]],loops=loops,layer=layer,radius=4 );
     difference() {
         intersection() {
             union() {
                 meshPolyhedron(meshi,convexity=5);
                 meshPolyhedron(meshe,convexity=5);
             }
-            translate( [0,0,4] )
-                cube( [100,100,4.5], true );
+            translate( [0,0,layer+layer/2] )
+                cube( [100,100,layer], true );
         }
-        cube( [10,10,10] );
+*        cube( [10,10,10] );
     }
 }
 
