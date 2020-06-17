@@ -11,7 +11,7 @@
  */
 use <list-comprehension-demos/skin.scad>
 use <scad-utils/lists.scad>
-use <printing.scad>
+use <agentscad/printing.scad>
 
 // ----------------------------------------
 //                    API
@@ -62,41 +62,29 @@ module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
 //             Implementation
 // ----------------------------------------.
 
-VGG           = 1; // Visual Glich Guard for better previews
 NB_MIN_NOZZLE = 3; // Minimal nb nozzle pass for a tooth width
 
 module hirthJoint ( profile, rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
 
     rmin  = NB_MIN_NOZZLE*nozzle()*teeth/(2*PI);
     angle = 360/teeth;
-
-//    echo ( "hirthJoint rmin: ",                rmin );
-//    echo ( "hirthJoint teeth angle (degre): ", angle );
+    prf   = is_undef(profile) ? hirthJointProfileSinus(teeth) : profile;
 
     translate( [0,0,+shoulder] )
     difference () {
         step=360/teeth;
         rotate ([0,0,shift*step])
-        for ( a=[0:step:360] ) {
+        for ( a=[0:step:360] )
             rotate( [0,0,a] )
-                if ( is_undef(profile) ) {
-                    alpha = atan( (height/2)/rmax );
-                    th = (rmax*tan(2*alpha)/cos(alpha))/2;
-                    hirthJointTooth( hirthJointProfileSinus(teeth), teeth, rmax, angle, height );
-                }
-                else {
-                    hirthJointTooth( profile, teeth, rmax, angle, height );
-                }
-        }
+                hirthJointTooth( prf, teeth, rmax, angle, height );
         translate( [0,0,+height/2] )
-            cylinder( r=rmin, h=height+VGG, center=true );
-
+            cylinder( r=rmin, h=10*height, center=true );
     }
     if ( shoulder>0 ) {
         translate( [0,0,+shoulder/2] )
         difference () {
             cylinder( r=rmax, h=shoulder,     center=true );
-            cylinder( r=rmin, h=shoulder+VGG, center=true );
+            cylinder( r=rmin, h=10*shoulder, center=true );
         }
     }
     if ( inlay>0 ) {
@@ -113,7 +101,7 @@ let (
     required_step = $fn>0?teeth*360/$fn:180,
     step = required_step>18?18:required_step
 )[
-    for ( a=[-180-step/2:step:180+step/2] )
+    for ( a=[-180:step:180] )
         [a/180,1/2*cos(a)+1/2]
 ];
 
@@ -239,3 +227,5 @@ translate( [30,15,0] ) {
         cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
     }
 }
+
+echo ("test=", hirthJointProfileSinus(1) );
