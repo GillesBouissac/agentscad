@@ -344,13 +344,14 @@ module libThreadExternal ( screw, l=undef, f=true ) {
 module libThreadInternal ( screw, l=undef, f=true, t=undef ) {
     local_t     = is_undef(t) || t<0.2 ? 0.2 : t;
     local_l     = is_undef(l) ? screwGetThreadL(screw): l;
+    radius      = screwGetThreadMaxD(screw)/2+local_t;
     margin      = f ? screwGetPitch(screw) : 0;
     rotations   = (local_l + 2*margin)/screwGetPitch(screw);
     profile     = screwThreadProfile ( screw, I=true );
     clipL       = local_l;
-    clipW       = screwGetThreadD(screw)+10;
+    clipW       = max(2*radius,screwGetThreadD(screw))+10;
     profile_gap = [ for(p=profile) [p.x+gap(),p.y] ];
-    spiral      = meshSpiralInternal ( profile_gap, rotations, screwGetPitch(screw), radius=screwGetThreadMaxD(screw)/2+local_t );
+    spiral      = meshSpiralInternal ( profile_gap, rotations, screwGetPitch(screw), radius=radius );
     translate([0,0,f?-screwGetPitch(screw):0])
     intersection() {
         translate([0,0,-margin])
