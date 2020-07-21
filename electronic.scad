@@ -76,6 +76,7 @@ function newPcb (
 function getPcbSx(p)          = p[IP_SX];
 function getPcbSy(p)          = p[IP_SY];
 function getPcbSz(p)          = p[IP_SZ];
+// Dz: Distance between top of PCB and mid-height of the bounding box
 function getPcbDz(p)          = p[IP_DZ];
 function getPcbT(p)           = p[IP_T];
 function getPcbBorder(p)      = p[IP_BORDER];

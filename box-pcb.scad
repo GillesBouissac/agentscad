@@ -56,7 +56,7 @@ function newPcbBox (
     pcb_tr   = sum ( concat([ for (gland=glands) gland[2] ], [[0,0,0]] ) ),
     augment  = sum ( concat([ for (gland=glands) gland[3] ], [[0,0,0]] ) ),
     l_shell  = newBoxShell (sx+augment[0], sy+augment[1], tsz+augment[2]/2, bsz+augment[2]/2, t, wt, lps ),
-    stands   = newPcbBoxStands(pcb,l_shell,pcb_tr,l_i),
+    stands   = newPcbBoxStands(pcb,l_shell,pcb_tr,l_i,o=standOrientationDownTop()),
     zip_cw   = getZipTieTw(boxzip)+2*gap()+2*wt,
     zip_tr   = [getBoxShellExtSx(l_shell)/2-zip_cw/2-t,0,0]
 ) [ pcb, pcb_tr, l_shell, stands, glands, boxzip, zip_tr ];
@@ -103,14 +103,14 @@ function makeObjectList(o) = is_undef(o) ? [] :
     len(o)==0 ? [] :
     is_list( o[0] ) ? o : [o];
 
-function newPcbBoxStands(pcb,shell,pcb_tr,i) =
+function newPcbBoxStands(pcb,shell,pcb_tr,i,o) =
 let(
     l = getBoxShellExtSz(shell),
-    d = pcb_tr[2]+l/2-getPcbDz(pcb)-getPcbT(pcb)-gap(),
+    d = pcb_tr[2]+l/2+getPcbDz(pcb)-gap(),
     h = getPcbT(pcb)+2*gap()
 )[
     for ( hole=getPcbHoles(pcb) )
-        newScrewStand(x=hole[0],y=hole[1],s=hole[2],l=l,d=d,h=h,i=i)
+        newScrewStand(x=hole[0],y=hole[1],s=hole[2],l=l,d=d,h=h,i=i,o=o)
 ];
 
 function newPcbBoxCableGlands( cables, zip, pcb, t, wt, margins ) = let(
@@ -166,7 +166,7 @@ module pcbBoxTopShape ( pcbBox ) {
     boxShellTopShape ( shell ) ;
     translate( [0,0,-getBoxShellExtSz(shell)/2] )
         translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
-            screwStandHeadShape ( pcbBox[IB_STANDS] );
+            screwStandDrillShape ( pcbBox[IB_STANDS] );
     intersection() {
         boxShellTopShape ( shell ) ;
         for ( gland=pcbBox[IB_GLANDS] ) {
@@ -187,60 +187,6 @@ module pcbBoxTopHollow ( pcbBox ) {
     boxzip = pcbBox[IB_ZIP];
     difference() {
         boxShellTopHollow ( shell ) ;
-        translate( [0,0,-getBoxShellExtSz(shell)/2] )
-            translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
-                screwStandHeadShape ( pcbBox[IB_STANDS] );
-        for ( gland=pcbBox[IB_GLANDS] ) {
-            translate( pcbBox[IB_PCBTR]+gland[1] )
-                cableGlandCubeShape(gland[0]);
-        }
-        if ( !is_undef(boxzip) )
-            mirror_x()
-                translate( pcbBox[IB_ZIPTR] )
-                    zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
-    }
-    translate( [0,0,-getBoxShellExtSz(shell)/2] )
-        translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
-            screwStandHeadHollow ( pcbBox[IB_STANDS] );
-    for ( gland=pcbBox[IB_GLANDS] ) {
-        translate( pcbBox[IB_PCBTR]+gland[1] )
-            cableGlandCubeHollow(gland[0]);
-    }
-    if ( !is_undef(boxzip) )
-        mirror_x()
-            translate( pcbBox[IB_ZIPTR] )
-                zipConduitHollow ( pcbBox[IB_ZIP] ) ;
-}
-module pcbBoxTopBevel ( pcbBox ) {
-    boxShellTopBevel ( pcbBox[IB_BOX] ) ;
-}
-module pcbBoxBottomShape ( pcbBox ) {
-    shell  = pcbBox[IB_BOX];
-    boxzip = pcbBox[IB_ZIP];
-    boxShellBottomShape ( shell ) ;
-    translate( [0,0,-getBoxShellExtSz(shell)/2] )
-        translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
-            screwStandDrillShape ( pcbBox[IB_STANDS] );
-    intersection() {
-        boxShellBottomShape ( shell ) ;
-        for ( gland=pcbBox[IB_GLANDS] ) {
-            translate( pcbBox[IB_PCBTR]+gland[1] )
-                cableGlandCubeShape(gland[0]);
-        }
-    }
-    if ( !is_undef(boxzip) )
-        intersection() {
-            boxShellBottomShape ( shell ) ;
-            mirror_x()
-                translate( pcbBox[IB_ZIPTR] )
-                    zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
-        }
-}
-module pcbBoxBottomHollow ( pcbBox ) {
-    shell  = pcbBox[IB_BOX];
-    boxzip = pcbBox[IB_ZIP];
-    difference() {
-        boxShellBottomHollow ( shell ) ;
         translate( [0,0,-getBoxShellExtSz(shell)/2] )
             translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
                 screwStandDrillShape ( pcbBox[IB_STANDS] );
@@ -265,6 +211,60 @@ module pcbBoxBottomHollow ( pcbBox ) {
             translate( pcbBox[IB_ZIPTR] )
                 zipConduitHollow ( pcbBox[IB_ZIP] ) ;
 }
+module pcbBoxTopBevel ( pcbBox ) {
+    boxShellTopBevel ( pcbBox[IB_BOX] ) ;
+}
+module pcbBoxBottomShape ( pcbBox ) {
+    shell  = pcbBox[IB_BOX];
+    boxzip = pcbBox[IB_ZIP];
+    boxShellBottomShape ( shell ) ;
+    translate( [0,0,-getBoxShellExtSz(shell)/2] )
+        translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
+            screwStandHeadShape ( pcbBox[IB_STANDS] );
+    intersection() {
+        boxShellBottomShape ( shell ) ;
+        for ( gland=pcbBox[IB_GLANDS] ) {
+            translate( pcbBox[IB_PCBTR]+gland[1] )
+                cableGlandCubeShape(gland[0]);
+        }
+    }
+    if ( !is_undef(boxzip) )
+        intersection() {
+            boxShellBottomShape ( shell ) ;
+            mirror_x()
+                translate( pcbBox[IB_ZIPTR] )
+                    zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
+        }
+}
+module pcbBoxBottomHollow ( pcbBox ) {
+    shell  = pcbBox[IB_BOX];
+    boxzip = pcbBox[IB_ZIP];
+    difference() {
+        boxShellBottomHollow ( shell ) ;
+        translate( [0,0,-getBoxShellExtSz(shell)/2] )
+            translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
+                screwStandHeadShape ( pcbBox[IB_STANDS] );
+        for ( gland=pcbBox[IB_GLANDS] ) {
+            translate( pcbBox[IB_PCBTR]+gland[1] )
+                cableGlandCubeShape(gland[0]);
+        }
+        if ( !is_undef(boxzip) )
+            mirror_x()
+                translate( pcbBox[IB_ZIPTR] )
+                    zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
+    }
+    translate( [0,0,-getBoxShellExtSz(shell)/2] )
+        translate( [ pcbBox[IB_PCBTR].x, pcbBox[IB_PCBTR].y, 0 ] )
+            screwStandHeadHollow ( pcbBox[IB_STANDS] );
+    for ( gland=pcbBox[IB_GLANDS] ) {
+        translate( pcbBox[IB_PCBTR]+gland[1] )
+            cableGlandCubeHollow(gland[0]);
+    }
+    if ( !is_undef(boxzip) )
+        mirror_x()
+            translate( pcbBox[IB_ZIPTR] )
+                zipConduitHollow ( pcbBox[IB_ZIP] ) ;
+}
 module pcbBoxBottomBevel ( pcbBox ) {
     boxShellBottomBevel ( pcbBox[IB_BOX] ) ;
 }
@@ -277,15 +277,15 @@ SEPARATION = 0;
 CABLE_D    = 3;
 
 module show_parts( part=0, cut=undef, cut_rotation=undef ) {
-    screw = M2_5(tl=25, ahd=5) ;
+    screw = M2_5(tl=10, ahd=5) ;
     draft = newBoxShell (bsz=8);
     cables = [
          newCable ( CABLE_D/2, CABLE_D, c=[0,-4,-2],  v=[+1,0,0] )
         ,newCable ( CABLE_D/2, CABLE_D, c=[0,-4,1],  v=[-1,0,0] )
-        ,newCable ( CABLE_D/2, CABLE_D, c=[0,10,-3],  v=[0,+1,0] )
-        ,newCable ( CABLE_D/2, CABLE_D, c=[0,15,4],  v=[0,-1,0] )
-        ,newCable ( CABLE_D/2, CABLE_D, c=[0,5,-5], v=[0,0,+1] )
-        ,newCable ( CABLE_D/2, CABLE_D, c=[0,0,0],  v=[0,0,-1] )
+//        ,newCable ( CABLE_D/2, CABLE_D, c=[0,10,-3],  v=[0,+1,0] )
+//        ,newCable ( CABLE_D/2, CABLE_D, c=[0,15,4],  v=[0,-1,0] )
+//        ,newCable ( CABLE_D/2, CABLE_D, c=[0,5,-5], v=[0,0,+1] )
+//        ,newCable ( CABLE_D/2, CABLE_D, c=[0,0,0],  v=[0,0,-1] )
     ];
     pcb   = newPcb(44, 22, holes=[
                     [-15, +5.0, screw ],
@@ -333,5 +333,5 @@ module show_parts( part=0, cut=undef, cut_rotation=undef ) {
 // 0: all
 // 1: bottom
 // 2: top
-show_parts ( 1, 0, -15, $fn=PRECISION );
+show_parts ( 0, 0, -15, $fn=PRECISION );
 
