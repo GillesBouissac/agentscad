@@ -40,26 +40,26 @@ function newPcbBox (
     margin       = undef,
     incrustation = undef,
 ) = let(
-    margins  = is_list(margin) ? margin : [margin,margin,margin],
+    margins  = is_list(margin) ? margin+gap() : [margin+gap(),margin+gap(),margin+gap()],
     l_i      = is_undef(incrustation) ? 0 : incrustation,
-    sx       = getPcbSx(pcb)+2*gap()+2*margins[0],
-    sy       = getPcbSy(pcb)+2*gap()+2*margins[1],
-    sz       = getPcbSz(pcb)+2*gap()+2*margins[2],
-    d_bsz    = getPcbBelow(pcb)+getPcbT(pcb)+gap()+margins[2],
+    sx       = getPcbSx(pcb)+2*margins.x,
+    sy       = getPcbSy(pcb)+2*margins.y,
+    sz       = getPcbSz(pcb)+2*margins.z,
+    d_bsz    = getPcbBelow(pcb)+getPcbT(pcb)+margins.z,
     bsz      = is_undef(shell) ? d_bsz : (is_undef(getBoxShellBotIntSz(shell))?d_bsz:getBoxShellBotIntSz(shell)),
     tsz      = sz-bsz,
     t        = is_undef(shell) ? BOX_BOTTOM_T : getBoxShellMainT(shell),
     wt       = is_undef(shell) ? BOX_WALL_T : getBoxShellWallT(shell),
     lps      = is_undef(shell) ? undef : getBoxShellLipsH(shell),
     glands   = newPcbBoxCableGlands(cables,cablezip,pcb,t,wt,margins),
-    pcbh     = getPcbBelow(pcb)+getPcbT(pcb)+gap()+margins[2]+t,
+    pcbh     = getPcbBelow(pcb)+getPcbT(pcb)+margins.z+t,
     pcb_tr   = sum ( concat([ for (gland=glands) gland[2] ], [[0,0,0]] ) ),
     augment  = sum ( concat([ for (gland=glands) gland[3] ], [[0,0,0]] ) ),
-    l_shell  = newBoxShell (sx+augment[0], sy+augment[1], tsz+augment[2]/2, bsz+augment[2]/2, t, wt, lps ),
+    l_shell  = newBoxShell (sx+augment.x, sy+augment.y, tsz+augment.z/2, bsz+augment.z/2, t, wt, lps ),
     stands   = newPcbBoxStands(pcb,l_shell,pcb_tr,l_i,o=standOrientationDownTop()),
     zip_cw   = getZipTieTw(boxzip)+2*gap()+2*wt,
     zip_tr   = [getBoxShellExtSx(l_shell)/2-zip_cw/2-t,0,0]
-) [ pcb, pcb_tr, l_shell, stands, glands, boxzip, zip_tr ];
+) [ pcb, pcb_tr, l_shell, stands, glands, boxzip, zip_tr, margins];
 function getPcbBoxPcb(p)            = p[IB_PCB];
 function getPcbBoxPcbTranslation(p) = p[IB_PCBTR];
 function getPcbBoxShell(p)          = p[IB_BOX];
@@ -67,6 +67,7 @@ function getPcbBoxStands(p)         = p[IB_STANDS];
 function getPcbBoxCables(p)         = p[IB_GLANDS];
 function getPcbBoxZip(p)            = p[IB_ZIP];
 function getPcbBoxZipTranslation(p) = p[IB_ZIPTR];
+function getPcbBoxMargin(p)         = p[IB_MRG];
 
 module pcbBoxTop ( pcbBox ) {
     difference() {
@@ -97,6 +98,7 @@ IB_STANDS = 3;
 IB_GLANDS = 4;
 IB_ZIP    = 5;
 IB_ZIPTR  = 6;
+IB_MRG    = 7;
 
 function makeObjectList(o) = is_undef(o) ? [] :
     !is_list( o ) ? [o] :
@@ -127,10 +129,10 @@ function newPcbBoxCableGland( cable, zip, pcb, t, wt, margins ) = let(
     l_v[2]==+l_max ? newPcbBoxCableGlandZ(cable, zip, pcb, t, wt, margins, [0,0,+1]) :
                      newPcbBoxCableGlandZ(cable, zip, pcb, t, wt, margins, [0,0,-1]) ;
 function newPcbBoxCableGlandX(cable, zip, pcb, t, wt, margins, v) = let (
-    o = getPcbSx(pcb)/2+margins[0]+gap(),
+    o = getPcbSx(pcb)/2+margins.x,
     l = getZipTieHw(zip) + 2*gap(),
-    w = getPcbSy(pcb)+2*margins[1]+2*gap()+2*wt,
-    h = getPcbSz(pcb)+2*margins[2]+2*gap()+2*t
+    w = getPcbSy(pcb)+2*margins.y+2*wt,
+    h = getPcbSz(pcb)+2*margins.z+2*t
 ) [
     newCableGland(newCable(r=getCableR(cable),i=getCableI(cable),c=getCableC(cable),v=v),zip,undef,w,h,wt=wt),
     [ v[0]*o, 0, 0 ],
@@ -138,10 +140,10 @@ function newPcbBoxCableGlandX(cable, zip, pcb, t, wt, margins, v) = let (
     [ l, 0, 0 ]
 ];
 function newPcbBoxCableGlandY(cable, zip, pcb, t, wt, margins, v) = let (
-    o = getPcbSy(pcb)/2+margins[1]+gap(),
+    o = getPcbSy(pcb)/2+margins.y,
     l = getZipTieHw(zip) + 2*gap(),
-    w = getPcbSx(pcb)+2*margins[0]+2*gap()+2*wt,
-    h = getPcbSz(pcb)+2*margins[2]+2*gap()+2*t
+    w = getPcbSx(pcb)+2*margins.x+2*wt,
+    h = getPcbSz(pcb)+2*margins.z+2*t
 ) [
     newCableGland(newCable(r=getCableR(cable),i=getCableI(cable),c=getCableC(cable),v=v),zip,undef,w,h,wt=wt),
     [ 0, v[1]*o, 0 ],
@@ -149,10 +151,10 @@ function newPcbBoxCableGlandY(cable, zip, pcb, t, wt, margins, v) = let (
     [ 0, l, 0 ]
 ];
 function newPcbBoxCableGlandZ(cable, zip, pcb, t, wt, margins, v) = let (
-    o = getPcbSz(pcb)/2+margins[2]+gap(),
+    o = getPcbSz(pcb)/2+margins.z,
     l = getZipTieHw(zip) + 2*gap(),
-    w = getPcbSy(pcb)+2*margins[1]+2*gap()+2*wt,
-    h = getPcbSx(pcb)+2*margins[0]+2*gap()+2*wt
+    w = getPcbSy(pcb)+2*margins.y+2*wt,
+    h = getPcbSx(pcb)+2*margins.x+2*wt
 ) [
     newCableGland(newCable(r=getCableR(cable),i=getCableI(cable),c=getCableC(cable),v=v),zip,undef,w,h,wt=wt),
     [ 0, 0, v[2]*o ],
@@ -281,7 +283,7 @@ module show_parts( part=0, cut=undef, cut_rotation=undef ) {
     draft = newBoxShell (bsz=8);
     cables = [
          newCable ( CABLE_D/2, CABLE_D, c=[0,-4,-2],  v=[+1,0,0] )
-        ,newCable ( CABLE_D/2, CABLE_D, c=[0,-4,1],  v=[-1,0,0] )
+        ,newCable ( CABLE_D/2, CABLE_D, c=[0,-4,1],   v=[-1,0,0] )
 //        ,newCable ( CABLE_D/2, CABLE_D, c=[0,10,-3],  v=[0,+1,0] )
 //        ,newCable ( CABLE_D/2, CABLE_D, c=[0,15,4],  v=[0,-1,0] )
 //        ,newCable ( CABLE_D/2, CABLE_D, c=[0,5,-5], v=[0,0,+1] )
@@ -333,5 +335,5 @@ module show_parts( part=0, cut=undef, cut_rotation=undef ) {
 // 0: all
 // 1: bottom
 // 2: top
-show_parts ( 0, 0, -15, $fn=PRECISION );
+show_parts ( 1, 0, -15, $fn=PRECISION );
 
