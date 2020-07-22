@@ -13,6 +13,7 @@
 use <scad-utils/lists.scad>
 use <scad-utils/mirror.scad>
 use <agentscad/printing.scad>
+use <agentscad/extensions.scad>
 use <agentscad/bevel.scad>
 
 // ----------------------------------------
@@ -156,12 +157,6 @@ module boxShellShape( params ) {
     cube( [params[IB_ESX], params[IB_ESY], params[IB_ESZ]], center=true );
 }
 
-module boxShellLips( params, inner=true ) {
-    difference() {
-        boxShellLipsShape ( params, inner );
-        boxShellLipsHollow ( params, inner );
-    }
-}
 module boxShellLipsShape( params, inner=true ) {
     wt = params[IB_WT];
     sx = params[IB_ESX] - ( inner ? wt+gap()/2: 0 ) ;
@@ -175,9 +170,9 @@ module boxShellLipsHollow( params, inner=true ) {
     wt = params[IB_WT];
     sx = params[IB_ESX] - ( inner ? wt+gap()/2: 0 ) ;
     sy = params[IB_ESY] - ( inner ? wt+gap()/2: 0 ) ;
-    h  = params[IB_LPS]-gap();
+    h  = params[IB_LPS]-gap()+2*mfg();
 
-    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 + ( inner ? 0 : gap() ) ] )
+    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 + ( inner ? 0 : gap() )-mfg() ] )
         cube( [sx-wt+gap()/2, sy-wt+gap()/2, h], center=true );
 }
 
