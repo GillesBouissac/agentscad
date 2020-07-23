@@ -27,7 +27,7 @@ PRECISION  = 50;
 SEPARATION = 0;
 CABLE_D    = 3.5;
 
-SCREW = M2_5(tl=15) ;
+SCREW = M2_5(tl=14) ;
 
 // AC-DC Converter board
 ZC255800_X = 31;
@@ -41,6 +41,8 @@ MP1584EN_Y = 17;
 MP1584EN_Z = 7;
 MP1584EN_POT_X = 7.5;
 MP1584EN_POT_Y = 2.2;
+MP1584EN_POT_D = 1.5;
+MP1584EN_PCB_T = 1.6;
 
 PCB_SEP    = 1;
 
@@ -90,15 +92,15 @@ module topWithVents ( box ) {
     }
 }
 
-module botWithSeparations ( box ) {
-    l   = MP1584EN_X+1.4;
+module botWithVerticalHolder ( box ) {
+    l   = MP1584EN_X;
     h   = MP1584EN_Y;
     w   = PCB_SEP;
     pcb = getPcbBoxPcb(box);
     mrg = getPcbBoxMargin(box);
 
     offsets = [
-        -getPcbSx(pcb)/2 + SCREW_STAND_D,
+        -(getPcbSx(pcb)-l)/2,
         -getPcbSy(pcb)/2 - mrg.y + MP1584EN_Z/2,
         -getPcbSz(pcb)/2 - mrg.z
     ];
@@ -108,11 +110,11 @@ module botWithSeparations ( box ) {
 
         // MP1584EN potentiometer access
         translate( [
-            offsets.x + l-1-MP1584EN_POT_X,
+            offsets.x + l - MP1584EN_POT_X,
             offsets.y + 1/2,
             offsets.z + MP1584EN_POT_Y] )
         rotate( [90,0,0] )
-        cylinder( r=1, h=100 );
+        cylinder( r=MP1584EN_POT_D/2+gap(), h=100 );
     }
 
     // PCB separation
@@ -122,19 +124,31 @@ module botWithSeparations ( box ) {
         offsets.z + h/2] )
     cube( [l,w,h], center=true ) ;
 
-    // MP1584EN back stopper
-    translate( [
-        offsets.x-w/2,
-        offsets.y + 1/2,
-        offsets.z + h/4] )
-    cube( [w,MP1584EN_Z+1,h/2], center=true ) ;
+    difference() {
+        ws = MP1584EN_X-21;
+        union() {
+            // MP1584EN back stopper
+            translate( [
+                offsets.x,
+                offsets.y + 1/2,
+                offsets.z + h/4] )
+            cube( [ws,MP1584EN_Z+1,h/2], center=true ) ;
 
-    // MP1584EN front stopper
-    translate( [
-        offsets.x + l-w/2,
-        offsets.y + 1/2,
-        offsets.z + 5/2] )
-    cube( [w,MP1584EN_Z+1,5], center=true ) ;
+            // MP1584EN front stopper
+            translate( [
+                offsets.x + l,
+                offsets.y + 1/2+1.25,
+                offsets.z + 5/2] )
+            cube( [ws,MP1584EN_Z-1.5,5], center=true ) ;
+        }
+        // MP1584EN PCB passage
+#
+        translate( [
+            offsets.x + l/2,
+            offsets.y + MP1584EN_Z/2 - MP1584EN_PCB_T/2 - 2,
+            offsets.z + MP1584EN_Y/2] )
+        cube( [l,MP1584EN_PCB_T+0.2,h], center=true ) ;
+    }
 }
 
 module show_box() {
@@ -151,11 +165,12 @@ module show_box() {
         cables       = cables,
         cablezip     = ZIP_TIE_CABLE,
         boxzip       = undef,
-        margin       = nozzle(),
+        margin       = [nozzle(),nozzle(),0],
         incrustation = 3
     );
+    echo( getPcbBoxShell(box) );
     translate( [0,30,0]) {
-        botWithSeparations ( box );
+        botWithVerticalHolder ( box );
     }
     translate( [0,-30,0])
         rotate( [180,0,0] )
