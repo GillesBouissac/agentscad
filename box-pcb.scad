@@ -40,7 +40,9 @@ function newPcbBox (
     margin       = undef,
     incrustation = undef,
 ) = let(
-    margins  = is_list(margin) ? margin+gap() : [margin+gap(),margin+gap(),margin+gap()],
+    margins  = is_undef(margin) ? [gap(),gap(),gap()] :
+                    is_list(margin) ? margin :
+                        [margin,margin,margin],
     l_i      = is_undef(incrustation) ? 0 : incrustation,
     sx       = getPcbSx(pcb)+2*margins.x,
     sy       = getPcbSy(pcb)+2*margins.y,
@@ -109,7 +111,7 @@ function newPcbBoxStands(pcb,shell,pcb_tr,i,o) =
 let(
     l = getBoxShellExtSz(shell),
     d = pcb_tr[2]+l/2+getPcbDz(pcb)-gap(),
-    h = getPcbT(pcb)+2*gap()
+    h = getPcbT(pcb)
 )[
     for ( hole=getPcbHoles(pcb) )
         newScrewStand(x=hole[0],y=hole[1],s=hole[2],l=l,d=d,h=h,i=i,o=o)

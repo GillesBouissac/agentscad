@@ -161,18 +161,18 @@ module boxShellLipsShape( params, inner=true ) {
     wt = params[IB_WT];
     sx = params[IB_ESX] - ( inner ? wt+gap()/2: 0 ) ;
     sy = params[IB_ESY] - ( inner ? wt+gap()/2: 0 ) ;
-    h  = params[IB_LPS]-gap();
+    h  = params[IB_LPS];
 
-    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 + ( inner ? 0 : gap() ) ] )
+    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 ] )
         cube( [sx, sy, h], center=true );
 }
 module boxShellLipsHollow( params, inner=true ) {
     wt = params[IB_WT];
     sx = params[IB_ESX] - ( inner ? wt+gap()/2: 0 ) ;
     sy = params[IB_ESY] - ( inner ? wt+gap()/2: 0 ) ;
-    h  = params[IB_LPS]-gap()+2*mfg();
+    h  = params[IB_LPS]+2*mfg();
 
-    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2 + ( inner ? 0 : gap() )-mfg() ] )
+    translate( [0, 0, -params[IB_SZ]/2+params[IB_BSZ] + h/2-mfg() ] )
         cube( [sx-wt+gap()/2, sy-wt+gap()/2, h], center=true );
 }
 
@@ -180,7 +180,7 @@ module boxShellLipsHollow( params, inner=true ) {
 //                Showcase
 // ----------------------------------------
 PRECISION  = 100;
-SEPARATION = 0;
+SEPARATION = 0.1;
 SHOW_SX    = 40;
 SHOW_SY    = 20;
 SHOW_TSZ   = 8;
