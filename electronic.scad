@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Vigibot
+ * Copyright (c) 2020, Gilles Bouissac
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,6 +13,7 @@
 use <agentscad/extensions.scad>
 use <agentscad/printing.scad>
 use <agentscad/mx-screw.scad>
+use <scad-utils/lists.scad>
 
 
 // ----------------------------------------
@@ -229,8 +230,417 @@ function getLampHolderE27T()   = E27_HOLDER_T;      // Handle Ring Thickness
 function getLampHolderE2SD()   = E27_HOLDER_SOCK_D; // Socket Diameter
 
 // ----------------------------------------
-//              Implementation
+// 5.25" CD Drives
+// Specifications:
+//    SFF-8551
+//    Form Factor of 5.25" CD Drives
+//    https://members.snia.org/document/dl/25931
 // ----------------------------------------
+SFF8551_A_Inch = [
+    0,
+    1.635, // A1: maximum height
+    1.665,
+    5.827,
+    7.984, // A4: maximum length
+    5.750, // A5: width
+    5.500, // A6: bottom hole X interval
+    0.125,
+    3.120, // A8: bottom hole Y interval
+    1.866, // A9: bottom hole Y distance from front
+    1.866, // A10: side hole Y distance from front
+    3.120, // A11: side hole Y interval
+    0,
+    0.394, // A13: side lower holes Z
+    0.860, // A14: side upper holes Z
+    0,
+    0.256,
+    0.197
+];
+SFF8551_A = [ for (i=SFF8551_A_Inch) inch2mm(i) ];
+SFF8551_TD  = 3;   // M3 Thread Diameter
+SFF8551_TP  = 0.5; // M3 Thread Pitch
+function getDrive525Data()     = SFF8551_A;      // Dimensions in mm
+function getDrive525DataInch() = SFF8551_A_Inch; // Dimensions in Inch
+function getDrive525TD()       = SFF8551_TD;     // Thread Diameter
+function getDrive525TP()       = SFF8551_TP;     // Thread Pitch
+
+module drive525Connector( height=undef, length=undef ) {
+    local_w = SFF8551_A[5];
+    local_h = min(is_undef(height)?SFF8551_A[1]:height, SFF8551_A[1]);
+    local_l = min(is_undef(length)?SFF8551_A[4]:length, SFF8551_A[4]);
+    cnx_o   = 3;
+    cnx_l   = 20;
+    cnx_h   = local_h/2 - 2*cnx_o;
+    cnx_w   = local_w - 2*cnx_o;
+    difference() {
+        translate( [0,local_l,cnx_h/2+cnx_o] )
+            cube( [cnx_w, cnx_l, cnx_h], center=true );
+    }
+}
+module drive525Body( height=undef, length=undef ) {
+    local_w = SFF8551_A[5];
+    local_h = min(is_undef(height)?SFF8551_A[1]:height, SFF8551_A[1]);
+    local_l = min(is_undef(length)?SFF8551_A[4]:length, SFF8551_A[4]);
+    difference() {
+        translate( [0,local_l/2,local_h/2] )
+            cube( [local_w, local_l, local_h], center=true );
+    }
+}
+module drive525Facade() {
+    local_w = SFF8551_A[5];
+    local_h = SFF8551_A[2];
+    local_l = SFF8551_A[17];
+    translate( [0,-local_l/2,local_h/2] )
+        cube( [local_w, local_l, local_h], center=true );
+}
+module drive525Hole( length=undef ) {
+    // SFF8551 says: 2 threads (pitch) minimum
+    tapMin    = 2*SFF8551_TP;
+    tapLength = max(is_undef(length)?tapMin:length,tapMin);
+    tapRadius = (SFF8551_TD-SFF8551_TP)/2;
+    translate( [0,0,tapLength/2] )
+        cylinder( r=tapRadius, h=tapLength, center=true );
+}
+module drive525ForEachBottomHole() {
+    cloneMirror([1,0,0]) {
+        translate( [SFF8551_A[6]/2,SFF8551_A[9],0] )
+            children();
+        translate( [SFF8551_A[6]/2,SFF8551_A[9]+SFF8551_A[8],0] )
+            children();
+    }
+}
+module drive525ForEachSideHole( height ) {
+    cloneMirror([1,0,0])
+    translate( [SFF8551_A[5]/2,0,height] )
+    rotate([0,-90,0]) {
+        translate( [0,SFF8551_A[10],0] )
+            children();
+        translate( [0,SFF8551_A[10]+SFF8551_A[11],0] )
+            children();
+    }
+}
+module drive525ForEachSideLowerHole() {
+    drive525ForEachSideHole(SFF8551_A[13])
+        children();
+}
+module drive525ForEachSideUpperHole() {
+    drive525ForEachSideHole(SFF8551_A[14])
+        children();
+}
+module drive525BottomHoles( length=undef ) {
+    drive525ForEachBottomHole()
+        drive525Hole( length );
+}
+module drive525SideUpperHoles( length=undef ) {
+    drive525ForEachSideUpperHole()
+        drive525Hole( length );
+}
+module drive525SideLowerHoles( length=undef ) {
+    drive525ForEachSideLowerHole()
+        drive525Hole( length );
+}
+module drive525( height=undef, length=undef, thread_l=undef ) {
+    difference() {
+        drive525Body(height, length);
+        drive525Connector(height, length);
+#        drive525BottomHoles(thread_l);
+#        drive525SideLowerHoles(thread_l);
+#        drive525SideUpperHoles(thread_l);
+    }
+    drive525Facade();
+}
+
+// ----------------------------------------
+// 3.5" Drives
+// Specifications:
+//    SFF-8301
+//    3.5" Form Factor Drive Dimensions
+//    https://members.snia.org/document/dl/25862
+// ----------------------------------------
+SFF8301_A_Inch = [
+    0,     /* A0 */
+    [ 0.7, 1.028, 1.654 ], /* A1: height */
+    5.787, /* A2: length */
+    4.0,   /* A3: width */
+    3.75,  /* A4: bottom holes X interval */
+    0.125,
+    1.75,  /* A6: bottom holes line 2 Y from line 1 */
+    1.625, /* A7: bottom holes line 1 Y from back */
+    1.122, /* A8: side holes line 1 Y from back */
+    4.0,   /* A9: side holes line 2 Y from line 1 */
+    0.25,  /* A10: side holes line Z */
+    0.01,
+    0.02,
+    3.0,   /* A6: bottom holes line 3 Y from line 1 */
+    0.138, /* A14: TD for UNC #6 32 */
+    1/32,  /* A15: TP for UNC #6 32 */
+    0.14   /* A16: TL */
+];
+SFF8301_A = [ for (i=SFF8301_A_Inch) inch2mm(i) ];
+SFF8301_TP  = SFF8301_A[15]; // UNC #6 32 Thread Pitch
+SFF8301_A1 = concat(
+    [[0,SFF8301_A[1][0]]],
+    flatten(
+        [    for (i=[1:len(SFF8301_A[1])-1]) let(
+                    cur  = SFF8301_A[1][i],
+                    prev = SFF8301_A[1][i-1],
+                    med  = (cur+prev)/2
+               ) [[ med, prev ],  [ med+0.001, cur ]]
+        ]
+    ),
+    [[100,SFF8301_A[1][len(SFF8301_A[1])-1]]]
+);
+
+function getDrive35Data()     = SFF8301_A;      // Dimensions in mm
+function getDrive35DataInch() = SFF8301_A_Inch; // Dimensions in Inch
+function getDrive35TP()       = SFF8301_TP;     // Thread Pitch
+// Guess the closest valid height A1
+function getDrive35ValidA1(h) = let(hv=is_undef(h)?10:h) lookup(hv, SFF8301_A1);
+
+module drive35Body( height=undef, length=undef ) {
+    local_w = SFF8301_A[3];
+    local_h = getDrive35ValidA1(height);
+    local_l = min(is_undef(length)?SFF8301_A[2]:length, SFF8301_A[2]);
+    difference() {
+        translate( [0,local_l/2,local_h/2] )
+            cube( [local_w, local_l, local_h], center=true );
+    }
+}
+module drive35Connector( height=undef, length=undef ) {
+    local_w = SFF8301_A[3];
+    local_h = getDrive35ValidA1(height);
+    local_l = min(is_undef(length)?SFF8301_A[2]:length, SFF8301_A[2]);
+    cnx_o   = 1;
+    cnx_l   = 10;
+    cnx_h   = local_h/2 - 2*cnx_o;
+    cnx_w   = local_w - 2*cnx_o;
+    difference() {
+        translate( [0,0,cnx_h/2+cnx_o] )
+            cube( [cnx_w, cnx_l, cnx_h], center=true );
+    }
+}
+module drive35Hole( length=undef ) {
+    tapMin    = SFF8301_A[16];
+    tapLength = max(is_undef(length)?tapMin:length,tapMin);
+    tapRadius = (SFF8301_A[14]-SFF8301_TP)/2;
+    translate( [0,0,tapLength/2] )
+        cylinder( r=tapRadius, h=tapLength, center=true );
+}
+module drive35AlignFront( length ) {
+    local_l = min(is_undef(length)?SFF8301_A[2]:length, SFF8301_A[2]);
+    translate( [0,local_l,0] )
+        rotate( [0,0,180] )
+            children();
+}
+module drive35ForEachBottomHoleLine(y) {
+    cloneMirror([1,0,0]) {
+        translate( [SFF8301_A[4]/2,y,0] )
+            children();
+    }
+}
+module drive35ForEachSideHole() {
+    cloneMirror([1,0,0])
+    translate( [SFF8301_A[3]/2,0,SFF8301_A[10]] )
+    rotate([0,-90,0]) {
+        translate( [0,SFF8301_A[8],0] )
+            children();
+        translate( [0,SFF8301_A[8]+SFF8301_A[9],0] )
+            children();
+    }
+}
+module drive35ForEachBottomHole1() {
+    drive35ForEachBottomHoleLine(SFF8301_A[7])
+        children();
+}
+module drive35ForEachBottomHole2() {
+    drive35ForEachBottomHoleLine(SFF8301_A[7]+SFF8301_A[6])
+        children();
+}
+module drive35ForEachBottomHole3() {
+    drive35ForEachBottomHoleLine(SFF8301_A[7]+SFF8301_A[13])
+        children();
+}
+module drive35ForEachBottomHole() {
+    drive35ForEachBottomHole1()
+        children();
+    drive35ForEachBottomHole2()
+        children();
+    drive35ForEachBottomHole3()
+        children();
+}
+module drive35BottomHoles1( length=undef ) {
+    drive35ForEachBottomHole1()
+        drive35Hole( length );
+}
+module drive35BottomHoles2( length=undef ) {
+    drive35ForEachBottomHole2()
+        drive35Hole( length );
+}
+module drive35BottomHoles3( length=undef ) {
+    drive35ForEachBottomHole3()
+        drive35Hole( length );
+}
+module drive35BottomHoles( length=undef ) {
+    drive35ForEachBottomHole()
+        drive35Hole( length );
+}
+module drive35SideHoles( length=undef ) {
+    drive35ForEachSideHole()
+        drive35Hole( length );
+}
+module drive35( height=undef, length=undef, thread_l=undef ) {
+    difference() {
+        drive35Body(height, length);
+        drive35Connector(height, length);
+#        drive35BottomHoles1(thread_l);
+#        drive35BottomHoles2(thread_l);
+#        drive35BottomHoles3(thread_l);
+#        drive35SideHoles(thread_l);
+    }
+}
+
+
+
+// ----------------------------------------
+// 2.5" Drives
+// Specifications:
+//    SFF-8201
+//    2.5" Form Factor Drive Dimensions
+//    https://members.snia.org/document/dl/25851
+// ----------------------------------------
+SFF8201_A = [
+    0,      /* A0 */
+    [5.00, 7.00, 8.47, 9.50, 10.50, 12.70, 15.00, 17.00, 19.05], /* A1: height */
+    0.00,
+    0.50, 
+    69.85,  /* A4: width */
+    0.25,
+    100.45, /* A6: maximum length */
+    0, 0, 0,
+    100.20, /* A10 */
+    100.50,
+    110.20,
+    0, 0, 0, 0, 0, 0, 0, 0, /* A20 */ 0, 0,
+    3.0,    /* A23: side holes line Z */
+    0, 0,
+    3.0,    /* A26: TD side holes */
+    0.50,
+    4.07,
+    61.72,  /* A29: bottom holes X interval */
+    34.93,  /* A30 */
+    38.10,
+    3.0,    /* A32: TD bottom holes */
+    0.50,
+    0, 0, 0,
+    8.0,
+    [2.0, 3.0], /* A38: TL side holes [if A1<=7, if A1>7] */
+    0, 0,   /* A40 */
+    2.50,   /* A41: TL bottom holes */
+    0, 0, 0, 0, 0, 0, 0, 0,
+    14.0,   /* A50: bottom holes line 1 Y from back */
+    90.60,  /* A51: bottom holes line 2 Y from back */
+    14.00,  /* A52: side holes line 1 Y from back */
+    90.60,  /* A53: side holes line 2 Y from back */
+];
+SFF8201_A_Inch = [ for (i=SFF8201_A) mm2inch(i) ];
+SFF8201_TP = 0.5;
+SFF8201_A1 = concat(
+    [[0,SFF8201_A[1][0]]],
+    flatten(
+        [    for (i=[1:len(SFF8201_A[1])-1]) let(
+                    cur  = SFF8201_A[1][i],
+                    prev = SFF8201_A[1][i-1],
+                    med  = (cur+prev)/2
+               ) [[ med, prev ],  [ med+0.001, cur ]]
+        ]
+    ),
+    [[100,SFF8201_A[1][len(SFF8201_A[1])-1]]]
+);
+
+function getDrive25Data()      = SFF8201_A;      // Dimensions in mm
+function getDrive25DataInch()  = SFF8201_A_Inch; // Dimensions in Inch
+// Guess the closest valid height A1
+function getDrive25ValidA1(h) = let(hv=is_undef(h)?10:h) lookup(hv, SFF8201_A1);
+
+module drive25AlignFront( length ) {
+    local_l = min(is_undef(length)?SFF8201_A[6]:length, SFF8201_A[6]);
+    translate( [0,local_l,0] )
+        rotate( [0,0,180] )
+            children();
+}
+module drive25Connector( height=undef, length=undef ) {
+    local_w = SFF8201_A[4];
+    local_h = getDrive25ValidA1(height);
+    local_l = min(is_undef(length)?SFF8201_A[6]:length, SFF8201_A[6]);
+    cnx_o   = 1;
+    cnx_l   = 10;
+    cnx_h   = local_h/2 - 2*cnx_o;
+    cnx_w   = local_w - 2*cnx_o;
+    difference() {
+        translate( [0,0,cnx_h/2+cnx_o] )
+            cube( [cnx_w, cnx_l, cnx_h], center=true );
+    }
+}
+module drive25Body( height=undef, length=undef ) {
+    local_w = SFF8201_A[4];
+    local_h = getDrive25ValidA1(height);
+    local_l = min(is_undef(length)?SFF8201_A[6]:length, SFF8201_A[6]);
+    difference() {
+        translate( [0,local_l/2,local_h/2] )
+            cube( [local_w, local_l, local_h], center=true );
+    }
+}
+module drive25BottomHole( length=undef ) {
+    tapMin    = SFF8201_A[41];
+    tapLength = max(is_undef(length)?tapMin:length,tapMin);
+    tapRadius = (SFF8201_A[32]-SFF8201_TP)/2;
+    translate( [0,0,tapLength/2] )
+        cylinder( r=tapRadius, h=tapLength, center=true );
+}
+module drive25SideHole( length=undef, height=undef ) {
+    local_h = getDrive25ValidA1(height);
+    tapMin    = local_h<=7 ? SFF8201_A[38][0] : SFF8201_A[38][1] ;
+    tapLength = max(is_undef(length)?tapMin:length,tapMin);
+    tapRadius = (SFF8201_A[26]-SFF8201_TP)/2;
+    translate( [0,0,-tapLength/2] )
+        cylinder( r=tapRadius, h=tapLength, center=true );
+}
+module drive25ForEachBottomHole() {
+    cloneMirror([1,0,0]) {
+        translate( [SFF8201_A[29]/2,SFF8201_A[50],0] )
+            children();
+        translate( [SFF8201_A[29]/2,SFF8201_A[51],0] )
+            children();
+    }
+}
+module drive25ForEachSideHole() {
+    cloneMirror([1,0,0])
+    translate( [SFF8201_A[4]/2,0,SFF8201_A[23]] )
+    rotate([0,90,0])
+    {
+        translate( [0,SFF8201_A[52],0] )
+            children();
+        translate( [0,SFF8201_A[53],0] )
+            children();
+    }
+}
+module drive25BottomHoles( length=undef ) {
+    drive25ForEachBottomHole()
+        drive25BottomHole(length);
+}
+module drive25SideHoles( length=undef, height=undef ) {
+    drive25ForEachSideHole()
+        drive25SideHole( length, height );
+}
+module drive25( height=undef, length=undef, thread_l=undef ) {
+    difference() {
+        drive25Body(height, length);
+        drive25Connector(height, length);
+#        drive25BottomHoles(thread_l);
+#        drive25SideHoles(thread_l, height);
+    }
+}
+
 LED_D         = 5;
 LED_L         = 9;
 LED_DP        = LED_D+2*gap();
@@ -276,3 +686,14 @@ translate( [0, 60, 0] ) {
         cornBulbE27($fn=PRECISION);
 }
 
+translate( [0, 150, 0] ) {
+    drive525(30,$fn=PRECISION);
+}
+translate( [170, 150, 0] ) {
+    drive35AlignFront()
+    drive35($fn=PRECISION);
+}
+translate( [300, 150, 0] ) {
+    drive25AlignFront()
+    drive25($fn=PRECISION);
+}
