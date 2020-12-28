@@ -304,8 +304,8 @@ module showcase() {
             translate( [0,0,layer+layer/2] )
                 cube( [100,100,layer], true );
         }
-*        cube( [10,10,10] );
+        cube( [10,10,10] );
     }
 }
-
+*
 showcase ($fn=50);
