@@ -11,7 +11,6 @@
  */
 
 use <scad-utils/lists.scad>
-use <scad-utils/mirror.scad>
 use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
 use <agentscad/bevel.scad>
@@ -28,20 +27,21 @@ use <agentscad/bevel.scad>
 // wt:  wall thickness
 // lps: lips height
 function newBoxShell (
-    sx, sy, tsz, bsz,
+    sx, sy, tsz=undef, bsz=undef,
     t    = BOX_BOTTOM_T,
     wt   = BOX_WALL_T,
     lps  = undef
 ) = let(
-    sz  = tsz+bsz,
-    esz = sz+2*t,
-    esx = sx+2*wt,
-    esy = sy+2*wt
+    sz  = is_undef(tsz)||is_undef(bsz) ? undef : tsz+bsz,
+    esz = is_undef(sz) ? undef : sz+2*t,
+    esx = is_undef(sx) ? undef : sx+2*wt,
+    esy = is_undef(sy) ? undef : sy+2*wt
 ) [
     sx, sy, sz,
     esx, esy, esz,
     tsz, bsz,
-    tsz+t, bsz+t,
+    is_undef(tsz) ? undef : tsz+t,
+    is_undef(bsz) ? undef : bsz+t,
     t, wt, is_undef(lps) ? BOX_LIPS_H : lps
 ];
 IB_SX     = 0;
@@ -126,15 +126,15 @@ module boxShellBottomBevel( params ) {
 }
 
 module boxShellBevel( params ) {
-    mirror_y()
+    cloneMirror([0,1,0])
         translate( [params[IB_ESX]/2, params[IB_ESY]/2, 0 ] )
         rotate( [0,0,90] )
         bevelCutLinear( params[IB_ESX], params[IB_ESZ] );
-    mirror_x()
+    cloneMirror([1,0,0])
         translate( [params[IB_ESX]/2, 0, -params[IB_ESZ]/2 ] )
         rotate( [90,0,0] )
         bevelCutLinear( params[IB_ESZ], params[IB_ESY] );
-    mirror_x()
+    cloneMirror([1,0,0])
         translate( [params[IB_ESX]/2, -params[IB_ESY]/2, 0 ] )
         bevelCutLinear( params[IB_ESY], params[IB_ESZ] );
 }

@@ -11,7 +11,6 @@
  */
 
 use <scad-utils/lists.scad>
-use <scad-utils/mirror.scad>
 use <agentscad/extensions.scad>
 use <agentscad/printing.scad>
 use <agentscad/electronic.scad>
@@ -181,7 +180,7 @@ module pcbBoxTopShape ( pcbBox ) {
     if ( !is_undef(boxzip) )
         intersection() {
             boxShellTopShape ( shell ) ;
-            mirror_x()
+            cloneMirror([1,0,0])
                 translate( pcbBox[IB_ZIPTR] )
                     zipConduitShape ( boxzip, t=getBoxShellMainT(shell) ) ;
         }
@@ -199,7 +198,7 @@ module pcbBoxTopHollow ( pcbBox ) {
                 cableGlandCubeShape(gland[0]);
         }
         if ( !is_undef(boxzip) )
-            mirror_x()
+            cloneMirror([1,0,0])
                 translate( pcbBox[IB_ZIPTR] )
                     zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
     }
@@ -211,7 +210,7 @@ module pcbBoxTopHollow ( pcbBox ) {
             cableGlandCubeHollow(gland[0]);
     }
     if ( !is_undef(boxzip) )
-        mirror_x()
+        cloneMirror([1,0,0])
             translate( pcbBox[IB_ZIPTR] )
                 zipConduitHollow ( pcbBox[IB_ZIP] ) ;
 }
@@ -235,7 +234,7 @@ module pcbBoxBottomShape ( pcbBox ) {
     if ( !is_undef(boxzip) )
         intersection() {
             boxShellBottomShape ( shell ) ;
-            mirror_x()
+            cloneMirror([1,0,0])
                 translate( pcbBox[IB_ZIPTR] )
                     zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
         }
@@ -253,7 +252,7 @@ module pcbBoxBottomHollow ( pcbBox ) {
                 cableGlandCubeShape(gland[0]);
         }
         if ( !is_undef(boxzip) )
-            mirror_x()
+            cloneMirror([1,0,0])
                 translate( pcbBox[IB_ZIPTR] )
                     zipConduitShape ( pcbBox[IB_ZIP], t=getBoxShellMainT(shell) ) ;
     }
@@ -265,7 +264,7 @@ module pcbBoxBottomHollow ( pcbBox ) {
             cableGlandCubeHollow(gland[0]);
     }
     if ( !is_undef(boxzip) )
-        mirror_x()
+        cloneMirror([1,0,0])
             translate( pcbBox[IB_ZIPTR] )
                 zipConduitHollow ( pcbBox[IB_ZIP] ) ;
 }
@@ -282,7 +281,7 @@ CABLE_D    = 3;
 
 module show_parts( part=0, cut=undef, cut_rotation=undef ) {
     screw = M2_5(tl=10, ahd=5) ;
-    draft = newBoxShell (bsz=8);
+    draft = newBoxShell (sy=40, bsz=8, t=2.4, wt=2);
     cables = [
          newCable ( CABLE_D/2, CABLE_D, c=[0,-4,-2],  v=[+1,0,0] )
         ,newCable ( CABLE_D/2, CABLE_D, c=[0,-4,1],   v=[-1,0,0] )
@@ -337,5 +336,5 @@ module show_parts( part=0, cut=undef, cut_rotation=undef ) {
 // 0: all
 // 1: bottom
 // 2: top
-show_parts ( 1, 0, -15, $fn=PRECISION );
+show_parts ( 0, 0, -15, $fn=PRECISION );
 

@@ -12,7 +12,6 @@
  */
 
 use <extensions.scad>
-use <scad-utils/mirror.scad>
 
 RADIUSBEVEL        = 0.5; // Default radius bevel
 CUTTER_W           = 1;
@@ -31,7 +30,7 @@ module bevelCutLinear ( length, width, cut=CUTTER_W ) {
             cube( [width,cut,length] );
         // Bevel
         if ( bevelActive() ) {
-            mirror_x()
+            cloneMirror([1,0,0])
             translate ( [-width/2, 0, 0] )
             linear_extrude( height=length )
                 bevelProfileModule ( b );
@@ -54,8 +53,8 @@ module bevelCutCornerConcave ( radius, width, angle=90 ) {
 
     // Cutter
     rotate( [0,0,angle/2] )
-        mirror_z()
-        mirror_y()
+        cloneMirror([0,0,1])
+        cloneMirror([0,1,0])
         translate ( [+cutterDiag, 0, 0] )
         rotate( [0,0,90-angle/2] )
         translate ( [-cutterSide, 0, 0] )
@@ -72,10 +71,10 @@ module bevelCutCornerConcave ( radius, width, angle=90 ) {
         longSideY = (longSide+mfg())*cos(angle/2);
 
         rotate( [0,0,angle/2] )
-        mirror_z()
+        cloneMirror([0,0,1])
         translate ( [diagonal, 0, 0] ) 
         difference() {
-            mirror_y()
+            cloneMirror([0,1,0])
             linear_extrude( height=width/2 )
                 polygon([
                     [0,          0],
@@ -83,7 +82,7 @@ module bevelCutCornerConcave ( radius, width, angle=90 ) {
                     [-longSideX,-longSideY],
                 ]);
 
-            mirror_y()
+            cloneMirror([0,1,0])
             difference() {
                 linear_extrude( height=width/2 )
                     polygon([
@@ -111,7 +110,7 @@ module bevelCutArc ( radius, width, angle=90 ) {
     cutter = mod(angle,180)==0 ? radius+b : radius/cos(angle/2);
 
     translate ( [0, distance, 0] )
-    mirror_z()
+    cloneMirror([0,0,1])
     translate ( [-radius, -radius, 0] ) {
         // Cutter
         rotate( [0,0,-mfg()] )
@@ -131,7 +130,7 @@ module bevelCutArc ( radius, width, angle=90 ) {
 // Concave circular beveling of a plate
 module bevelCutArcConcave ( radius, width, angle=90 ) {
     b = getRadiusBevel();
-    mirror_z() {
+    cloneMirror([0,0,1]) {
         // Cutter
         rotate( [0,0,-mfg()] )
         rotate_extrude( angle=angle+2*mfg() )
@@ -155,7 +154,10 @@ BEVEL_PROFILE_DIAGONAL = 0;
 BEVEL_PROFILE_ARC      = 1;
 
 function bevelActive() =
-    is_undef($bevel) ? true        : $bevel>0?true:false;
+    is_undef($bevel) ?
+        true
+    :
+        $bevel>0 ? true : false;
 function getRadiusBevel() =
     is_undef($bevel)?
         RADIUSBEVEL
@@ -307,6 +309,7 @@ module bevelShow() {
                     bevelCutLinear( 5/cos(45), 2 );
 
             }
+
         }
     }
 }

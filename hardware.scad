@@ -13,7 +13,6 @@
 use <agentscad/extensions.scad>
 use <agentscad/printing.scad>
 use <agentscad/bevel.scad>
-use <scad-utils/mirror.scad>
 
 // ----------------------------------------
 //                   API
@@ -131,7 +130,7 @@ module zipUShape ( zip, gap=0, head=true ) {
         translate ( [0,0,hl/2+radius] )
             cube ( [ zip[IZ_TW]+2*gap, sep, zip[IZ_TH]+2*gap ], center=true );
         // U part
-        mirror_y()
+        cloneMirror([0,1,0])
         translate ( [0,sep/2,hl/2] )
             rotate( [0,-90,0] )
                 rotate_extrude ( angle=90 )

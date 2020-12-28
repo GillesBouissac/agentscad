@@ -15,7 +15,6 @@ use <agentscad/printing.scad>
 use <agentscad/bevel.scad>
 use <agentscad/electronic.scad>
 use <agentscad/hardware.scad>
-use <scad-utils/mirror.scad>
 
 // ----------------------------------------
 //                   API
@@ -95,7 +94,7 @@ module cableGlandCubeBevel ( gland ) {
             rotate( [0,-90,0] )
             rotate( [90,0,0] )
             bevelCutLinear( gland[IC_H], gland[IC_W] );
-        mirror_y()
+        cloneMirror([0,1,0])
             translate( [0,-gland[IC_W]/2,0 ] )
             rotate( [0,-90,0] )
             rotate( [0,0,-90] )
