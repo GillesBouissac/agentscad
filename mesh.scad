@@ -92,12 +92,20 @@ function meshFrustum(poly,h=1,a=-45) =
         ]
     );
 
-translate([0,0,0])
-meshPolyhedron( meshRegularPolygon(5) );
+// ----------------------------------------
+//               Showcase
+// ----------------------------------------
 
-translate([3,0,0])
-meshPolyhedron( meshPrism(meshRegularPolygon(6)) );
+module showParts() {
+    translate([0,0,0])
+    meshPolyhedron( meshRegularPolygon(5) );
 
-translate([6,0,0])
-meshPolyhedron( meshFrustum(meshRegularPolygon(7)) );
+    translate([3,0,0])
+    meshPolyhedron( meshPrism(meshRegularPolygon(6)) );
 
+    translate([6,0,0])
+    meshPolyhedron( meshFrustum(meshRegularPolygon(7)) );
+}
+
+*
+showParts();

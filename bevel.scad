@@ -313,4 +313,5 @@ module bevelShow() {
         }
     }
 }
+*
 bevelShow($fn=100, $bevelProfile=bevelArc(), $bevel=0.4);
