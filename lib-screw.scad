@@ -322,18 +322,16 @@ module libThreadExternal ( screw, l=undef, f=true ) {
     margin      = f ? screwGetPitch(screw) : 0;
     rotations   = (local_l + 2*margin)/screwGetPitch(screw);
     profile     = screwThreadProfile ( screw, I=false );
-    clipL       = local_l;
-    clipW       = screwGetThreadD(screw)+10;
+    clipL       = f ? local_l : 1000;
+    clipW       = f ? screwGetThreadD(screw)+10 : 1000;
     profile_gap = [ for(p=profile) [p.x-gap(3/4),p.y] ];
     spiral      = meshSpiralExternal ( profile_gap, rotations, screwGetPitch(screw) );
     translate([0,0,f?-screwGetPitch(screw):0])
     intersection() {
         translate([0,0,-margin])
             meshPolyhedron( spiral, convexity=10);
-        if ( f ) {
-            translate([0,0,screwGetPitch(screw)+clipL/2])
-                cube([clipW, clipW, clipL ],center=true);
-        }
+        translate([0,0,screwGetPitch(screw)+clipL/2])
+            cube([clipW, clipW, clipL ],center=true);
     }
 }
 
@@ -348,18 +346,16 @@ module libThreadInternal ( screw, l=undef, f=true, t=undef ) {
     margin      = f ? screwGetPitch(screw) : 0;
     rotations   = (local_l + 2*margin)/screwGetPitch(screw);
     profile     = screwThreadProfile ( screw, I=true );
-    clipL       = local_l;
-    clipW       = max(2*radius,screwGetThreadD(screw))+10;
+    clipL       = f ? local_l : 1000;
+    clipW       = f ? max(2*radius,screwGetThreadD(screw))+10 : 1000;
     profile_gap = [ for(p=profile) [p.x+gap(),p.y] ];
     spiral      = meshSpiralInternal ( profile_gap, rotations, screwGetPitch(screw), radius=radius );
     translate([0,0,f?-screwGetPitch(screw):0])
     intersection() {
         translate([0,0,-margin])
             meshPolyhedron( spiral, convexity=10);
-        if ( f ) {
-            translate([0,0,screwGetPitch(screw)+clipL/2])
-                cube([clipW, clipW, clipL ],center=true);
-        }
+        translate([0,0,screwGetPitch(screw)+clipL/2])
+            cube([clipW, clipW, clipL ],center=true);
     }
 }
 
@@ -642,56 +638,58 @@ module showName( d, dy=0 ) {
 }
 
 // Thread profiles visualisation
-if (1) {
-    screw_w = libScrewDataCompletion([["Profile BSW / BSF",     6,12,1]],0,prf=PROFILE_W);
-    screw_m = libScrewDataCompletion([["Profile M / UNC / UNF", 6,12,1]],0,prf=PROFILE_M);
-    !union() {
-        color("white")
-        union() {
-            intersection() {
-                rotate( [90,0,90] )
-                union() {
-                    libThreadExternal(screw_m,l=2*screwGetPitch(screw_m),f=true,$fn=100);
-                    libThreadInternal(screw_m,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
+module showParts( part=0 ) {
+    if ( part==0 ) {
+        screw_w = libScrewDataCompletion([["Profile BSW / BSF",     6,12,1]],0,prf=PROFILE_W);
+        screw_m = libScrewDataCompletion([["Profile M / UNC / UNF", 6,12,1]],0,prf=PROFILE_M);
+        !union() {
+            color("white")
+            union() {
+                intersection() {
+                    rotate( [90,0,90] )
+                    union() {
+                        libThreadExternal(screw_m,l=2*screwGetPitch(screw_m),f=true,$fn=100);
+                        libThreadInternal(screw_m,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
+                    }
+                    cube( [100,100,0.01], center=true );
                 }
-                cube( [100,100,0.01], center=true );
+                showName(screw_m,-0.6);
             }
-            showName(screw_m,-0.6);
+            translate( [0,0,-2] )
+            color("lightblue")
+            union() {
+                intersection() {
+                    rotate( [90,0,90] )
+                    union() {
+                        libThreadExternal(screw_w,l=2*screwGetPitch(screw_m),f=true,$fn=100);
+                        libThreadInternal(screw_w,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
+                    }
+                    cube( [100,100,0.01], center=true );
+                }
+                showName(screw_w,-0.6);
+            }
         }
-        translate( [0,0,-2] )
-        color("lightblue")
-        union() {
-            intersection() {
-                rotate( [90,0,90] )
-                union() {
-                    libThreadExternal(screw_w,l=2*screwGetPitch(screw_m),f=true,$fn=100);
-                    libThreadInternal(screw_w,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
-                }
-                cube( [100,100,0.01], center=true );
+    }
+
+    // Complex structure
+    if ( part==1 ) {
+        screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
+        screw_hole = libScrewDataCompletion([["B",2,6,1]],0,prf=PROFILE_W);
+
+        difference() {
+            union() {
+                libThreadExternal( screw_w, 10, f=false, $fn=100 );
+                libThreadInternal( screw_w, 10, f=false, t=1, $fn=100 );
             }
-            showName(screw_w,-0.6);
+#            translate( [-1,0,9] )
+                rotate( [ 60, 20, -60 ] )
+                translate( [0,0,-10] )
+                libThreadExternal( screw_hole, 16, $fn=100 );
+#            rotate( [ 0, 0, -90 ] )
+                translate( [5,5,3] )
+                cylinder( r=4.5,10, $fn=100 );
         }
     }
 }
-
-// Complex structure
-if (0) {
-    screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
-    screw_m = libScrewDataCompletion([["Profile M / UNC / UNF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_M);
-    screw_hole = libScrewDataCompletion([["B",2,6,1]],0,prf=PROFILE_W);
-
-    difference() {
-        union() {
-            libThreadExternal( screw_w, 10, f=false, $fn=100 );
-            libThreadInternal( screw_w, 10, f=false, t=1, $fn=100 );
-        }
-#
-        translate( [-1,0,3] )
-        rotate( [ 60, 20, 30 ] )
-            translate( [0,0,-6] )
-            libThreadExternal( screw_hole, 16, $fn=100 );
-        translate( [5,5,0] )
-            cylinder( r=4.5,10, $fn=100 );
-    }
-}
-
+*
+showParts(1);
