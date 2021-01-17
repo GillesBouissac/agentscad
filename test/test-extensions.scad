@@ -71,7 +71,7 @@ assert(angle_vector_7==180, "ERROR angle_vector_7");
 // ----------------------------------------
 //            Test:  wrinkle
 // ----------------------------------------
-module showLine( line ) {
+module extrudeProfile( line ) {
     lineBot = to_3d(line);
     lineTop = transform( translation([0,0,1]), lineBot);
     showPolyFaces = [ for ( i=[0:len(line)-2] ) [i,len(line)+i,len(line)+i+1,i+1] ];
@@ -88,17 +88,44 @@ echo("showPoly2wrinkle_0 = ", showPoly2wrinkle_0);
 assert(showPoly2wrinkle_0==showPoly2wrinkle_0_check,
     "ERROR wrong showPoly2wrinkle_0");
 
+closedPoly = [
+    [-1.0, +0.3], [-0.3, +1.0],
+    [+0.3, +1.0], [+1.0, +0.3],
+    [+1.0, -0.3], [+0.3, -1.0],
+    [-0.3, -1.0], [-1.0, -0.3],
+];
+closedPoly_0 = roundDownList(wrinkle(closedPoly,0.2,true));
+closedPoly_0_check = [
+    [-1.2, 0.38],  [-0.39, 1.2],
+    [0.38, 1.2],   [1.2, 0.38],
+    [1.2, -0.39],  [0.38, -1.2],
+    [-0.39, -1.2], [-1.2, -0.39]
+];
+echo("closedPoly_0 = ", closedPoly_0);
+assert(closedPoly_0==closedPoly_0_check,
+    "ERROR wrong closedPoly_0");
+
 // ----------------------------------------
-//  Showcase
+//  Visual check
 // ----------------------------------------
-color( "#99ff66" ) showLine( wrinkle(showPoly2wrinkle,-0.6) );
-color( "#ccff66" ) showLine( wrinkle(showPoly2wrinkle,-0.4) );
-color( "#ccff33" ) showLine( wrinkle(showPoly2wrinkle,-0.2) );
-color( "#66ffff" ) showLine( showPoly2wrinkle );
-color( "#ffff66" ) showLine( wrinkle(showPoly2wrinkle,+0.2) );
-color( "#ffff99" ) showLine( wrinkle(showPoly2wrinkle,+0.4) );
-color( "#ffffcc" ) showLine( wrinkle(showPoly2wrinkle,+0.6) );
-color( "#ffffff" ) showLine( wrinkle(showPoly2wrinkle,+0.8) );
+color( "#99ff66" ) extrudeProfile( wrinkle(showPoly2wrinkle,-0.6) );
+color( "#ccff66" ) extrudeProfile( wrinkle(showPoly2wrinkle,-0.4) );
+color( "#ccff33" ) extrudeProfile( wrinkle(showPoly2wrinkle,-0.2) );
+color( "#66ffff" ) extrudeProfile( showPoly2wrinkle );
+color( "#ffff66" ) extrudeProfile( wrinkle(showPoly2wrinkle,+0.2) );
+color( "#ffff99" ) extrudeProfile( wrinkle(showPoly2wrinkle,+0.4) );
+color( "#ffffcc" ) extrudeProfile( wrinkle(showPoly2wrinkle,+0.6) );
+color( "#ffffff" ) extrudeProfile( wrinkle(showPoly2wrinkle,+0.8) );
+
+translate([5,0,0]) {
+    color("red")
+    linear_extrude(height=2)
+        polygon( to_2d(closedPoly) );
+    color("green")
+    translate([0,0,-1])
+    linear_extrude(height=2)
+        polygon( to_2d(closedPoly_0) );
+}
 
 // ----------------------------------------
 //  Utilities

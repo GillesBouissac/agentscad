@@ -201,12 +201,13 @@ function faceTheZenith( list, zenith=[0,100000] ) = rotateBuffer(list,closestToP
 //   the returned polygon's edges are shifted by 'distance' like wrinkles
 // source:   2D polygon
 // distance: distance between each target edge and source edge
-function wrinkle ( source, distance ) = let( last=len(source)-1 )
+// closed:   true to indicate that the profile is a closed profile
+function wrinkle ( source, distance, closed=false ) = let( last=len(source)-1 )
 [
     for ( i=[0:last] ) let (
         c   = source[i],
-        p   = (i==0)    ? 2*c-source[i+1] : source[i-1],
-        n   = (i==last) ? 2*c-source[i-1] : source[i+1],
+        p   = (i==0)    ? (closed ? source[last] : 2*c-source[i+1]) : source[i-1],
+        n   = (i==last) ? (closed ? source[0]    : 2*c-source[i-1]) : source[i+1],
         cp  = p-c,
         cn  = n-c,
         p1  = c + distance/norm(cp)*cp,
