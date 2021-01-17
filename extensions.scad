@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Vigibot
+ * Copyright (c) 2021, Gilles Bouissac
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,8 +50,11 @@ function assertClass(object,class) = let (
 //           Mathematics
 // ----------------------------------------
 
+// Round down a as multiple of m
+function roundDown(a,m) = let(ar=round(a*1000000),mr=round(m*1000000)) (mr*floor(ar/mr))/1000000;
+
 // Modulo
-function mod(a,m) = a - m*floor(a/m);
+function mod(a,m) = a - roundDown(a,m);
 
 // Sums all the elements of a list of elements
 function sum(l) = __sum(l,0);
@@ -98,7 +101,9 @@ function columnSum ( list, col=undef, start=undef, end=undef ) =
 //           Euclidean space functions
 // ----------------------------------------
 function vec2(p) = len(p) < 2 ? concat(p,0) : [p[0],p[1]];
+function vec3(p) = len(p) < 3 ? concat(p,0) : [p[0],p[1],p[2]];
 function to_2d(list) = [ for(v = list) vec2(v) ];
+function unit(v) = let( n=norm(v) ) n==0 ? [0,0,1] : v/n;
 
 // Returns a vector of distance from each point in list and ref
 function distanceToPoint ( list, ref ) =
@@ -123,12 +128,13 @@ function circ_for_angle ( angle, radius ) = (180/PI)*(angle*radius);
 function angle_for_cut ( segment, radius ) = radius==0 ? 360 : 2*asin((segment/2)/radius);
 
 // https://stackoverflow.com/a/33920320
-// angle = atan2( ( b x a ) . n, a . b)
-function angle_vector ( a, b ) = let (
-    a3 = vec3(a),
-    b3 = vec3(b),
-    n3 = [0,0,1]
-) atan2 ( cross(b3,a3)*n3, a3*b3 );
+//    atan2( (Va x Vb) . Vn, Va . Vb)
+function angle_vector ( a, b ) =
+let ( va = vec3(a) )
+let ( vb = vec3(b) )
+let ( vc = cross(va,vb) )
+let ( vn = unit(vc) )
+atan2 ( vc*vn, va*vb );
 
 // Apply a rotation matrix on a 2D vector for given angle
 function rot2d ( v, a ) = [ [cos(a), -sin(a)], [sin(a), cos(a)] ]*v;
@@ -207,7 +213,7 @@ function wrinkle ( source, distance ) = let( last=len(source)-1 )
         n1  = c + distance/norm(cn)*cn,
         p2  = c + rot2d(p1-c,-90),
         n2  = c + rot2d(n1-c,+90),
-        a   = angle_vector( p2-c, n2-c )/2,
+        a   = sign(cross(n2-c,p2-c))*angle_vector( p2-c, n2-c )/2,
         n3  = c + rot2d(n2-c,a)/cos(a)
     ) n3
 ];
@@ -310,24 +316,3 @@ let(
     curValue = forceValueInRange ( current, 0 ),
     itemVal  = is_undef(col)     ? list[startIdx] : list[startIdx][col]
 ) startIdx>endIdx ? curValue : itemVal+__columnSum(list,col,startIdx+1,endIdx,curValue);
-
-// ----------------------------------------
-//                Showcase
-// ----------------------------------------
-module showLine( line ) {
-    lineBot = to_3d(line);
-    lineTop = transform( translation([0,0,1]), lineBot);
-    showPolyFaces = [ for ( i=[0:len(line)-2] ) [i,len(line)+i,len(line)+i+1,i+1] ];
-    polyhedron(points=concat(lineBot,lineTop), faces=showPolyFaces);
-}
-showPoly2wrinkle = [ [1,8], [2,7], [2,6], [1,5], [1,4], [2,3], [2,2], [1,2], [1,0.5], [2,0.5] ];
-color( "#66ff66" ) showLine( wrinkle(showPoly2wrinkle,-0.8) );
-color( "#99ff66" ) showLine( wrinkle(showPoly2wrinkle,-0.6) );
-color( "#ccff66" ) showLine( wrinkle(showPoly2wrinkle,-0.4) );
-color( "#ccff33" ) showLine( wrinkle(showPoly2wrinkle,-0.2) );
-color( "#66ffff" ) showLine( showPoly2wrinkle );
-color( "#ffff66" ) showLine( wrinkle(showPoly2wrinkle,+0.2) );
-color( "#ffff99" ) showLine( wrinkle(showPoly2wrinkle,+0.4) );
-color( "#ffffcc" ) showLine( wrinkle(showPoly2wrinkle,+0.6) );
-color( "#ffffff" ) showLine( wrinkle(showPoly2wrinkle,+0.8) );
-

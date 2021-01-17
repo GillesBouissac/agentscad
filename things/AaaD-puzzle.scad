@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, G.Bouissac
+ * Copyright (c) 2021, Gilles Bouissac
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,9 +12,11 @@
  * Author:      Gilles Bouissac
  */
 
+use <scad-utils/transformations.scad>
 use <agentscad/mesh.scad>
 use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
+use <agentscad/geometry.scad>
 use <agentscad/bevel.scad>
 use <agentscad/polyhedron/rhombicosidodecahedron.scad>
 
@@ -22,63 +24,71 @@ use <agentscad/polyhedron/rhombicosidodecahedron.scad>
 //             Rendering
 // ----------------------------------------
 
+R       = 80;   // Circumscribed sphere radius
+
 $fn     = 300;  // Joints precision
-R       = 80;   // circumscribed sphere radius
+$gap    = 0.08; // Tight joints
 
 // 0 - Render printable pentagon tile
 // 1 - Render printable square tile
 // 2 - Render printable triangle tile
 // 3 - Render printable pentagon to triangle joint
 // 4 - Render printable square to square joint
-// 5 - Render the rhombicosidodecahedron
-// 6 - Render a single joint for design/debug purpose
-showParts(5);
+// 5 - Render printable stand
+// 6 - Render all together
+// 7 - Render a single joint for design/debug purpose
+showParts(6);
 
 // ----------------------------------------
 //             Implementation
 // ----------------------------------------
 
-WALL_T  = R/30;  // tiles and joints thickness
-JOINT_H = R/5.5; // joints height
-$bevel  = 0.6;   // parts bevel size
+WALL_T  = roundDown(R/30,layer());     // tiles and joints thickness
+JOINT_H = R/5.5;                       // joints height
+CLUE_R  = WALL_T-gap();                // center clue on tiles: radius
+CLUE_T  = roundDown(WALL_T/2,layer()); // center clue on tiles: height
+$bevel  = 0.6;                         // parts bevel size
+
+
+function passageT(t) = t+2*gap();
 
 // Basic pentagon shape
-module ppentagon(r,e,t) {
+module ppentagon(r,e,t,g=gap()) {
     meshPolyhedron(meshFrustum(
-        meshRegularPolygon(5,circumscribedRadius(e-gap()/2,5)),
+        meshRegularPolygon(5,circumscribedRadius(e-g,5)),
         h=t,
         a=pva(r,e)
     ));
 }
 
 // Basic square shape
-module psquare(r,e,t) {
+module psquare(r,e,t,g=gap()) {
     meshPolyhedron(meshFrustum(
-        meshRegularPolygon(4,circumscribedRadius(e-gap()/2,4)),
+        meshRegularPolygon(4,circumscribedRadius(e-g,4)),
         h=t,
         a=sva(r,e)
     ));
 }
 
 // Basic triangle shape
-module ptriangle(r,e,t) {
+module ptriangle(r,e,t,g=gap()) {
     meshPolyhedron(meshFrustum(
-        meshRegularPolygon(3,circumscribedRadius(e-gap()/2,3)),
+        meshRegularPolygon(3,circumscribedRadius(e-g,3)),
         h=t,
         a=tva(r,e)
     ));
 }
 
 // Basic joint shape
-module jointRing(r,e,h,t,gap=0 ) {
+module jointRing(r,e,h,t) {
     jointRavr = (po(r,e)+r)/2;
     jointRext = jointRavr+h/2;
     jointRint = jointRavr-h/2;
 
     rotate([90,0,0])
     difference() {
-        cylinder(r=jointRext,h=t+gap,center=true);
-        cylinder(r=jointRint,h=2*t+gap,center=true);
+        cylinder(r=jointRext,h=t,center=true);
+        cylinder(r=jointRint,h=2*t,center=true);
     }
 }
 
@@ -91,13 +101,13 @@ module ptJointPassage(AaaD,h,t) {
     render()
     difference() {
         translate([0,0,-r])
-            jointRing(r,e,h,t,gap());
+            jointRing(r,e,h,passageT(t));
         multmatrix(j2p) {
-            translate([pv(e)/2-500-gap(),0,0])
+            translate([pv(e)/2-500-2*gap(),0,0])
             cube([1000,1000,1000],center=true);
         }
         multmatrix(j2t) {
-            translate([tv(e)/2-500-gap(),0,0])
+            translate([tv(e)/2-500-2*gap(),0,0])
             cube([1000,1000,1000],center=true);
         }
     }
@@ -113,11 +123,11 @@ module ssJointPassage(AaaD,h,t) {
     difference() {
         translate([0,0,-r])
             rotate([0,0,90])
-            jointRing(r,e,h,t,gap());
+            jointRing(r,e,h,passageT(t));
         cloneMirror([0,1,0])
             multmatrix(j2s)
             rotate([0,0,45])
-            translate([0,e/4-500-gap(),0])
+            translate([0,e/4-500-2*gap(),0])
             cube([1000,1000,1000],center=true);
     }
 }
@@ -144,8 +154,9 @@ module ptJoint(AaaD,h,t) {
                     translate([0,-500,0])
                     bevelCutLinear(1000,t);
             }
+            // mortise to receive pentagon
             translate([pv(e)/2-500,0,0])
-                cube([1000,1000,t+2*gap()],center=true);
+                cube([1000,1000,passageT(t)],center=true);
         }
         multmatrix(j2t) {
             translate([t+gap(),0,0]) {
@@ -155,11 +166,13 @@ module ptJoint(AaaD,h,t) {
                     translate([0,-500,0])
                     bevelCutLinear(1000,t);
             }
+            // mortise to receive triangle
             translate([tv(e)/2-500,0,0])
-                cube([1000,1000,t+2*gap()],center=true);
+                cube([1000,1000,passageT(t)],center=true);
         }
+        // mortise to receive ssJoint
         translate([0,0,+500-r+jointRavr-gap()/2])
-            cube([t+2*gap(),1000,1000],center=true);
+            cube([passageT(t),1000,1000],center=true);
         translate([jointRext,0,jointRext-r+mfg()])
             rotate([90,0,0])
             bevelCutArc(jointRext,t,360);
@@ -178,6 +191,16 @@ module ssJoint(AaaD,h,t) {
     jointRavr = (po(r,e)+r)/2;
     jointRext = jointRavr+h/2;
     jointRint = jointRavr-h/2;
+
+    cutplane = transform(
+        j2s*rotation([0,0,45]),
+        plane3([[0,t/2],[0,1]]) );
+    jointplane = plane3([[+t/2,0],[1,0]]);
+    lineToBevel = intersec_planes_2(jointplane,cutplane);
+    angle=angle_vector(lineToBevel[1],[0,0,1]);
+    vn=cross(lineToBevel[1],[0,0,1]);
+    bev=getRadiusBevel()/cos(60);
+
     color("#ccc")
     render()
     difference() {
@@ -188,18 +211,102 @@ module ssJoint(AaaD,h,t) {
             multmatrix(j2s)
             rotate([0,0,45]) {
                 translate([0,-500+t/2,0])
-                cube([1000,1000,1000],center=true);
+                    cube([1000,1000,1000],center=true);
+                // mortise to receive square
                 translate([0,e/4-500,0])
-                cube([1000,1000,t+2*gap()],center=true);
+                    cube([1000,1000,passageT(t)],center=true);
             }
+        // Bevel the vertical edge
+        cloneMirror([0,1,0])
+            translate(lineToBevel[0])
+            rotate(-angle,vn)
+            rotate([0,0,-60])
+            cube([bev,bev,100],center=true);
+        // mortise to receive ptJoint
         translate([0,0,-500-r+jointRavr+gap()/2])
-            cube([1000,t+2*gap(),1000],center=true);
+            cube([1000,passageT(t),1000],center=true);
         translate([0,jointRext,jointRext-r+mfg()])
             rotate([0,-90,0])
             bevelCutArc(jointRext,t,360);
         translate([0,0,-r-mfg()])
             rotate([0,-90,0])
             bevelCutArcConcave(jointRint,t,360);
+    }
+}
+
+module stand(AaaD,h,t) {
+    hp = h+4*gap();
+    r = getAaaDR(AaaD);
+    e = getAaaDE(AaaD);
+    jointRavr = (po(r,e)+r)/2;
+    jointRext = jointRavr+hp/2;
+    j2p = getAaaDV2P(AaaD);
+    j2t = j2p*getAaaDP2V(AaaD)[0]*getAaaDV2T(AaaD);
+    j2s = j2p*getAaaDP2E(AaaD)[0]*getAaaDE2S(AaaD);
+
+    color("sienna")
+    difference() {
+        translate([0,0,r/2])
+            cylinder(r1=2*r/3,r2=0,h=r, center=true);
+
+        translate([0,0,jointRext-po(r,e)+t])
+            rotate( [0,180,0] )
+            multmatrix(getAaaDP2V(AaaD)[0])
+            rotate( [0,0,180] )
+            multmatrix(j2p)
+                translate([0,0,-r/2])
+                meshPolyhedron(meshPrism(
+                    meshRegularPolygon(5,circumscribedRadius(e,5)),
+                    h=r
+                ));
+
+        translate([0,0,jointRext-po(r,e)+t])
+        rotate( [0,180,0] ){
+            for ( i=[0:4] ) {
+                rotate( [0,0,i*360/5] ) 
+                multmatrix(getAaaDP2V(AaaD)[0])
+                rotate( [0,0,180] ) {
+                    render(2)
+                    difference() {
+                        translate([0,0,-r])
+                            jointRing(r,e,hp,2*t);
+                        multmatrix(j2p)
+                            translate([t-gap(),0,0])
+                            translate([-500,0,0])
+                            cube(1000,center=true);
+                        multmatrix(j2t)
+                            translate([-500,0,0])
+                            cube(1000,center=true);
+                    }
+                    render(2)
+                    difference() {
+                        translate([10,0,-r])
+                            rotate([0,0,90])
+                            jointRing(r,e,hp,2*(t+10));
+                        cloneMirror([0,1,0])
+                            multmatrix(j2s)
+                            rotate([0,0,45])
+                            translate([0,-mfg(),0])
+                            translate([0,-500,0])
+                                cube(1000,center=true);
+                    }
+                    render(2)
+                    multmatrix(j2t)
+                        translate([0,0,-r/2])
+                        meshPolyhedron(meshPrism(
+                            meshRegularPolygon(3,circumscribedRadius(e,3)),
+                            h=r
+                        ));
+                    render(2)
+                    multmatrix(j2s)
+                        translate([0,0,-r/2])
+                        meshPolyhedron(meshPrism(
+                            meshRegularPolygon(4,circumscribedRadius(e,4)),
+                            h=r
+                        ));
+                }
+            }
+        }
     }
 }
 
@@ -223,50 +330,62 @@ module tileBevel(AaaD,t,n) {
 
 module tilePentagon(AaaD,h,t) {
     color("#ec0")
-    render()
-    difference() {
-        ppentagon(getAaaDR(AaaD),getAaaDE(AaaD),t);
-        for ( i=[0:4] )
-            rotate( [0,0,i*360/5] )
-            multmatrix(getAaaDP2V(AaaD)[0])
-            rotate( [0,0,180] ) {
-                ptJointPassage(AaaD,h,t);
-                ssJointPassage(AaaD,h,t);
-            }
-        tileBevel(AaaD,t,5);
+    render() {
+        difference() {
+            ppentagon(getAaaDR(AaaD),getAaaDE(AaaD),t);
+            for ( i=[0:4] )
+                rotate( [0,0,i*360/5] )
+                multmatrix(getAaaDP2V(AaaD)[0])
+                rotate( [0,0,180] ) {
+                    ptJointPassage(AaaD,h,t);
+                    ssJointPassage(AaaD,h,t);
+                }
+            tileBevel(AaaD,t,5);
+        }
+        // Sphere center clue
+        translate([0,0,-(t+CLUE_T)/2])
+            cylinder(r=CLUE_R, h=CLUE_T, center=true);
     }
 }
 
 module tileSquare(AaaD,h,t) {
     e2j = getAaaDS2E(AaaD)[0]*getAaaDE2P(AaaD)*getAaaDP2V(AaaD)[0];
     color("#ccc")
-    render()
-    difference() {
-        psquare(getAaaDR(AaaD),getAaaDE(AaaD),t);
-        cloneMirror([1,-1,0])
-        cloneMirror([1,1,0]) {
-            multmatrix(e2j)
-            rotate( [0,0,180] ) {
-                ptJointPassage(AaaD,h,t);
-                ssJointPassage(AaaD,h,t);
+    render() {
+        difference() {
+            psquare(getAaaDR(AaaD),getAaaDE(AaaD),t);
+            cloneMirror([1,-1,0])
+            cloneMirror([1,1,0]) {
+                multmatrix(e2j)
+                rotate( [0,0,180] ) {
+                    ptJointPassage(AaaD,h,t);
+                    ssJointPassage(AaaD,h,t);
+                }
             }
+            tileBevel(AaaD,t,4);
         }
-        tileBevel(AaaD,t,4);
+        // Sphere center clue
+        translate([0,0,-(t+CLUE_T)/2])
+            cylinder(r=CLUE_R, h=CLUE_T, center=true);
     }
 }
 
 module tileTriangle(AaaD,h,t) {
     color("#ec0")
-    render()
-    difference() {
-        ptriangle(getAaaDR(AaaD),getAaaDE(AaaD),t);
-        for ( i=[0:2] )
-            rotate( [0,0,i*360/3] )
-            multmatrix(getAaaDT2V(AaaD)[0]) {
-                ptJointPassage(AaaD,h,t);
-                ssJointPassage(AaaD,h,t);
-            }
-        tileBevel(AaaD,t,3);
+    render() {
+        difference() {
+            ptriangle(getAaaDR(AaaD),getAaaDE(AaaD),t);
+            for ( i=[0:2] )
+                rotate( [0,0,i*360/3] )
+                multmatrix(getAaaDT2V(AaaD)[0]) {
+                    ptJointPassage(AaaD,h,t);
+                    ssJointPassage(AaaD,h,t);
+                }
+            tileBevel(AaaD,t,3);
+        }
+        // Sphere center clue
+        translate([0,0,-(t+CLUE_T)/2])
+            cylinder(r=CLUE_R, h=CLUE_T, center=true);
     }
 }
 
@@ -275,12 +394,16 @@ module tileTriangle(AaaD,h,t) {
 // ----------------------------------------
 
 module showParts( part=0 ) {
+
     AaaD = newRhombicosidodecahedron(R);
 
     echo ( "D=", 2*getAaaDR(AaaD) );
     echo ( "E=", getAaaDE(AaaD) );
     echo ( "T=", WALL_T );
     echo ( "H=", JOINT_H );
+    echo ( "Passages =", passageT(WALL_T) );
+    echo ( "CLUE R=", CLUE_R );
+    echo ( "CLUE T=", CLUE_T );
 
     if ( part==0 ) {
         rotate([180,0,0])
@@ -289,7 +412,7 @@ module showParts( part=0 ) {
             text( "12x pentagon", halign="center", valign="center", size=5, $fn=100 );
     }
     else if ( part==1 ) {
-        rotate([180,0,0])
+        rotate([180,0,45])
             tileSquare(AaaD,JOINT_H,WALL_T);
         %translate([0,0,4])
             text( "30x square", halign="center", valign="center", size=5, $fn=100 );
@@ -313,6 +436,9 @@ module showParts( part=0 ) {
             text( "60x square/square joint", halign="center", valign="center", size=5, $fn=100 );
     }
     else if ( part==5 ) {
+        stand(AaaD,JOINT_H,WALL_T);
+    }
+    else if ( part==6 ) {
         // All together
         AaaDLayout(AaaD) {
             // First children placed at every pentagon location
@@ -334,8 +460,11 @@ module showParts( part=0 ) {
             // Third children placed at every triangle location
             tileTriangle(AaaD,JOINT_H,WALL_T);
         }
+        // Stand
+        translate( [0,0,-2*getAaaDR(AaaD)-3] )
+            stand(AaaD,JOINT_H,WALL_T);
     }
-    else if ( part==6 ) {
+    else if ( part==7 ) {
         // Single joint
         ori_2_p = getAaaDV2P(AaaD);
         ori_2_t = ori_2_p * getAaaDP2V(AaaD)[0] * getAaaDV2T(AaaD);

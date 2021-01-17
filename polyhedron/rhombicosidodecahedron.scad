@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, G.Bouissac
+ * Copyright (c) 2021, Gilles Bouissac
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,8 +20,8 @@ use <agentscad/extensions.scad>
 //                   API
 // ----------------------------------------
 
-// We use the shorcut AaaD for the Rhombicosidodecahedron
-// aaD is the conway transformation sequence to get a Rhombicosidodecahedron
+// We use the shortcut AaaD for the Rhombicosidodecahedron
+// aaD is the Conway transformation sequence to get a Rhombicosidodecahedron
 // btw aaD just gives the topology, polygons are not necessarily regular:
 //    https://en.wikipedia.org/wiki/Conway_polyhedron_notation
 //    https://levskaya.github.io/polyhedronisme/?recipe=aaD
@@ -246,36 +246,36 @@ IE   = 17;
 // ----------------------------------------
 
 module showParts() {
-    aaD = newRhombicosidodecahedron(50);
+    AaaD = newRhombicosidodecahedron(50);
 
-    AaaDLayout(aaD) {
+    AaaDLayout(AaaD) {
         WALL_T  = 3;
 
         // First children placed at every pentagon location
         // Can be anything else
         color("red")
         meshPolyhedron(meshFrustum(
-            meshRegularPolygon(5,circumscribedRadius(aaD[IE]-1,5)),
+            meshRegularPolygon(5,circumscribedRadius(AaaD[IE]-1,5)),
             h=WALL_T,
-            a=polyVertexAngle(aaD[IR],aaD[IE],5)
+            a=polyVertexAngle(AaaD[IR],AaaD[IE],5)
         ));
 
         // Second children placed at every square location
         // Can be anything else
         color("yellow")
         meshPolyhedron(meshFrustum(
-            meshRegularPolygon(4,circumscribedRadius(aaD[IE]-1,4)),
+            meshRegularPolygon(4,circumscribedRadius(AaaD[IE]-1,4)),
             h=WALL_T,
-            a=polyVertexAngle(aaD[IR],aaD[IE],4)
+            a=polyVertexAngle(AaaD[IR],AaaD[IE],4)
         ));
 
         // Third children placed at every triangle location
         // Can be anything else
         color("green")
         meshPolyhedron(meshFrustum(
-            meshRegularPolygon(3,circumscribedRadius(aaD[IE]-1,3)),
+            meshRegularPolygon(3,circumscribedRadius(AaaD[IE]-1,3)),
             h=WALL_T,
-            a=polyVertexAngle(aaD[IR],aaD[IE],3)
+            a=polyVertexAngle(AaaD[IR],AaaD[IE],3)
         ));
     }
 }
