@@ -17,6 +17,10 @@ use <agentscad/extensions.scad>
 use <agentscad/printing.scad>
 use <list-comprehension-demos/sweep.scad>
 
+
+// Demo: See test-snap-joint.scad and test-snap-joint-tutorial.scad
+
+
 // ----------------------------------------
 //                   API
 // ----------------------------------------
@@ -252,50 +256,4 @@ module snapJointCuts (joint) {
         rotate([0,0,a])
             snapJointCut(joint);
 }
-
-// ----------------------------------------
-//                Showcase
-// ----------------------------------------
-
-SHOW_INTERVAL = 0;
-
-module showSnapJointParts (part=0, sub_part=0, cut=undef, cut_rotation=undef) {
-
-    // One time snap joint, cannot be removed after insertion
-    joint_circ_ext_spring_i = newSnapCircleInt ( height=7, radius=7, leaves=5, spring_w=5 );
-    joint_circ_ext_spring_e = newSnapCircleExt ( source=joint_circ_ext_spring_i, springs=true, cutdistance=1 );
-
-    // Removable snap joint
-    joint_pent_i = newSnapPolygonInt ( radius=10, leaves=5, springs=true, cutdistance=3 );
-    joint_pent_e = newSnapPolygonExt ( source=joint_pent_i );
-
-    if ( part==0 ) {
-        intersection () {
-            union() {
-                translate( [-10,0,0] ) {
-                    translate( [0,0,SHOW_INTERVAL] )
-                    snapJoint ( joint_pent_i );
-                    snapJoint ( joint_pent_e );
-                }
-                translate( [+10,0,0] ) {
-                    translate( [0,0,SHOW_INTERVAL] )
-                    snapJoint ( joint_circ_ext_spring_i );
-                    snapJoint ( joint_circ_ext_spring_e );
-                }
-            }
-            color ( "#fff",0.1 )
-                rotate( [0,0,is_undef(cut_rotation)?0:cut_rotation] )
-                translate( [-500,is_undef(cut)?-500:cut,-500] )
-                cube( [1000,1000,1000] );
-        }
-    }
-}
-
-// part=0: mutiple parts at the same time
-//   cut/cut_rotation: cut position/rotation (ex:0) to see inside (undef for no cut)
-// $fn:    Rendering precision
-SMOOTH  = 100;
-FAST    = 20;
-LOWPOLY = 6;
-showSnapJointParts ( part=0, cut=0, cut_rotation=undef, $fn=SMOOTH );
 

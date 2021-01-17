@@ -13,6 +13,10 @@ use <list-comprehension-demos/skin.scad>
 use <scad-utils/lists.scad>
 use <agentscad/printing.scad>
 
+
+// Demo: See test-hirth-joint.scad
+
+
 // ----------------------------------------
 //                    API
 // ----------------------------------------
@@ -166,66 +170,3 @@ module hirthJointTooth ( profile, teeth, radius, angle, height ) {
     polyhedron(points,faces,convexity=10);
 }
 
-// ----------------------------------------
-//                 Showcase
-// ----------------------------------------
-PRECISION=100;
-
-translate( [0,0,0] ) {
-    difference() {
-        hirthJointSinus( 5, 11, 2, 1, 1, shift=0.5, $fn=PRECISION );
-        cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
-    }
-    %hirthJointPassage( 5, 2, 1, 1, $fn=PRECISION );
-}
-
-translate( [15,0,0] ) {
-    difference() {
-        hirthJointRectangle( 5, 11, 1, 1, 1, shift=0, $fn=PRECISION );
-        cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
-    }
-    %hirthJointPassage( 5, 1, 1, 1, $fn=PRECISION );
-}
-translate( [30,0,0] ) {
-    difference() {
-        hirthJointTriangle( 5, 11, 1, 1, 1, shift=0, $fn=PRECISION );
-        cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
-    }
-    %hirthJointPassage( 5, 1, 1, 1, $fn=PRECISION );
-}
-
-translate( [0,15,0] ) {
-    difference() {
-        union() {
-            hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=PRECISION );
-            translate( [0,0,3+0.01] )
-            rotate([0,180,0])
-                hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5, $fn=PRECISION );
-        }
-        cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
-    }
-}
-translate( [15,15,0] ) {
-    difference() {
-        union() {
-            hirthJointRectangle( 5, 11, 1, 1, 1, shift=0.5, $fn=PRECISION );
-            translate( [0,0,3+0.01] )
-            rotate([0,180,0])
-                hirthJointRectangle( 5, 11, 1, 1, 1, shift=0.5, $fn=PRECISION );
-        }
-        cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
-    }
-}
-translate( [30,15,0] ) {
-    difference() {
-        union() {
-            hirthJointTriangle( 5, 11, 1, 1, 1, shift=0.5, $fn=PRECISION );
-            translate( [0,0,3+0.01] )
-            rotate([0,180,0])
-                hirthJointTriangle( 5, 11, 1, 1, 1, shift=0.5, $fn=PRECISION );
-        }
-        cylinder(r=2.5,h=10, center=true, $fn=PRECISION);
-    }
-}
-
-echo ("test=", hirthJointProfileSinus(1) );

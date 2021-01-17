@@ -64,60 +64,74 @@ module hirthJointShow( part=0 ) {
             }
         }
     }
+
+    if ( part==0 || part==6 )
+    translate( [0,50,0] ) {
+        translate( [0,0,0] ) {
+            difference() {
+                hirthJointSinus( 5, 11, 2, 1, 1, shift=0.5 );
+                cylinder(r=2.5,h=10, center=true);
+            }
+            %hirthJointPassage( 5, 2, 1, 1 );
+        }
+
+        translate( [15,0,0] ) {
+            difference() {
+                hirthJointRectangle( 5, 11, 1, 1, 1, shift=0 );
+                cylinder(r=2.5,h=10, center=true);
+            }
+            %hirthJointPassage( 5, 1, 1, 1 );
+        }
+        translate( [30,0,0] ) {
+            difference() {
+                hirthJointTriangle( 5, 11, 1, 1, 1, shift=0 );
+                cylinder(r=2.5,h=10, center=true);
+            }
+            %hirthJointPassage( 5, 1, 1, 1 );
+        }
+
+        translate( [0,15,0] ) {
+            difference() {
+                union() {
+                    hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5 );
+                    translate( [0,0,3+0.01] )
+                    rotate([0,180,0])
+                        hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5 );
+                }
+                cylinder(r=2.5,h=10, center=true);
+            }
+        }
+        translate( [15,15,0] ) {
+            difference() {
+                union() {
+                    hirthJointRectangle( 5, 11, 1, 1, 1, shift=0.5 );
+                    translate( [0,0,3+0.01] )
+                    rotate([0,180,0])
+                        hirthJointRectangle( 5, 11, 1, 1, 1, shift=0.5 );
+                }
+                cylinder(r=2.5,h=10, center=true);
+            }
+        }
+        translate( [30,15,0] ) {
+            difference() {
+                union() {
+                    hirthJointTriangle( 5, 11, 1, 1, 1, shift=0.5 );
+                    translate( [0,0,3+0.01] )
+                    rotate([0,180,0])
+                        hirthJointTriangle( 5, 11, 1, 1, 1, shift=0.5 );
+                }
+                cylinder(r=2.5,h=10, center=true);
+            }
+        }
+
+        echo ("test=", hirthJointProfileSinus(1) );
+    }
+
 }
+
+$fn=50;
+
 difference() {
-    hirthJointShow( 0, $fn=50 );
-    cylinder( r=1.5+MARGIN/2, h=100, center=true, $fn=50 );
+    hirthJointShow( 0 );
+    cylinder( r=1.5+MARGIN/2, h=100, center=true );
 }
-
-/*
-$fn=100;
-
-// Sinusoidal profile
-//   Radius:       10 mm
-//   Nb tooth:     20
-//   Tooth height: 1.2 mm
-hirthJointSinus( 10, 21, 1.2 );
-
-// Sinusoidal profile with shoulder
-//   Radius:          10 mm
-//   Nb tooth:        20
-//   Tooth height:    1.2 mm
-//   Shoulder height: 2 mm
-hirthJointSinus( 10, 21, 1.2, 2 );
-
-// Sinusoidal profile with shoulder and inlay
-//   Radius:          10 mm
-//   Nb tooth:        20
-//   Tooth height:    1.2 mm
-//   Shoulder height: 2 mm
-//   Inlay height:    1 mm
-hirthJointSinus( 10, 21, 1.2, 2, 1 );
-
-// Triangle profile
-//   Radius:          10 mm
-//   Nb tooth:        20
-//   Tooth height:    1.2 mm
-//   Shoulder height: 2 mm
-//   Inlay height:    1 mm
-hirthJointTriangle( 10, 21, 1.2, 1, 1 );
-
-// Rectangle profile
-//   Radius:          10 mm
-//   Nb tooth:        20
-//   Tooth height:    1.2 mm
-//   Shoulder height: 2 mm
-//   Inlay height:    1 mm
-hirthJointRectangle( 10, 21, 1.2, 1, 1 );
-
-// Inlay passage
-//   Radius:          10 mm
-//   Inlay height:    1 mm
-difference() {
-    translate( [0,0,-2] )
-        cylinder( r=15, h=4, center=true );
-    hirthJointPassage( 10, 1 );
-}
-
-*/
-
