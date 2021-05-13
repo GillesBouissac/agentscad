@@ -26,8 +26,10 @@ module bevelCutLinear ( length, width, cut=CUTTER_W ) {
     rotate( [0,0,90] )
     rotate( [0,90,0] ) {
         // Cutter
-        translate ( [-width/2, -cut, 0] )
-            cube( [width,cut,length] );
+        if ( cut>0 ) {
+            translate ( [-width/2, -cut, 0] )
+                cube( [width,cut,length] );
+        }
         // Bevel
         if ( bevelActive() ) {
             cloneMirror([1,0,0])
