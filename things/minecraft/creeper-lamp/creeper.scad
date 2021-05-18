@@ -59,7 +59,7 @@ PART_FOOT = 11;
  *     2: cable cut
  *
  */
-showCase( part=PART_HEAD_FRONT, color=3, 0 );
+showCase( part=PART_ALL, color=0, 0 );
 
 //
 // This parameter has no incidence on final rendering
