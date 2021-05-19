@@ -11,6 +11,7 @@
  * Author:      Gilles Bouissac
  */
 
+SHADER_T = 1.2;
 
 CGREEN1 = "#005500";
 CGREEN2 = "#00d400";
@@ -25,7 +26,6 @@ HEAD_W = 120;
 HEAD_L = HEAD_W;
 HEAD_H = HEAD_W;
 
-SHADER_T = 1.2;
 WALL_THIN = 2;
 WALL_THICK = 4;
 

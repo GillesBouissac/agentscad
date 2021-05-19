@@ -20,7 +20,7 @@ use <creeper-lib.scad>
 include <creeper-const.scad>
 
 HEAD_HOLLOW_W = HEAD_W-2*SHADER_T;
-HEAD_HOLLOW_B = 2.6;
+HEAD_HOLLOW_B = 5.0;
 
 JOINT_W = 1.6;
 JOINT_H = JOINT_W*4/8;
@@ -35,7 +35,7 @@ JOINT_OFFSET = HEAD_W/2-1.4;
 GLUE_GAP = 0.1;
 
 module bevelHeadHollow() {
-    bevelCube(HEAD_HOLLOW_W, nobot=true, $bevel=HEAD_HOLLOW_B);
+    bevelCube(HEAD_W, nobot=true, $bevel=HEAD_HOLLOW_B);
 }
 
 module headShellHollow () {
@@ -147,7 +147,7 @@ module headGreen1( face=FACE_ALL ) {
 }
 
 module headGrey( face=FACE_ALL ) {
-    extrude = 2*SHADER_T; // 2* to allow interior beveling
+    extrude = HEAD_HOLLOW_B; // higher than SHADER_T to allow interior beveling
 
     color( CGREY )
     translate([0,0,HEAD_W/2])
@@ -200,7 +200,7 @@ module headGrey( face=FACE_ALL ) {
 }
 
 module headGreen2( face=FACE_ALL ) {
-    extrude = 2*SHADER_T; // 2* to allow interior beveling
+    extrude = HEAD_HOLLOW_B; // higher than SHADER_T to allow interior beveling
 
     color( CGREEN2 )
     translate([0,0,HEAD_W/2])
@@ -249,7 +249,7 @@ module headGreen2( face=FACE_ALL ) {
 }
 
 module headGreen3( face=FACE_ALL ) {
-    extrude = 2*SHADER_T; // 2* to allow interior beveling
+    extrude = HEAD_HOLLOW_B; // higher than SHADER_T to allow interior beveling
 
     color( CGREEN3 )
     translate([0,0,HEAD_W/2])
