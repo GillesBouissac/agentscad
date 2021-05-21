@@ -137,7 +137,7 @@ let ( vn = unit(vc) )
 atan2 ( vc*vn, va*vb );
 
 // Apply a rotation matrix on a 2D vector for given angle
-function rot2d ( v, a ) = [ [cos(a), -sin(a)], [sin(a), cos(a)] ]*v;
+function rot2d ( v, a ) = [ [cos(a), -sin(a)], [sin(a), cos(a)] ]*[ v[0], v[1] ];
 
 //
 // Project given list of vertices on a sphere using cylindrical projection
