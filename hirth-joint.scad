@@ -29,30 +29,30 @@ use <agentscad/printing.scad>
 // shift:    Number of tooth to rotate the resuting teeth set
 
 // Hirth Joint with sinusoidal profile
-module hirthJointSinus ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
+module hirthJointSinus ( rmax, teeth, height, shoulder=0, inlay=0, shift=0, rmin=undef ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
-    hirthJoint ( hirthJointProfileSinus(teeth), rmax, teeth, height, shoulder, inlay, shift );
+    hirthJoint ( hirthJointProfileSinus(teeth), rmax, teeth, height, shoulder, inlay, shift, rmin );
 }
 
 // Hirth Joint with triangular profile
-module hirthJointTriangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
+module hirthJointTriangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0, rmin=undef ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
-    hirthJoint ( hirthJointProfileTriangle(), rmax, teeth, height, shoulder, inlay, shift );
+    hirthJoint ( hirthJointProfileTriangle(), rmax, teeth, height, shoulder, inlay, shift, rmin );
 }
 
 // Hirth Joint with rectangular profile
-module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
+module hirthJointRectangle ( rmax, teeth, height, shoulder=0, inlay=0, shift=0, rmin=undef ) {
     alpha = atan( (height/2)/rmax );
     th = (rmax*tan(2*alpha)/cos(alpha));
     width = 2*PI*rmax/teeth;
 
-    hirthJoint ( hirthJointProfileRectangle(), rmax, teeth, height, shoulder, inlay, shift );
+    hirthJoint ( hirthJointProfileRectangle(), rmax, teeth, height, shoulder, inlay, shift, rmin );
 }
 
 module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
@@ -68,9 +68,9 @@ module hirthJointPassage ( rmax, height, shoulder=0, inlay=0 ) {
 
 NB_MIN_NOZZLE = 3; // Minimal nb nozzle pass for a tooth width
 
-module hirthJoint ( profile, rmax, teeth, height, shoulder=0, inlay=0, shift=0 ) {
+module hirthJoint ( profile, rmax, teeth, height, shoulder=0, inlay=0, shift=0, rmin=undef ) {
 
-    rmin  = NB_MIN_NOZZLE*nozzle()*teeth/(2*PI);
+    _rmin = is_undef(rmin) ? NB_MIN_NOZZLE*nozzle()*teeth/(2*PI) : rmin ;
     angle = 360/teeth;
     prf   = is_undef(profile) ? hirthJointProfileSinus(teeth) : profile;
 
@@ -82,13 +82,13 @@ module hirthJoint ( profile, rmax, teeth, height, shoulder=0, inlay=0, shift=0 )
             rotate( [0,0,a] )
                 hirthJointTooth( prf, teeth, rmax, angle, height );
         translate( [0,0,+height/2] )
-            cylinder( r=rmin, h=10*height, center=true );
+            cylinder( r=_rmin, h=10*height, center=true );
     }
     if ( shoulder>0 ) {
         translate( [0,0,+shoulder/2] )
         difference () {
             cylinder( r=rmax, h=shoulder,     center=true );
-            cylinder( r=rmin, h=10*shoulder, center=true );
+            cylinder( r=_rmin, h=10*shoulder, center=true );
         }
     }
     if ( inlay>0 ) {

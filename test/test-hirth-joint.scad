@@ -68,37 +68,30 @@ module hirthJointShow( part=0 ) {
     if ( part==0 || part==6 )
     translate( [0,50,0] ) {
         translate( [0,0,0] ) {
-            difference() {
-                hirthJointSinus( 5, 11, 2, 1, 1, shift=0.5 );
-                cylinder(r=2.5,h=10, center=true);
-            }
+            hirthJointSinus( 5, 11, 2, 1, 1, shift=0.5, rmin=0 );
             %hirthJointPassage( 5, 2, 1, 1 );
         }
 
         translate( [15,0,0] ) {
-            difference() {
-                hirthJointRectangle( 5, 11, 1, 1, 1, shift=0 );
-                cylinder(r=2.5,h=10, center=true);
-            }
+            hirthJointRectangle( 5, 11, 1, 1, 1, shift=0, rmin=2.5 );
             %hirthJointPassage( 5, 1, 1, 1 );
         }
         translate( [30,0,0] ) {
-            difference() {
-                hirthJointTriangle( 5, 11, 1, 1, 1, shift=0 );
-                cylinder(r=2.5,h=10, center=true);
-            }
+            hirthJointTriangle( 5, 11, 1, 1, 1, shift=0, rmin=4 );
             %hirthJointPassage( 5, 1, 1, 1 );
         }
 
         translate( [0,15,0] ) {
             difference() {
                 union() {
+                    // Automatic rmin
                     hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5 );
                     translate( [0,0,3+0.01] )
                     rotate([0,180,0])
                         hirthJointSinus( 5, 11, 1, 1, 1, shift=0.5 );
                 }
-                cylinder(r=2.5,h=10, center=true);
+                translate( [0,-500,0] )
+                    cube( 1000, center=true );
             }
         }
         translate( [15,15,0] ) {
