@@ -11,12 +11,12 @@
  * Author:      Gilles Bouissac
  */
 
-include <agentscad/things/pixeled/const.scad>
+use <agentscad/things/pixeled/const.scad>
 use <agentscad/things/pixeled/layout.scad>
 
 /**
  * $part:
- *   ALL
+ *   ALL()
  *   0: Cells only
  *   1: Caps only
  *   2: Nails only
@@ -26,7 +26,7 @@ use <agentscad/things/pixeled/layout.scad>
  *   5: Nails for printing
  * 
  * $subpart:
- *   ALL
+ *   ALL()
  *   0: part 0
  *   1: part 1
  *   etc...
@@ -37,15 +37,19 @@ use <agentscad/things/pixeled/layout.scad>
  *
  */
 
+// Cell size
+$pixel_w = 25;
+$pixel_h = 20;
+
 // Selection of what to display
-$part    = ALL;
-$subpart = ALL;
+$part    = ALL();
+$subpart = ALL();
 
 // Beveling is essentially to counter first layer overextrusion
 //   set this value to 0 to disable beveling
 $bevel = 0.3;
 
-layoutPixeledObject(PICKAXE_CELLS(), PICKAXE_NAILS(), PICKAXE_COLORS());
+layoutPixeledObject ( PICKAXE_CELLS(), PICKAXE_NAILS(), PICKAXE_COLORS() );
 
 
 COLOR_DARK_BROWN   = "#513c1a";

@@ -14,51 +14,50 @@
 use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
 use <agentscad/mesh.scad>
+use <agentscad/things/pixeled/const.scad>
 
-include <agentscad/things/pixeled/const.scad>
-
-NAIL_GAP = 0.15;
-NAIL_W = CELL_H/8-2*NAIL_GAP;
-NAIL_PROFILE = meshRegularPolygon(8, NAIL_W/(2*cos(45/2)));
-NAIL_PASSAGE_PROFILE = newMesh(wrinkle(getMeshVertices(NAIL_PROFILE), -NAIL_GAP, true), getMeshFaces(NAIL_PROFILE));
+function getNailGap() = 0.15;
+function getNailW() = getPixelH()/8-2*getNailGap();
+function getNailProfile() = meshRegularPolygon(8, getNailW()/(2*cos(45/2)));
+function getNailPassageProfile() = newMesh(wrinkle(getMeshVertices(getNailProfile()), -getNailGap(), true), getMeshFaces(getNailProfile()));
 
 // Horizontal and Vertical nail never cross each other
-NAIL_MARGIN_H = 0.1;
-NAIL_MAX_H = CELL_H/4-NAIL_MARGIN_H;
-NAIL_V_H = [+(NAIL_MAX_H-NAIL_W-2*layer()), -NAIL_MAX_H];
-NAIL_H_H = [-(NAIL_MAX_H-NAIL_W-2*layer()), +NAIL_MAX_H];
-
-module nail( l=NAIL_H ) {
-    rotate( [-90,0,0] )
-    rotate( [0,0,45/2] )
-        meshPolyhedron( meshExtrude( getMeshVertices(NAIL_PROFILE), l ));
-}
-module nailPassage( l=NAIL_H ) {
-    rotate( [-90,0,0] )
-    rotate( [0,0,45/2] )
-        meshPolyhedron( meshExtrude( getMeshVertices(NAIL_PASSAGE_PROFILE), l+2*gap() ));
-}
-module locateNailInLayer() {
-    x = CELL_W/2 - NAIL_W/2 - 2*(nozzle()+0.1);
-    translate ( [+x, 0, 0 ] )
-        children();
-    translate ( [-x, 0, 0 ] )
-        children();
-}
-module nailPassagesLayer( l=NAIL_H ) {
-    locateNailInLayer()
-        nailPassage(l);
-}
-module nailsLayer( l=NAIL_H ) {
-    locateNailInLayer()
-        nail(l);
-}
+function getNailMarginH() = 0.1;
+function getNailMaxH() = getPixelH()/4-getNailMarginH();
+function getNailVH() = [+(getNailMaxH()-getNailW()-2*layer()), -getNailMaxH()];
+function getNailHH() = [-(getNailMaxH()-getNailW()-2*layer()), +getNailMaxH()];
 
 // Index in nails layouts arrays
 IDX_TOP_NAILS = 0;
 IDX_LFT_NAILS = 1;
 IDX_BOT_NAILS = 2;
 IDX_RGT_NAILS = 3;
+
+module nail( l=getNailH() ) {
+    rotate( [-90,0,0] )
+    rotate( [0,0,45/2] )
+        meshPolyhedron( meshExtrude( getMeshVertices(getNailProfile()), l ));
+}
+module nailPassage( l=getNailH() ) {
+    rotate( [-90,0,0] )
+    rotate( [0,0,45/2] )
+        meshPolyhedron( meshExtrude( getMeshVertices(getNailPassageProfile()), l+2*gap() ));
+}
+module locateNailInLayer() {
+    x = getPixelW()/2 - getNailW()/2 - 2*(nozzle()+0.1);
+    translate ( [+x, 0, 0 ] )
+        children();
+    translate ( [-x, 0, 0 ] )
+        children();
+}
+module nailPassagesLayer( l=getNailH() ) {
+    locateNailInLayer()
+        nailPassage(l);
+}
+module nailsLayer( l=getNailH() ) {
+    locateNailInLayer()
+        nail(l);
+}
 
 function decomposeValues ( val, values, _i=0 ) = let (
     i = floor ( val / values[_i] ),
@@ -69,27 +68,27 @@ function decomposeValues ( val, values, _i=0 ) = let (
 module locateNailInCell( val ) {
     values = decomposeValues ( val, NAIL_VALS() );
     if ( values[IDX_TOP_NAILS] ) {
-        translate ( [0, 0, NAIL_V_H[0] ] )
+        translate ( [0, 0, getNailVH()[0] ] )
             children();
-        translate ( [0, 0, NAIL_V_H[1] ] )
+        translate ( [0, 0, getNailVH()[1] ] )
             children();
     }
     if ( values[IDX_LFT_NAILS] ) {
-        translate ( [0, 0, NAIL_H_H[0] ] )
+        translate ( [0, 0, getNailHH()[0] ] )
             rotate ( [0, 0, +90] ) children();
-        translate ( [0, 0, NAIL_H_H[1] ] )
+        translate ( [0, 0, getNailHH()[1] ] )
             rotate ( [0, 0, +90] ) children();
     }
     if ( values[IDX_BOT_NAILS] ) {
-        translate ( [0, 0, NAIL_V_H[0] ] )
+        translate ( [0, 0, getNailVH()[0] ] )
             rotate ( [0, 0, 180] ) children();
-        translate ( [0, 0, NAIL_V_H[1] ] )
+        translate ( [0, 0, getNailVH()[1] ] )
             rotate ( [0, 0, 180] ) children();
     }
     if ( values[IDX_RGT_NAILS] ) {
-        translate ( [0, 0, NAIL_H_H[0] ] )
+        translate ( [0, 0, getNailHH()[0] ] )
             rotate ( [0, 0, -90] ) children();
-        translate ( [0, 0, NAIL_H_H[1] ] )
+        translate ( [0, 0, getNailHH()[1] ] )
             rotate ( [0, 0, -90] ) children();
     }
 }
@@ -101,8 +100,8 @@ module partNails( part_layout, nails_layout, colors=[[],[]] ) {
         for ( j = [0:len(part_layout[i])-1] ) {
             let ( val = part_layout[i][j] )
             if ( val>=0 ) {
-                translate( [ (j-hx)*CELL_W, (hy-i)*CELL_W, 0 ] ) {
-                    color( getCellColor(colors, val) )
+                translate( [ (j-hx)*getPixelW(), (hy-i)*getPixelW(), 0 ] ) {
+                    color( getPixelColor(colors, val) )
                         locateNailInCell(nails_layout[i][j])
                             nailsLayer();
                 }
@@ -118,7 +117,7 @@ module partNailPassages( part_layout, nails_layout ) {
         for ( j = [0:len(part_layout[i])-1] ) {
             let ( val = part_layout[i][j] )
             if ( val>=0 ) {
-                translate( [ (j-hx)*CELL_W, (hy-i)*CELL_W, 0 ] ) {
+                translate( [ (j-hx)*getPixelW(), (hy-i)*getPixelW(), 0 ] ) {
                     locateNailInCell(nails_layout[i][j])
                         nailPassagesLayer();
                 }

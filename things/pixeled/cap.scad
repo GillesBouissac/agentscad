@@ -16,47 +16,50 @@ use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
 use <agentscad/mesh.scad>
 use <agentscad/bevel.scad>
+use <agentscad/things/pixeled/const.scad>
 
-include <agentscad/things/pixeled/const.scad>
+function getMinWidth() = (nozzle()+0.1);
+function getCapW() = getPixelW()-2*getMinWidth()-2*getRadiusBevel();
+function getCapInsert() = 2*layer();
+function getCapT() = 1;
 
-MIN_WIDTH = (nozzle()+0.1);
-CAP_W = CELL_W-2*MIN_WIDTH-2*getRadiusBevel();
-CAP_INSERT = 2*layer();
-CAP_T = 1;
+function getSnapR() = getCapW()/(2*sin(45));
+function getSnapH() = getPixelH()/2 - getCapInsert();
+function getSnapA() = 50;
 
-SNAP_R = CAP_W/(2*sin(45));
-SNAP_H = CELL_H/2 - CAP_INSERT;
-SNAP_A = 50;
+function getJointQuadI() = newSnapPolygonInt ( height=getSnapH(), radius=getSnapR(), spring_w=getPixelW()/5, cutdistance=getPixelW()/3, spring_a=getSnapA(), leaves=4, springs=true );
+function getJointQuadE() = newSnapPolygonExt ( source=getJointQuadI() );
+function getJointElevation() = getSnapJointVGap(getJointQuadE())+mfg();
 
-joint_quad_i = newSnapPolygonInt ( height=SNAP_H, radius=SNAP_R, spring_w=CELL_W/5, cutdistance=CELL_W/3, spring_a=SNAP_A, leaves=4, springs=true );
-joint_quad_e = newSnapPolygonExt ( source=joint_quad_i );
-joint_elevation = getSnapJointVGap(joint_quad_e)+mfg();
-
-drad = getSnapJointSpringW(joint_quad_e)-getSnapJointHGap(joint_quad_i);
-function getCapGripWidth() = CAP_W - 2*drad;
+function drad() = getSnapJointSpringW(getJointQuadE())-getSnapJointHGap(getJointQuadI());
+function getCapGripWidth() = getCapW() - 2*drad();
 
 module cap() {
+    elevation = getJointElevation();
+    jointI = getJointQuadI();
     gap = 2*gap();
-    translate( [0,0,joint_elevation] ) {
+    translate( [0,0,elevation] ) {
         intersection() {
-            snapJoint( joint_quad_i );
-            translate( [0,0,-500+SNAP_H] )
-                cube ( [CAP_W-gap,CAP_W-gap,1000], center=true );
+            snapJoint( jointI );
+            translate( [0,0,-500+getSnapH()] )
+                cube ( [getCapW()-gap,getCapW()-gap,1000], center=true );
         }
     }
     intersection() {
-        translate( [0,0,joint_elevation] )
-            snapJointShape ( joint_quad_i );
-        translate( [0,0,CELL_H/2-CAP_T/2+joint_elevation/2] )
-            cube ( [ CAP_W-gap, CAP_W-gap, CAP_T-joint_elevation], center=true );
+        translate( [0,0,elevation] )
+            snapJointShape ( jointI );
+        translate( [0,0,getPixelH()/2-getCapT()/2+elevation/2] )
+            cube ( [ getCapW()-gap, getCapW()-gap, getCapT()-elevation], center=true );
     }
 }
 
 module capPassage() {
-    translate( [0,0,+joint_elevation] )
-        snapJointHollow( joint_quad_e );
-    translate( [0,0,CELL_H/2-CAP_INSERT/2] )
-        cube ( [ CAP_W, CAP_W, CAP_INSERT+mfg()], center=true );
+    elevation = getJointElevation();
+    jointE = getJointQuadE();
+    translate( [0,0,+elevation] )
+        snapJointHollow( jointE );
+    translate( [0,0,getPixelH()/2-getCapInsert()/2] )
+        cube ( [ getCapW(), getCapW(), getCapInsert()+mfg()], center=true );
 }
 
 module partCaps( part_layout, colors=[[],[]] ) {
@@ -66,7 +69,7 @@ module partCaps( part_layout, colors=[[],[]] ) {
         for ( j = [0:len(part_layout[i])-1] ) {
             let ( val = part_layout[i][j] )
             if ( val>=0 ) {
-                translate( [ (j-hx)*CELL_W, (hy-i)*CELL_W, 0 ] )
+                translate( [ (j-hx)*getPixelW(), (hy-i)*getPixelW(), 0 ] )
                     color( getCapColor(colors, val) )
                     if ( isCellBicolor(val) ) {
                         cap();

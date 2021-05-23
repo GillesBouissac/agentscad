@@ -15,14 +15,14 @@ use <agentscad/snap-joint.scad>
 use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
 
-use <agentscad/things/pixeled/cell.scad>
+use <agentscad/things/pixeled/pixel.scad>
 use <agentscad/things/pixeled/cap.scad>
 use <agentscad/things/pixeled/nail.scad>
-include <agentscad/things/pixeled/const.scad>
+use <agentscad/things/pixeled/const.scad>
 
 /**
  * $part:
- *   ALL
+ *   ALL()
  *   0: Cells only
  *   1: Caps only
  *   2: Nails only
@@ -32,7 +32,7 @@ include <agentscad/things/pixeled/const.scad>
  *   5: Nails for printing
  * 
  * $subpart:
- *   ALL
+ *   ALL()
  *   0: part 0
  *   1: part 1
  *   etc...
@@ -45,14 +45,35 @@ include <agentscad/things/pixeled/const.scad>
 
 // Default parameters
 $bevel   = 0.3;
-$part    = ALL;
-$subpart = ALL;
+$part    = ALL();
+$subpart = ALL();
 $cut     = true;
 
+function mergedValue( parts, r, c, _p=0 ) =
+    parts[_p][r][c] != VAL_EMPTY() ? parts[_p][r][c] :
+    _p==len(parts)-1 ? VAL_EMPTY() : mergedValue(parts, r, c, _p+1)
+;
+
+function mergeParts( obj_parts ) = let(
+    nrow = len(obj_parts[0]),
+    ncol = len(obj_parts[0][0])
+) [
+    for ( r=[0:nrow-1] ) [
+        for ( c=[0:ncol-1] )
+            mergedValue(obj_parts, r, c)
+    ]
+];
+
 module layoutPixeledObject ( obj_parts, obj_nails, obj_colors ) {
-    _parts   = is_undef( $part ) ? ALL : $part;
-    _subpart = is_undef( $subpart ) ? ALL : $subpart;
+    _parts   = is_undef( $part ) ? ALL() : $part;
+    _subpart = is_undef( $subpart ) ? ALL() : $subpart;
     _cut     = is_undef( $cut ) ? false : $cut;
+
+    nrow = len(obj_parts[0]);
+    ncol = len(obj_parts[0][0]);
+    echo("Object width",  ncol * getPixelW() );
+    echo("Object height", nrow * getPixelW() );
+
     difference() {
         layoutPixeledPart ( obj_parts, obj_nails, obj_colors, _parts, _subpart );
         if ( _cut ) {
@@ -62,9 +83,9 @@ module layoutPixeledObject ( obj_parts, obj_nails, obj_colors ) {
     }
 }
 
-module layoutPixeledPart( obj_parts, obj_nails, obj_colors, parts=ALL, subpart=ALL ) {
+module layoutPixeledPart( obj_parts, obj_nails, obj_colors, parts=ALL(), subpart=ALL() ) {
     
-    if ( parts==ALL ) {
+    if ( parts==ALL() ) {
         layoutPixeledCells(obj_parts, obj_nails, obj_colors, subpart);
         layoutPixeledCaps(obj_parts, obj_nails, obj_colors, subpart);
         layoutPixeledNails(obj_parts, obj_nails, obj_colors, subpart);
@@ -98,7 +119,7 @@ module layoutPixeledPart( obj_parts, obj_nails, obj_colors, parts=ALL, subpart=A
 module layoutPixeledCells(obj_parts, obj_nails, obj_colors, subpart) {
     parts = obj_parts;
     nails = obj_nails;
-    if ( subpart==ALL )
+    if ( subpart==ALL() )
         difference() {
             for ( i = [0:len(parts)-1] )
                 difference() {
@@ -117,7 +138,7 @@ module layoutPixeledCells(obj_parts, obj_nails, obj_colors, subpart) {
 
 module layoutPixeledCaps(obj_parts, obj_nails, obj_colors, subpart) {
     parts = obj_parts;
-    if ( subpart==ALL )
+    if ( subpart==ALL() )
         for ( p = parts )
             partCaps(p, obj_colors);
     else
@@ -127,7 +148,7 @@ module layoutPixeledCaps(obj_parts, obj_nails, obj_colors, subpart) {
 module layoutPixeledNails(obj_parts, obj_nails, obj_colors, subpart) {
     parts = obj_parts;
     nails = obj_nails;
-    if ( subpart==ALL )
+    if ( subpart==ALL() )
         for ( i = [0:len(parts)-1] )
             partNails(parts[i], nails[i], obj_colors);
     else
@@ -140,12 +161,12 @@ module layoutPixeledCapTypes(obj_parts, obj_nails, obj_colors, subpart) {
 }
 
 module layoutPixeledNailTypes(obj_parts, obj_nails, obj_colors, subpart) {
-    if ( subpart==0 || subpart==ALL )
-        nail ( 2*NAIL_H );
-    if ( subpart==1 || subpart==ALL )
-        translate( [CELL_W/2, 0, 0] )
-        nail ( 3*NAIL_H );
-    if ( subpart==2 || subpart==ALL )
-        translate( [CELL_W, 0, 0] )
-        nail ( 5*NAIL_H );
+    if ( subpart==0 || subpart==ALL() )
+        nail ( 2*getNailH() );
+    if ( subpart==1 || subpart==ALL() )
+        translate( [getPixelW()/2, 0, 0] )
+        nail ( 3*getNailH() );
+    if ( subpart==2 || subpart==ALL() )
+        translate( [getPixelW(), 0, 0] )
+        nail ( 5*getNailH() );
 }

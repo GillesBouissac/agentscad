@@ -11,12 +11,12 @@
  * Author:      Gilles Bouissac
  */
 
-include <agentscad/things/pixeled/const.scad>
+use <agentscad/things/pixeled/const.scad>
 use <agentscad/things/pixeled/layout.scad>
 
 /**
  * $part:
- *   ALL
+ *   ALL()
  *   0: Cells only
  *   1: Caps only
  *   2: Nails only
@@ -26,7 +26,7 @@ use <agentscad/things/pixeled/layout.scad>
  *   5: Nails for printing
  * 
  * $subpart:
- *   ALL
+ *   ALL()
  *   0: part 0
  *   1: part 1
  *   etc...
@@ -37,9 +37,13 @@ use <agentscad/things/pixeled/layout.scad>
  *
  */
 
+// Custom sizes
+$pixel_w = 30;
+$pixel_h = 20;
+
 // Selection of what to display
-$part    = ALL;
-$subpart = ALL;
+$part    = ALL();
+$subpart = ALL();
 
 // Beveling is essentially to counter first layer overextrusion
 //   set this value to 0 to disable beveling

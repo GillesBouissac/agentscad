@@ -11,11 +11,13 @@
  * Author:      Gilles Bouissac
  */
 
-CELL_W = 25;
-CELL_H = 20;
-NAIL_H = CELL_W/2; // Height of an elementary nail in a cell
 
-ALL = -1; // Used to render all parts or subparts
+function getPixelW() = is_undef($pixel_w) ? 25 : $pixel_w;
+function getPixelH() = is_undef($pixel_h) ? 20 : $pixel_h;
+function getNailH() = getPixelW()/2;
+
+// Used to render all parts or subparts
+function ALL() = -1;
 
 // Empty value in any layout
 function VAL_EMPTY() = -1;
@@ -55,6 +57,6 @@ function getLayoutColor( mapping, v, _i=0 ) =
     _i<len(mapping) ? getLayoutColor( mapping, v, _i+1 ) :
     "#FFFFFFFF"
 ;
-function getCellColor( colors, v ) = getLayoutColor( colors[IDX_COLOR_CELL()], v );
+function getPixelColor( colors, v ) = getLayoutColor( colors[IDX_COLOR_CELL()], v );
 function getCapColor( colors, v ) = getLayoutColor( colors[IDX_COLOR_CAP()], v );
 
