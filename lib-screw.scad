@@ -117,7 +117,7 @@ module libBoltHexagonalPassage( p ) {
 // Bolt with Allen head
 //  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  bt   : Bevel top of head
-module libBoltAllen( p, bt=true ) {
+module libBoltAllen( p, bt=true, bb=false ) {
     // +gap() for easier fitting with the tool
     tool_r   = p[I_ATS]/(2*cos(30))+gap();
     cone_h   = tool_r/2*tan(30);
@@ -133,12 +133,14 @@ module libBoltAllen( p, bt=true ) {
             translate( [0,0,-p[I_AHL]/2] )
             intersection() {
                 cylinder( r=p[I_AHD]/2, h=p[I_AHL], center=true );
-                libBevelShape(
-                    p[I_AHL],
-                    p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A),
-                    a=BEVEL_ALLEN_A,
-                    t=false,
-                    b=bt);
+                if (bt||bb)
+                    libBevelShape(
+                        p[I_AHL],
+                        p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A),
+                        a=BEVEL_ALLEN_A,
+                        t=bb,
+                        b=bt
+                    );
             }
         }
         translate( [0,0,-p[I_AHL]-VGG] ) {
@@ -166,9 +168,9 @@ module libBoltHexagonal( p, bt=true, bb=true ) {
         );
         translate( [0,0,-local_hhl/2 ] )
         intersection() {
-            // -gap() for easier fitting with the tool
             cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
-            libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
+            if (bt||bb)
+                libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
         }
     }
 }
@@ -186,7 +188,8 @@ module libNutHexagonal( p, bt=true, bb=true ) {
                 cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
                 cylinder( r=p[I_TAP]/2,  h=local_hhl+VGG, center=true );
             }
-            libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
+            if (bt||bb)
+                libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
         }
 }
 
@@ -205,8 +208,8 @@ module libNutSquare( p, bt=true, bb=true ) {
                 cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
                 cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
             }
-            // libBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
-            libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
+            if (bt||bb)
+                libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
             cylinder( r=(local_shd-gap())/(2*cos(45))-p[I_TD]/10,  h=local_shl, center=true );
         }
 }
@@ -243,7 +246,7 @@ let (
     filtered = [ for (a=sorted) if (a[0]!=EXCLUDED) a ],
     idx      = len(filtered)==0 ? undef : filtered[0][1]
 )
-libScrewDataCompletion(
+is_undef(idx) ? undef : libScrewDataCompletion(
     data = data,
     idx  = idx,
     n    = undef,
@@ -369,7 +372,8 @@ module libNutHexagonalThreaded( screw, bt=true, bb=true ) {
         // -gap() for easier fitting with the tool
         translate( [0,0,local_hhl/2 ] )
             cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
-        translate( [0,0,local_hhl/2 ] )
+        if (bt||bb)
+            translate( [0,0,local_hhl/2 ] )
             libBevelShape( local_hhl, screw[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
         libThreadInternal ( screw, local_hhl, t=10*local_hhd );
     }
@@ -385,11 +389,11 @@ module libNutSquareThreaded( screw, bt=true, bb=true ) {
         // -gap() for easier fitting with the tool
         translate( [0,0,+local_shl/2 ] )
         cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
-        // libBevelShape( local_shl, local_shd-gap(), a=BEVEL_SQUARE_A, b=false );
+        if (bt||bb)
+            translate( [0,0,+local_shl/2 ] )
+            libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*screw[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
         translate( [0,0,+local_shl/2 ] )
-        libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*screw[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
-        translate( [0,0,+local_shl/2 ] )
-        cylinder( r=(local_shd-gap())/(2*cos(45))-screw[I_TD]/10,  h=local_shl, center=true );
+            cylinder( r=(local_shd-gap())/(2*cos(45))-screw[I_TD]/10,  h=local_shl, center=true );
         libThreadInternal ( screw, local_shl, t=10*local_shd );
     }
 }
@@ -405,10 +409,10 @@ module libBoltHexagonalThreaded( screw, bt=true, bb=true ) {
 
 // Bolt with Allen head
 //  bt   : Bevel top of head
-module libBoltAllenThreaded( screw, bt=true ) {
+module libBoltAllenThreaded( screw, bt=true, bb=false ) {
     libThreadExternal ( screw );
     translate([0,0,0])
-        libBoltAllen(screwClone(data=undef,p=screw,tl=0),bt=bt);
+        libBoltAllen(screwClone(data=undef,p=screw,tl=0),bt=bt,bb=bb);
 }
 
 // ----------------------------------------
