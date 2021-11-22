@@ -117,6 +117,7 @@ module libBoltHexagonalPassage( p ) {
 // Bolt with Allen head
 //  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  bt   : Bevel top of head
+//  bb   : Bevel bottom of head (thread side)
 module libBoltAllen( p, bt=true, bb=false ) {
     // +gap() for easier fitting with the tool
     tool_r   = p[I_ATS]/(2*cos(30))+gap();
@@ -130,17 +131,11 @@ module libBoltAllen( p, bt=true, bb=false ) {
                 0,         0,
                 0,         0
             );
-            translate( [0,0,-p[I_AHL]/2] )
             intersection() {
-                cylinder( r=p[I_AHD]/2, h=p[I_AHL], center=true );
+                translate( [0,0,-p[I_AHL]/2] )
+                    cylinder( r=p[I_AHD]/2, h=p[I_AHL], center=true );
                 if (bt||bb)
-                    libBevelShape(
-                        p[I_AHL],
-                        p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A),
-                        a=BEVEL_ALLEN_A,
-                        t=bb,
-                        b=bt
-                    );
+                    libBoltAllenBevel(p, bt, bb);
             }
         }
         translate( [0,0,-p[I_AHL]-VGG] ) {
@@ -151,11 +146,25 @@ module libBoltAllen( p, bt=true, bb=false ) {
         }
     }
 }
+// Bevelling for bolt with Allen head
+//  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head (thread side)
+module libBoltAllenBevel( p, bt=true, bb=false ) {
+    translate( [0,0,-p[I_AHL]/2] )
+        libBevelShape(
+            p[I_AHL],
+            p[I_AHD]-2*(p[I_TD]/10)/tan(BEVEL_ALLEN_A),
+            a=BEVEL_ALLEN_A,
+            t=bb,
+            b=bt
+        );
+}
 
 // Bolt with Hexagonal head
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
 //  bt   : Bevel top of head
-//  bb   : Bevel bottom of head
+//  bb   : Bevel bottom of head (thread side)
 module libBoltHexagonal( p, bt=true, bb=true ) {
     local_tl  = p[I_TL] ;
     local_hhd = p[I_HHD] ;
@@ -166,59 +175,88 @@ module libBoltHexagonal( p, bt=true, bb=true ) {
             0,       0,
             0,       0
         );
-        translate( [0,0,-local_hhl/2 ] )
         intersection() {
-            cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
+            translate( [0,0,-local_hhl/2 ] )
+                cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
             if (bt||bb)
-                libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
+                libBoltHexagonalBevel(p, bt, bb);
         }
     }
+}
+// Bevelling for bolt with Hexagonal head
+//  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head (thread side)
+module libBoltHexagonalBevel( p, bt=true, bb=true ) {
+    local_hhl = p[I_HHL] ;
+    translate( [0,0,-local_hhl/2 ] )
+        libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
 }
 
 // Hexagonal nut
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  Note : This passage will prevent nut from turning
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
 module libNutHexagonal( p, bt=true, bb=true ) {
     local_hhd = p[I_HHD] ;
     local_hhl = p[I_HHL] ;
-    translate( [0,0,+local_hhl/2 ] )
-        intersection() {
+    intersection() {
+        translate( [0,0,+local_hhl/2 ] )
             difference() {
                 // -gap() for easier fitting with the tool
                 cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
                 cylinder( r=p[I_TAP]/2,  h=local_hhl+VGG, center=true );
             }
             if (bt||bb)
-                libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
+                libNutHexagonalBevel(p, bt, bb);
         }
+}
+// Bevelling for Hexagonal nut
+//  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
+module libNutHexagonalBevel( p, bt=true, bb=true ) {
+    local_hhl = p[I_HHL] ;
+    translate( [0,0,+local_hhl/2 ] )
+        libBevelShape( local_hhl, p[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
 }
 
 // Square nut
 //  p    : bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
-//  shl  : square head length, <0 means use default hexagonal head length from p
-//  Note : This passage will prevent nut from turning
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
 module libNutSquare( p, bt=true, bb=true ) {
     local_shd = p[I_HTS] ;
     local_shl = p[I_HHL] ;
 
-    translate( [0,0,+local_shl/2 ] )
-        intersection() {
+    intersection() {
+        translate( [0,0,+local_shl/2 ] )
             difference() {
                 // -gap() for easier fitting with the tool
                 cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
                 cylinder( r=p[I_TAP]/2,  h=local_shl, center=true );
             }
-            if (bt||bb)
-                libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
-            cylinder( r=(local_shd-gap())/(2*cos(45))-p[I_TD]/10,  h=local_shl, center=true );
-        }
+        if (bt||bb)
+            libNutSquareBevel(p, bt, bb);
+        cylinder( r=(local_shd-gap())/(2*cos(45))-p[I_TD]/10,  h=2*local_shl, center=true );
+    }
+}
+// Bevelling for Square nut
+//  p    : Bolt params (M1_6(), M2(), M2_5(), M3(), etc...)
+//  bt   : Bevel top of head
+//  bb   : Bevel bottom of head
+module libNutSquareBevel( p, bt=true, bb=false ) {
+    local_shd = p[I_HTS] ;
+    local_shl = p[I_HHL] ;
+    translate( [0,0,+local_shl/2 ] )
+        libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*p[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
 }
 
 // l    : head length
 // d    : diameter or tangent circle on top of head
 // a    : beveling angle
-// t    : true to get the top bevel
 // b    : true to get the bottom bevel
+// t    : true to get the top bevel
 module libBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
     h  = (d/2)*tan(a);
     r  = (l+h)/tan(a);
@@ -373,8 +411,7 @@ module libNutHexagonalThreaded( screw, bt=true, bb=true ) {
         translate( [0,0,local_hhl/2 ] )
             cylinder( r=(local_hhd-gap())/2, h=local_hhl, center=true, $fn=6 );
         if (bt||bb)
-            translate( [0,0,local_hhl/2 ] )
-            libBevelShape( local_hhl, screw[I_HTS]-2*gap()*cos(30), b=bt, t=bb );
+            libNutHexagonalBevel(screw,bt,bb);
         libThreadInternal ( screw, local_hhl, t=10*local_hhd );
     }
 }
@@ -390,8 +427,7 @@ module libNutSquareThreaded( screw, bt=true, bb=true ) {
         translate( [0,0,+local_shl/2 ] )
         cube( [local_shd-gap(),local_shd-gap(),local_shl], center=true );
         if (bt||bb)
-            translate( [0,0,+local_shl/2 ] )
-            libBevelShape( local_shl, (local_shd-gap())/cos(45)-5*screw[I_TD]/10, a=BEVEL_SQUARE_A, b=bt, t=bb );
+            libNutSquareBevel(screw,bt,bb);
         translate( [0,0,+local_shl/2 ] )
             cylinder( r=(local_shd-gap())/(2*cos(45))-screw[I_TD]/10,  h=local_shl, center=true );
         libThreadInternal ( screw, local_shl, t=10*local_shd );
