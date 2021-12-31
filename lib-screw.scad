@@ -272,7 +272,7 @@ module libBevelShape( l, d, a=BEVEL_HEXA_A, b=true, t=true ) {
     }
 }
 
-// Guess what is the better standard thread from the given one
+// Guess what is the better standard thread from the given thread diameter (td)
 //   if td>0: will pick the first screw larger than the given value
 //   if td<0: will pick the first screw smaller than the given value
 EXCLUDED=1e100;
@@ -331,6 +331,7 @@ function screwGetTapD(s)                = s[I_TAP];
 function screwGetPitch(s)               = s[I_TP];
 function screwGetThreadD(s)             = s[I_TD];
 function screwGetThreadDP(s)            = s[I_TDP];
+function screwGetThreadMinD(s)          = s[I_TMN];
 function screwGetThreadMaxD(s)          = s[I_TMX];
 function screwGetThreadL(s)             = s[I_TL];
 function screwGetThreadLP(s)            = s[I_TLP];
@@ -495,9 +496,10 @@ I_HHD    = 13; // Head Diameter for Hexagonal head
 I_HHL    = 14; // Head Length for Hexagonal head
 I_HTS    = 15; // Hexagonal Tool Size
 I_PRF    = 16; // Profile type
-I_TMX    = 17; // Thread Maximal Diameter
-I_PRFM   = 18; // Metric or UTS profile data
-I_PRFW   = 19; // Whitworth profile data
+I_TMN    = 17; // Thread Minimal Diameter
+I_TMX    = 18; // Thread Maximal Diameter
+I_PRFM   = 19; // Metric or UTS profile data
+I_PRFW   = 20; // Whitworth profile data
 
 PROFILE_M = "M"; // Metric or UTS profile
 PROFILE_W = "W"; // Whitworth profile
@@ -544,7 +546,8 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     WCmin     = [ WRBot+WRadius, local_p*1/4 ],
     WCmaj     = [ WRTop-WRadius, local_p*3/4 ],
 
-    // Thread maximal diameter
+    // Thread min/maximal diameters
+    local_tmn = local_prf==PROFILE_M ? 2*MRBot : 2*WRBot,
     local_tmx = local_prf==PROFILE_M ? 2*MRTop : 2*WRTop,
 
     // Passage is +gap() on thread maximal radius
@@ -567,6 +570,7 @@ function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=
     local_hhl,                 // HHL
     local_hts,                 // HTS
     local_prf,                 // PRF
+    local_tmn,                 // TMN
     local_tmx,                 // TMX
     // M screw profile data
     [ MRmin,MRmaj,MFmin,MFmaj,MRRmin,MRRmaj,MCmin,MCmaj,MRpitch ],
