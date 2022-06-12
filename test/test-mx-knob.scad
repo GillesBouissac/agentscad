@@ -21,7 +21,7 @@ use <../mx-screw.scad>
 
 module mxKnobTest() {
     translate([+60,+30,0]) {
-        mxKnob ( M12(), 50, 100 );
+        mxKnob ( M12(), 50, 100, cap_height=30 );
         rotate( [180,0,0] )
             %mxBoltHexagonal ( M12() );
     }

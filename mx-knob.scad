@@ -26,12 +26,14 @@ CAP_GRIP        = 0.3; // Amount of overlap between cap grips and knob handle
 HANDLE_CAP_GAP  = 10;
 
 // Knob that for mx hexagonal screw
-// - screw:    the screw: M2(), M3() etc...
-// - diameter: required diameter, can be larger if the screw don't fit
-//             computed from screw dimensions if -1
-// - height:   required total height, can be larger if the screw don't fit
-//             computed from screw dimensions if -1
-module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
+// - screw:      the screw: M2(), M3() etc...
+// - diameter:   required diameter, can be larger if the screw don't fit
+//               computed from screw dimensions if -1
+// - height:     required total height, can be larger if the screw don't fit
+//               computed from screw dimensions if -1
+// - cap_height: required total height for the fap
+//               computed if -1
+module mxKnob( screw, diameter=-1, height=-1, part=0, cap_height=-1 ) {
     bottom_t    = mxGetHeadDP(screw)/3;
     wall_t      = mxGetHeadDP(screw)/4;
 
@@ -45,7 +47,7 @@ module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
     knob_r    = diameter/2>knob_r_min ? diameter/2 : knob_r_min;
 
     cap_r     = min(knob_r-wall_t,base_r);
-    cap_h     = min(cap_r, knob_h-base_h-NOZZLE);
+    cap_h     = cap_height==-1 ? min(cap_r, knob_h-base_h-NOZZLE) : cap_height;
 
     if ( part==0 ) {
         translate( [0,0,knob_h+min(HANDLE_CAP_GAP,cap_h)] )
