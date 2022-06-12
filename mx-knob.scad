@@ -18,11 +18,12 @@ use <bevel.scad>
 //    API
 //
 // ----------------------------------------
-MFG      = 0.01;  // ManiFold Guard
-VGG      = 1;     // Visual Glich Guard
-MARGIN   = 0.2;
-NOZZLE   = 0.4;
-CAP_GRIP = 0.3; // Amount of overlap between cap grips and knob handle
+MFG             = 0.01;  // ManiFold Guard
+VGG             = 1;     // Visual Glich Guard
+MARGIN          = 0.2;
+NOZZLE          = 0.4;
+CAP_GRIP        = 0.3; // Amount of overlap between cap grips and knob handle
+HANDLE_CAP_GAP  = 10;
 
 // Knob that for mx hexagonal screw
 // - screw:    the screw: M2(), M3() etc...
@@ -43,11 +44,11 @@ module mxKnob( screw, diameter=-1, height=-1, part=0 ) {
     knob_h    = height>knob_h_min     ? height : knob_h_min;
     knob_r    = diameter/2>knob_r_min ? diameter/2 : knob_r_min;
 
-    cap_h     = knob_h-base_h-NOZZLE;
     cap_r     = min(knob_r-wall_t,base_r);
+    cap_h     = min(cap_r, knob_h-base_h-NOZZLE);
 
     if ( part==0 ) {
-        translate( [0,0,-cap_h+2*knob_h] )
+        translate( [0,0,knob_h+min(HANDLE_CAP_GAP,cap_h)] )
             color ( "white" )
             mxKnobCap ( cap_r, cap_h, screw, wall_t );
         mxKnobHandle ( knob_r, knob_h, bottom_t, base_r, base_h, cap_r, cap_h, screw, wall_t );
@@ -110,8 +111,10 @@ module mxKnobHandleShape ( knob_r, knob_h, cap_r, screw, thickness ) {
     sphere_r = knob_r*1.2;
     intersection() {
         cylinder( r=knob_r, h=knob_h );
-        translate( [0,0,sphere_r+thickness/2] )
+        translate( [0,0,sphere_r+thickness/2] ) {
             sphere( r=sphere_r );
+            cylinder( r=sphere_r, h=knob_h );
+        }
     }
 }
 
