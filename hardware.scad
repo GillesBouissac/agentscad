@@ -13,9 +13,12 @@
 use <agentscad/extensions.scad>
 use <agentscad/printing.scad>
 use <agentscad/bevel.scad>
+use <scad-utils/shapes.scad>
+use <scad-utils/transformations.scad>
+use <list-comprehension-demos/skin.scad>
 
 // ----------------------------------------
-//                   API
+//              API - ZIP TIE
 // ----------------------------------------
 
 // tw:  Tie width
@@ -89,7 +92,153 @@ module zipConduitHollow ( zip ) {
 }
 
 // ----------------------------------------
-//             Implementation
+//            API - ER Collets
+// ----------------------------------------
+// https://sc01.alicdn.com/kf/HTB1E20DLVXXXXXdXVXXq6xXFXXXv/222369115/HTB1E20DLVXXXXXdXVXXq6xXFXXXv.jpg
+
+// Creates a new collet object
+//
+// D: Collet external diameter / Reference
+// d: Grip/internal diameter
+function newERCollet ( D=11, d=7 ) = ERColletData(D, d);
+function newER8  ( d= 5 ) = newERCollet( 8, d);
+function newER11 ( d= 7 ) = newERCollet(11, d);
+function newER16 ( d=10 ) = newERCollet(16, d);
+function newER20 ( d=13 ) = newERCollet(20, d);
+function newER25 ( d=16 ) = newERCollet(25, d);
+function newER32 ( d=20 ) = newERCollet(32, d);
+function newER40 ( d=26 ) = newERCollet(40, d);
+function newER50 ( d=34 ) = newERCollet(50, d);
+
+
+// Render the collet
+//
+// collet:  Collet created with newERxxxx functions
+// wings:   Number of wings, auto computed if undef
+// slot:    Slots width, auto computed if undef
+// gap:     Gap around the shape, no gap if undef
+module ERCollet ( collet, wings=undef, slot=undef ) {
+    difference() {
+        ERColletShape  ( collet );
+        ERColletHollow ( collet, wings, slot );
+    }
+}
+
+// Render the collet shape
+//
+// collet:  Collet created with newERxxxx functions
+module ERColletShape ( collet ) {
+    class = assertClass(collet,classERCollet());
+    rl1   = collet[IER_D]/2;
+    rl2   = collet[IER_D2]/2;
+    overguard = (rl1-rl2)/tan(overhang());
+    rbase = collet[IER_DB]/2;
+    rtop  = collet[IER_DT]/2;
+    rmidbot  = rl1;
+    rmidtop  = rl1;
+    skin ([
+        transform( translation([0,0,0]), circle(rbase)),
+        transform( translation([0,0,collet[IER_L1]]), circle(rmidbot)),
+        transform( translation([0,0,collet[IER_L1]+overguard]), circle(rl2)),
+        transform( translation([0,0,collet[IER_L]-collet[IER_L3]]), circle(rl2)),
+        transform( translation([0,0,collet[IER_L]-collet[IER_L3]]), circle(rmidtop)),
+        transform( translation([0,0,collet[IER_L]]), circle(rtop))
+    ]);
+}
+
+// Render the collet hollow part
+//
+// collet:  Collet created with newERxxxx functions
+// wings:   Number of wings, auto computed if undef
+// slot:    Slots width, auto computed if undef
+ER_WINGS_MAX = 8;
+module ERColletHollow ( collet, wings=undef, slot=undef ) {
+    class = assertClass(collet,classERCollet());
+    // rg: radius of tool (grip)
+    rg = collet[IER_DG]/2;
+
+    // sl: slot width linear
+    slmin = (PI*rg/90)*asin(collet[IER_SMIN]/(2*rg));
+
+    // nl: nozzle linear
+    nl = (PI*rg/90)*asin(nozzle()/(2*rg));
+
+    // wl: wing width linear
+    wlmin = 2*slmin + 2*nl;
+
+    // wn: number of wings
+    wn = is_undef(wings) ? min(ER_WINGS_MAX, floor(2*PI*rg/wlmin) ) : wings;
+    wl = 2*PI*rg/wn;
+    sl = (wl-2*nl)/2;
+
+    // s: slot width straight
+    scomputed = 2*rg*sin(sl/(PI*rg/90));
+    s = is_undef(slot)  ? min(collet[IER_SMAX],max(collet[IER_SMIN],scomputed)) : slot;
+
+    wall = collet[IER_L3]/2;
+    sx = 1000;
+    sz = collet[IER_L];
+    angle = 360/wn;
+
+    cylinder(r=rg, h=collet[IER_L]);
+    for ( i=[0:wn] ) {
+        rotate([0,0,i*angle])
+            translate([sx/2,0,sz/2+wall])
+            cube([sx,s,sz], center=true);
+        rotate([0,0,angle/2+i*angle])
+            translate([sx/2,0,sz/2-wall])
+            cube([sx,s,sz], center=true);
+    }
+}
+
+// Render the collet passage
+//
+// collet:  Collet created with newERxxxx functions
+// e:       Additional extrusion on top and bottom of the shape
+module ERColletPassage ( collet, e=undef ) {
+    class = assertClass(collet,classERCollet());
+    g = gap();
+    extrude = is_undef(e) ? 0 : e;
+    rbase = collet[IER_DB]/2 + g*(1-tan(collet[IER_AS]));
+    rtop  = collet[IER_DT]/2 + g*(1-tan(collet[IER_AG]));
+    rmid  = collet[IER_D]/2  + g;
+    skin (concat(
+        extrude>0 ? [ transform( translation([0,0,-extrude-g]), circle(rbase)) ] : [],
+        [
+            transform( translation([0,0,-g]), circle(rbase)),
+            transform( translation([0,0,collet[IER_L1]]), circle(rmid)),
+            transform( translation([0,0,collet[IER_L]-collet[IER_L3]]), circle(rmid)),
+            transform( translation([0,0,collet[IER_L]+g]), circle(rtop))
+        ],
+        extrude>0 ? [ transform( translation([0,0,collet[IER_L]+extrude+g]), circle(rtop)) ] : []
+    ));
+}
+
+// Render collet extractor ring
+//
+// collet: Collet created with newERxxxx functions
+// d:      Extra diameter, auto computed if undef
+// t:      Ring thickness, auto computed if undef
+module ERColletExtractorRing ( collet, d=undef, t=undef ) {
+    class = assertClass(collet,classERCollet());
+    groovew = collet[IER_L]-collet[IER_L1]-collet[IER_L3];
+    local_t = is_undef(t) ? collet[IER_RT] : t;
+    r2 = is_undef(d) ? collet[IER_D]/2+2*gap() : d ;
+
+    translate([0,0,collet[IER_L]-collet[IER_L3]-local_t])
+    difference() {
+        cylinder(r=r2, h=local_t);
+        skin([
+            transform(translation(collet[IER_RTR])*translation([0,0,-mfg()]),
+                circle(r=collet[IER_RD]/2+gap())),
+            transform(translation(collet[IER_RTR])*translation([0,0,local_t+mfg()]),
+                circle(r=collet[IER_RD]/2+gap()))
+        ]);
+    }
+}
+
+// ----------------------------------------
+//         ZIP TIE - Implementation
 // ----------------------------------------
 WALL_T     = 1.2;
 
@@ -168,53 +317,81 @@ module zipOblongShape ( zip, gap=0, head=true ) {
 }
 
 // ----------------------------------------
+//       ER Collets - Implementation
+// ----------------------------------------
+function classERCollet()  = "ERCollet";
+ER_COLLET_DATA = [
+//| Class          |  Name   |  d1  |  D  |  d2  |   L  |  L1  |  L2  |  L3  |  A1  |  A2  | SMIN | SMAX |
+  [ classERCollet(),  "ER8"  ,     8,  8.5,   6.5,  13.5,  10.8,  2.98,   1.5,  30.0,   8.0,   0.1,  0.2 ],
+  [ classERCollet(),  "ER11" ,    11, 11.5,   9.5,  18.0,  13.5,  3.80,   2.5,  30.0,   8.0,   0.1,  0.3 ],
+  [ classERCollet(),  "ER16" ,    16, 17.0,  13.8,  27.5,  20.8,  6.26,   4.0,  30.0,   8.0,   0.1,  0.4 ],
+  [ classERCollet(),  "ER20" ,    20, 21.0,  17.4,  31.5,  23.9,  6.36,   4.8,  30.0,   8.0,   0.2,  0.5 ],
+  [ classERCollet(),  "ER25" ,    25, 26.0,  22.0,  34.0,  25.9,  6.66,   5.0,  30.0,   8.0,   0.2,  0.6 ],
+  [ classERCollet(),  "ER32" ,    32, 33.0,  29.2,  40.0,  30.9,  7.16,   5.5,  30.0,   8.0,   0.3,  0.7 ],
+  [ classERCollet(),  "ER40" ,    40, 41.0,  36.2,  46.0,  34.9,  7.66,   7.0,  30.0,   8.0,   0.3,  0.8 ],
+  [ classERCollet(),  "ER50" ,    50, 52.0,  46.0,  60.0,  46.0,  13.4,   8.5,  30.0,   8.0,   0.3,  0.8 ],
+];
+
+// Input
+IER_NAME      =  1; // Collet type name
+IER_D1        =  2; // Advertized diameter at L-L3-L2
+IER_D         =  3; // External diameter
+IER_D2        =  4; // Inner diameter of groove
+IER_L         =  5; // Whole length
+IER_L1        =  6; // Length from bottom to groove
+IER_L2        =  7; // Length from bottom to advertized diameter
+IER_L3        =  8; // Length of grip
+IER_AG        =  9; // Grip angle
+IER_AS        = 10; // Slide angle
+IER_SMIN      = 11; // Slot min width
+IER_SMAX      = 12; // Slot max width
+// Computed
+IER_DG        = 13; // Collet grip diameter
+IER_RT        = 14; // Extractor ring thickness
+IER_RD        = 15; // Extractor ring diameter
+IER_RTR       = 16; // Extractor ring translation vector
+IER_DB        = 17; // Base diameter
+IER_DT        = 18; // Top diameter
+
+ER_RINGT_RATIO = 0.5;
+ER_RINGT_MAX   = 2;
+ER_RINGG_RATIO = 0.5;
+function ERColletData(D, d) = let (
+    dists    = [ for( i=[0:len(ER_COLLET_DATA)-1] )
+        abs ( diff=ER_COLLET_DATA[i][IER_D1]-abs(D) )
+    ],
+    sorted  = sortIndexed(dists),
+    rawdata = ER_COLLET_DATA[sorted[0][1]],
+    groovew = rawdata[IER_L]-rawdata[IER_L1]-rawdata[IER_L3],
+    eringt  = min(ER_RINGT_MAX, floor(10*groovew*ER_RINGT_RATIO)/10),
+
+    dr = rawdata[IER_D]/2-rawdata[IER_D2]/2,
+    grip = ER_RINGG_RATIO*dr,
+    ungrip = dr-grip,
+    eringd = rawdata[IER_D2] + dr + ungrip,
+    eringtr = [-grip/2,0,0],
+    dbase = rawdata[IER_D] - 2 * rawdata[IER_L1] * tan(rawdata[IER_AS]),
+    dtop  = rawdata[IER_D] - 2 * rawdata[IER_L3] * tan(rawdata[IER_AG])
+) sorted[0][0]!=0 ? undef : concat(rawdata,[d,eringt,eringd,eringtr,dbase,dtop]);
+
+function ERColletGetName(c)  = c[IER_NAME];
+function ERColletGetD(c)     = c[IER_D];
+function ERColletGetD1(c)    = c[IER_D1];
+function ERColletGetD2(c)    = c[IER_D2];
+function ERColletGetDG(c)    = c[IER_DG];
+function ERColletGetL(c)     = c[IER_L];
+function ERColletGetL1(c)    = c[IER_L1];
+function ERColletGetL2(c)    = c[IER_L2];
+function ERColletGetL3(c)    = c[IER_L3];
+function ERColletGetRT(c)    = c[IER_RT];
+function ERColletGetRD(c)    = c[IER_RD];
+function ERColletGetRTr(c)   = c[IER_RTR];
+function ERColletGetBaseD(c) = c[IER_DB];
+function ERColletGetTopD(c)  = c[IER_DT];
+
+
+// ----------------------------------------
 //                Showcase
 // ----------------------------------------
-PRECISION  = 100;
-SEPARATION = 0;
 
-module show_parts( part=0, cut=undef, cut_rotation=undef ) {
-    zip   = newZipTie2_5();
-    zipu1 = makeZipU( zip, 20 );
-    zipu2 = makeZipU( zip, 10, 5 );
-    zipo1 = makeZipOblong( zip, 1.5, 3 );
-    if ( part==0 ) {
-        intersection () {
-            union() {
-                zipShape ( zipu1 );
-                rotate( [0,90,0] )
-                    zipShape ( zipo1 );
-                translate( [0, 0, 2])
-                    difference() {
-                        zipConduitShape ( zipu2 );
-                        zipConduitHollow( zipu2 );
-                    }
-                }
-            color ( "#fff",0.1 )
-                rotate( [0,0,is_undef(cut_rotation)?0:cut_rotation] )
-                translate( [-500,is_undef(cut)?-500:cut,-500] )
-                cube( [1000,1000,1000] );
-        }
-    }
-
-    if ( part==1 ) {
-        #zipShapePassage ( zipu2, $gap=1 );
-        zipShape ( zipu2 );
-    }
-    if ( part==2 ) {
-        #zipShapePassage ( zipo1 );
-        zipShape ( zipo1 );
-    }
-    if ( part==3 ) {
-        difference() {
-            zipConduitShape( zipu2 );
-            zipConduitHollow( zipu2 );
-        }
-    }
-}
-
-// 0: all
-// 1: zip U shape
-// 2: zip Obblong shape
-// 3: zip U shape conduit
-show_parts ( 0, 0, -90, $fn=PRECISION );
+// See test/test-hardware.scad
