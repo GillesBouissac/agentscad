@@ -37,7 +37,7 @@ module showCase() {
 
     translate ( [+80,0,0] ) {
         // 2: Bolt passage
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltPassage (screw);
@@ -46,7 +46,7 @@ module showCase() {
 
     translate ( [+60,0,0] ) {
         // 3: Allen bolt
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltPassage (screw);
@@ -56,7 +56,7 @@ module showCase() {
 
     translate ( [40,0,0] ) {
         // 4: Hexagonal bolt
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltPassage (screw);
@@ -66,7 +66,7 @@ module showCase() {
 
     translate ( [+20,0,0] ) {
         // 5: Tight passage allen
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltAllenPassage (screw);
@@ -76,7 +76,7 @@ module showCase() {
 
     translate ( [-0,0,0] ) {
         // 6: Tight passage hexagonal
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltHexagonalPassage (screw);
@@ -86,7 +86,7 @@ module showCase() {
 
     translate ( [-20,0,0] ) {
         // 7: Nut passage
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltHexagonalPassage (screw);
@@ -98,7 +98,7 @@ module showCase() {
 
     translate ( [-40,0,0] ) {
         // 8: Hexagonal nut
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltHexagonalPassage (screw);
@@ -112,7 +112,7 @@ module showCase() {
 
     translate ( [-60,0,0] ) {
         // 9: Square nut
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltHexagonalPassage (screw);
@@ -126,7 +126,7 @@ module showCase() {
 
     translate ( [-80,0,0] ) {
         // 10: Hexagonal nut passage
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             showcaseWalls (3,10,15);
             mxfBoltHexagonalPassage (screw);
@@ -140,7 +140,7 @@ module showCase() {
 
     translate ( [-100,0,0] ) {
         // 11: Square nut passage
-        screw = MXF3(10,3);
+        screw = MF3(10,3);
         difference() {
             translate ( [0,-screwGetSquareToolSize(screw)/2,0] )
                 showcaseWalls (3,10,15);

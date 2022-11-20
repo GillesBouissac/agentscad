@@ -14,6 +14,7 @@
 use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
 use <agentscad/mesh.scad>
+use <agentscad/extrude.scad>
 use <agentscad/things/pixeled/const.scad>
 
 function getNailGap() = 0.15;
@@ -36,12 +37,12 @@ IDX_RGT_NAILS = 3;
 module nail( l=getNailH() ) {
     rotate( [-90,0,0] )
     rotate( [0,0,45/2] )
-        meshPolyhedron( meshExtrude( getMeshVertices(getNailProfile()), l ));
+        extrude( getMeshVertices(getNailProfile()), l );
 }
 module nailPassage( l=getNailH() ) {
     rotate( [-90,0,0] )
     rotate( [0,0,45/2] )
-        meshPolyhedron( meshExtrude( getMeshVertices(getNailPassageProfile()), l+2*gap() ));
+        extrude( getMeshVertices(getNailPassageProfile()), l+2*gap() );
 }
 module locateNailInLayer() {
     x = getPixelW()/2 - getNailW()/2 - 2*(nozzle()+0.1);

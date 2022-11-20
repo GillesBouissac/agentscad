@@ -59,7 +59,11 @@ function mod(a,m) = a - roundDown(a,m);
 // Sums all the elements of a list of elements
 function sum(l) = __sum(l,0);
 
+INFINITE = +1e9;
 INCH=25.4;
+
+// Returns a very big integer value
+function infinite() = INFINITE;
 
 // millimeter to inch conversion
 // - if d is a vector every number will be converted, non number are preserved unchanged
@@ -171,8 +175,8 @@ let ( r=forceValueInRange(radius,minv=0,defv=100) ) [
 //
 function projectCylinder ( vertices, radius=undef, height=undef ) =
 let (
-    r=forceValueInRange(radius,minv=0,defv=height/PI),
-    h=forceValueInRange(height,minv=0,defv=radius*PI)
+    h=forceValueInRange(height,minv=0,defv=radius*PI),
+    r=forceValueInRange(radius,minv=0,defv=h/PI)
 )[
     for ( pt=vertices ) let (
         z         = h*(pt.y-0.5),

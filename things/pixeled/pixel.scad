@@ -13,6 +13,7 @@
 
 use <agentscad/bevel.scad>
 use <agentscad/mesh.scad>
+use <agentscad/extrude.scad>
 use <agentscad/bevel.scad>
 
 use <agentscad/things/pixeled/cap.scad>
@@ -68,7 +69,7 @@ module bevelEdge() {
     ];
 
     rotate( [-90,0,0] )
-    meshPolyhedron( meshExtrude(BEVEL_PROFILE, getRadiusBevel(), [undef, 0, getRadiusBevel()], [0, undef, -getPixelW()/2]) );
+    extrude(BEVEL_PROFILE, getRadiusBevel(), true, [undef, 0, getRadiusBevel()], [0, undef, -getPixelW()/2]);
 }
 
 module bevelCellSide() {

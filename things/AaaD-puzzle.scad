@@ -16,6 +16,7 @@ use <scad-utils/transformations.scad>
 use <agentscad/mesh.scad>
 use <agentscad/printing.scad>
 use <agentscad/extensions.scad>
+use <agentscad/extrude.scad>
 use <agentscad/geometry.scad>
 use <agentscad/bevel.scad>
 use <agentscad/polyhedron/rhombicosidodecahedron.scad>
@@ -54,29 +55,29 @@ function passageT(t) = t+2*gap();
 
 // Basic pentagon shape
 module ppentagon(r,e,t,g=gap()) {
-    meshPolyhedron(meshFrustum(
+    frustum(
         meshRegularPolygon(5,circumscribedRadius(e-g,5)),
-        h=t,
-        a=pva(r,e)
-    ));
+        height=t,
+        angle=pva(r,e)
+    );
 }
 
 // Basic square shape
 module psquare(r,e,t,g=gap()) {
-    meshPolyhedron(meshFrustum(
+    frustum(
         meshRegularPolygon(4,circumscribedRadius(e-g,4)),
-        h=t,
-        a=sva(r,e)
-    ));
+        height=t,
+        angle=sva(r,e)
+    );
 }
 
 // Basic triangle shape
 module ptriangle(r,e,t,g=gap()) {
-    meshPolyhedron(meshFrustum(
+    frustum(
         meshRegularPolygon(3,circumscribedRadius(e-g,3)),
-        h=t,
-        a=tva(r,e)
-    ));
+        height=t,
+        angle=tva(r,e)
+    );
 }
 
 // Basic joint shape
@@ -255,10 +256,10 @@ module stand(AaaD,h,t) {
             rotate( [0,0,180] )
             multmatrix(j2p)
                 translate([0,0,-r/2])
-                meshPolyhedron(meshPrism(
+                prism(
                     meshRegularPolygon(5,circumscribedRadius(e,5)),
-                    h=r
-                ));
+                    height=r
+                );
 
         translate([0,0,jointRext-po(r,e)+t])
         rotate( [0,180,0] ){
@@ -293,17 +294,17 @@ module stand(AaaD,h,t) {
                     render(2)
                     multmatrix(j2t)
                         translate([0,0,-r/2])
-                        meshPolyhedron(meshPrism(
+                        prism(
                             meshRegularPolygon(3,circumscribedRadius(e,3)),
-                            h=r
-                        ));
+                            height=r
+                        );
                     render(2)
                     multmatrix(j2s)
                         translate([0,0,-r/2])
-                        meshPolyhedron(meshPrism(
+                        prism(
                             meshRegularPolygon(4,circumscribedRadius(e,4)),
-                            h=r
-                        ));
+                            height=r
+                        );
                 }
             }
         }

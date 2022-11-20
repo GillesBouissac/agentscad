@@ -15,6 +15,7 @@ use <scad-utils/lists.scad>
 use <scad-utils/spline.scad>
 use <agentscad/mesh.scad>
 use <agentscad/extensions.scad>
+use <agentscad/extrude.scad>
 
 // ----------------------------------------
 //                   API
@@ -254,31 +255,31 @@ module showParts() {
         // First children placed at every pentagon location
         // Can be anything else
         color("red")
-        meshPolyhedron(meshFrustum(
+        frustum(
             meshRegularPolygon(5,circumscribedRadius(AaaD[IE]-1,5)),
-            h=WALL_T,
-            a=polyVertexAngle(AaaD[IR],AaaD[IE],5)
-        ));
+            height=WALL_T,
+            angle=polyVertexAngle(AaaD[IR],AaaD[IE],5)
+        );
 
         // Second children placed at every square location
         // Can be anything else
         color("yellow")
-        meshPolyhedron(meshFrustum(
+        frustum(
             meshRegularPolygon(4,circumscribedRadius(AaaD[IE]-1,4)),
-            h=WALL_T,
-            a=polyVertexAngle(AaaD[IR],AaaD[IE],4)
-        ));
+            height=WALL_T,
+            angle=polyVertexAngle(AaaD[IR],AaaD[IE],4)
+        );
 
         // Third children placed at every triangle location
         // Can be anything else
         color("green")
-        meshPolyhedron(meshFrustum(
+        frustum(
             meshRegularPolygon(3,circumscribedRadius(AaaD[IE]-1,3)),
-            h=WALL_T,
-            a=polyVertexAngle(AaaD[IR],AaaD[IE],3)
-        ));
+            height=WALL_T,
+            angle=polyVertexAngle(AaaD[IR],AaaD[IE],3)
+        );
     }
 }
 
-*
+
 showParts();
