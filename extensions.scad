@@ -18,7 +18,6 @@ use <scad-utils/transformations.scad>
 // ----------------------------------------
 
 // ManiFold Guard
-MFG = 0.01;
 function mfg(mult=1) = is_undef($mfg) ? mult*MFG : mult*$mfg;
 
 // Step in range [0:1] from $fn/ratio
@@ -56,14 +55,23 @@ function roundDown(a,m) = let(ar=round(a*1000000),mr=round(m*1000000)) (mr*floor
 // Modulo
 function mod(a,m) = a - roundDown(a,m);
 
+// Reduce a list to a single element using fn(accumulator,nextval)
+function reduce(fn, list, initial=0) = __reduce(fn, list, initial, 0);
+
 // Sums all the elements of a list of elements
-function sum(l) = __sum(l,0);
+function sum(l,inital=0) = reduce(function(a,b) a+b,l,inital);
 
-INFINITE = +1e9;
-INCH=25.4;
+// Radian to Degree conversions
+function deg(a) = a*RAD2DEG;
 
-// Returns a very big integer value
+// Degree to Radian conversions
+function rad(a) = a/RAD2DEG;
+
+// Returns a very big number
 function infinite() = INFINITE;
+
+// Returns a very low number
+function epsilon() = EPSILON;
 
 // millimeter to inch conversion
 // - if d is a vector every number will be converted, non number are preserved unchanged
@@ -98,7 +106,7 @@ function sortIndexed(arr) = !(len(arr)>0) ? [] : let(
 // Sum all the numbers at column 'col' of every element from list
 //   only elements at indexes [start:end] are taken into account
 //   if col=undef then elements from list are considered as numbers
-function columnSum ( list, col=undef, start=undef, end=undef ) =
+function columnSum(list, col=undef, start=undef, end=undef) =
     __columnSum(list,col,start,end,0);
 
 // ----------------------------------------
@@ -303,7 +311,7 @@ module alignOnVector(v) {
 // ----------------------------------------
 //              Implementation
 // ----------------------------------------
-function __sortIndexed(arr) = !(len(arr)>0) ? [] : let(
+__sortIndexed = function(arr) !(len(arr)>0) ? [] : let(
     pivot   = arr[floor(len(arr)/2)][0],
     lesser  = [ for (y = arr) if (y[0]  < pivot) y ],
     equal   = [ for (y = arr) if (y[0] == pivot) y ],
@@ -311,9 +319,8 @@ function __sortIndexed(arr) = !(len(arr)>0) ? [] : let(
 ) concat(
     __sortIndexed(lesser), equal, __sortIndexed(greater)
 );
-function __sum(l,i=0) = i<len(l)-1 ? l[i] + __sum(l,i+1) : l[i];
-
-function __columnSum ( list, col, start, end, current ) =
+__reduce = function(f,l,a,i) i<len(l) ? __reduce(f,l,f(a,l[i]),i+1) : a;
+__columnSum = function( list, col, start, end, current )
 let(
     maxEnd   = len(list)-1,
     startIdx = is_undef(start) ? 0      : (start<0    ? 0:start),
@@ -321,3 +328,9 @@ let(
     curValue = forceValueInRange ( current, 0 ),
     itemVal  = is_undef(col)     ? list[startIdx] : list[startIdx][col]
 ) startIdx>endIdx ? curValue : itemVal+__columnSum(list,col,startIdx+1,endIdx,curValue);
+
+RAD2DEG = 180/PI;
+INFINITE = 1e9;
+EPSILON = 1e-9;
+INCH=25.4;
+MFG = 0.01;

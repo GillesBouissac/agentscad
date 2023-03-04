@@ -15,6 +15,40 @@ use <agentscad/extensions.scad>
 
 
 // ----------------------------------------
+//            Test:  reduce
+// ----------------------------------------
+reduce_0 = reduce(function(a,b) max(a,b),[]);
+echo("reduce_0=",reduce_0);
+assert(reduce_0==0, "ERROR reduce_0");
+
+reduce_1 = reduce(function(a,b) max(a,b),[2,1,5,10,6,4,3]);
+echo("reduce_1=",reduce_1);
+assert(reduce_1==10, "ERROR reduce_1");
+
+reduce_2 = reduce(function(a,b) a+b,[2,1,5,10,6,4,3], 10);
+echo("reduce_2=",reduce_2);
+assert(reduce_2==41, "ERROR reduce_2");
+
+// ----------------------------------------
+//            Test:  sum
+// ----------------------------------------
+sum_0 = sum([]);
+echo("sum_0=",sum_0);
+assert(sum_0==0, "ERROR sum_0");
+
+sum_1 = sum([2]);
+echo("sum_1=",sum_1);
+assert(sum_1==2, "ERROR sum_1");
+
+sum_2 = sum([2,1,5,10,6,4,3]);
+echo("sum_2=",sum_2);
+assert(sum_2==31, "ERROR sum_2");
+
+sum_3 = sum([2,1,5,10,6,4,3],10);
+echo("sum_3=",sum_3);
+assert(sum_3==41, "ERROR sum_3");
+
+// ----------------------------------------
 //            Test:  round_down
 // ----------------------------------------
 round_down_0 = roundDown(100.45654, 1);
