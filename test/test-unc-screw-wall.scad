@@ -75,4 +75,5 @@ module showcaseBigWall() {
     }
 }
 
+dumpScrewsData(ALL_SCREW);
 showcaseBigWall ($fn=50);

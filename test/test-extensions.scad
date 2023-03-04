@@ -45,6 +45,21 @@ echo("reduceWI_2=",reduceWI_2);
 assert(reduceWI_2==62, "ERROR reduceWI_2");
 
 // ----------------------------------------
+//            Test:  accumulate
+// ----------------------------------------
+accumulate_0 = accumulate(function(a,b) max(a,b),-1);
+echo("accumulate_0=",accumulate_0);
+assert(accumulate_0==0, "ERROR accumulate_0");
+
+accumulate_1 = accumulate(function(a,b) max(a,b),3);
+echo("accumulate_1=",accumulate_1);
+assert(accumulate_1==2, "ERROR accumulate_1");
+
+accumulate_2 = accumulate(function(a,b) a+b,3,10);
+echo("accumulate_2=",accumulate_2);
+assert(accumulate_2==13, "ERROR accumulate_2");
+
+// ----------------------------------------
 //            Test:  sum
 // ----------------------------------------
 sum_0 = sum([]);

@@ -56,10 +56,13 @@ function roundDown(a,m) = let(ar=round(a*1000000),mr=round(m*1000000)) (mr*floor
 function mod(a,m) = a - roundDown(a,m);
 
 // Reduce a list to a single element using fn(accumulator, nextval)
-function reduce(fn, list, initial=0) = __reduce(fn, list, initial, 0);
+function reduce(fn, list, initial=0) = __reduce(fn, list, initial);
 
 // Reduce a list to a single element using fn(accumulator, nextval, nextvalidx)
-function reduceWithIndex(fn, list, initial=0) = __reduceWithIndex(fn, list, initial, 0);
+function reduceWithIndex(fn, list, initial=0) = __reduceWithIndex(fn, list, initial);
+
+// Accumulate calls to fn(accumulator, nextval) count times
+function accumulate(fn, count, initial=0) = __accumulate(fn, count, initial);
 
 // Sums all the elements of a list of elements
 function sum(l,inital=0) = reduce(function(a,b) a+b,l,inital);
@@ -322,8 +325,9 @@ __sortIndexed = function(arr) !(len(arr)>0) ? [] : let(
 ) concat(
     __sortIndexed(lesser), equal, __sortIndexed(greater)
 );
-__reduce = function(f,l,a,i) i<len(l) ? __reduce(f,l,f(a,l[i]),i+1) : a;
-__reduceWithIndex = function(f,l,a,i) i<len(l) ? __reduceWithIndex(f,l,f(a,l[i],i),i+1) : a;
+__reduce = function(f,l,a,i=0) i<len(l) ? __reduce(f,l,f(a,l[i]),i+1) : a;
+__reduceWithIndex = function(f,l,a,i=0) i<len(l) ? __reduceWithIndex(f,l,f(a,l[i],i),i+1) : a;
+__accumulate = function(f,c,a,i=0) i<c ? __accumulate(f,c,f(a,i),i+1) : a;
 __columnSum = function( list, col, start, end, current )
 let(
     maxEnd   = len(list)-1,

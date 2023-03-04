@@ -9,6 +9,7 @@
  * Description: Metric screw modelisation
  * Author:      Gilles Bouissac
  */
+use <agentscad/lib-screw.scad>
 use <agentscad/mx-screw.scad>
 use <agentscad/extensions.scad>
 
@@ -74,4 +75,5 @@ module showcaseBigWall() {
     }
 }
 
+dumpScrewsData(ALL_SCREW);
 showcaseBigWall ($fn=50);
