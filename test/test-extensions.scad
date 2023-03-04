@@ -30,6 +30,21 @@ echo("reduce_2=",reduce_2);
 assert(reduce_2==41, "ERROR reduce_2");
 
 // ----------------------------------------
+//            Test:  reduceWithIndex
+// ----------------------------------------
+reduceWI_0 = reduceWithIndex(function(a,b,i) max(a,b),[]);
+echo("reduceWI_0=",reduceWI_0);
+assert(reduceWI_0==0, "ERROR reduceWI_0");
+
+reduceWI_1 = reduceWithIndex(function(a,b,i) max(a,b),[2,1,5,10,6,4,3]);
+echo("reduceWI_1=",reduceWI_1);
+assert(reduceWI_1==10, "ERROR reduceWI_1");
+
+reduceWI_2 = reduceWithIndex(function(a,b,i) a+b+i,[2,1,5,10,6,4,3], 10);
+echo("reduceWI_2=",reduceWI_2);
+assert(reduceWI_2==62, "ERROR reduceWI_2");
+
+// ----------------------------------------
 //            Test:  sum
 // ----------------------------------------
 sum_0 = sum([]);
