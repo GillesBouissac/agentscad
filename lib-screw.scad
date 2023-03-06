@@ -504,6 +504,34 @@ I_PRFW   = 20; // Whitworth profile data
 PROFILE_M = "M"; // Metric or UTS profile
 PROFILE_W = "W"; // Whitworth profile
 
+function alignRight(text, width) = let(padding=accumulate(function(a,n) str(a," "),width-len(text), "")) str(padding,text);
+module dumpScrewsData(data) {
+    idx_array = [
+        I_IDX,        I_NAME,      I_PRF,       I_TP,      I_TAP,
+        I_TD,         I_TMN,       I_TMX,       I_TDP,     I_TL,
+        I_TLP,        I_HDP,       I_HLP,       I_AHD,     I_AHL,
+        I_ATS,        I_HHD,       I_HHL,       I_HTS
+    ];
+    title_array = [
+        "idx",        "name",      "profile",   "pitch",   "tap D",
+        "thr. D",     "thr. minD", "thr. maxD", "thr. DP", "thr. L",
+        "thr. LP",    "head DP",   "head LP",   "Allen D", "Allen L",
+        "Allen tool", "Hex D",     "Hex L",     "Hex tool"
+    ];
+    text_array = [
+        title_array,
+        for ( d=data )
+            [ for ( i=[0:len(idx_array)-1] ) let(idx=idx_array[i]) str(d[idx]) ]
+    ];
+    col_length = [
+        for (i=[0:len(idx_array)-1])
+            reduce(function(a,n) max(a,len(n[i])),text_array)
+    ];
+    for (row=text_array)
+        let(line=reduceWithIndex(function(a,n,i) str(a," ",alignRight(n,col_length[i])," |"),row,"|"))
+        echo(line);
+}
+
 function libScrewDataCompletion( data,idx,n=undef,p=undef,td=undef,tl=undef,hdp=undef,hlp=undef,ahd=undef,ahl=undef,ats=undef,hhd=undef,hhl=undef,tdp=undef,tlp=undef,prf=undef ) = let (
     local_name = is_undef(n)   ? data[idx][CNAME]  : n,
     local_p    = is_undef(p)   ? data[idx][CPITCH] : p,
@@ -669,71 +697,3 @@ function screwThreadSlices( profile, pitch, rotations=1 ) = [
         transform(translation([a*pitch/360,0,0])*rotation([a,0,0]), profile )
 ];
 
-// ----------------------------------------
-//
-//                  Showcase
-//
-// ----------------------------------------
-
-module showName( d, dy=0 ) {
-    translate( [screwGetPitch(d),dy,0.1] )
-    linear_extrude(1)
-    text( screwGetName(d), halign="center", valign="center", size=1, $fn=100 );
-}
-
-// Thread profiles visualisation
-module showParts( part=0 ) {
-    if ( part==0 ) {
-        screw_w = libScrewDataCompletion([["Profile BSW / BSF",     6,12,1]],0,prf=PROFILE_W);
-        screw_m = libScrewDataCompletion([["Profile M / UNC / UNF", 6,12,1]],0,prf=PROFILE_M);
-        !union() {
-            color("white")
-            union() {
-                intersection() {
-                    rotate( [90,0,90] )
-                    union() {
-                        libThreadExternal(screw_m,l=2*screwGetPitch(screw_m),f=true,$fn=100);
-                        libThreadInternal(screw_m,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
-                    }
-                    cube( [100,100,0.01], center=true );
-                }
-                showName(screw_m,-0.6);
-            }
-            translate( [0,0,-2] )
-            color("lightblue")
-            union() {
-                intersection() {
-                    rotate( [90,0,90] )
-                    union() {
-                        libThreadExternal(screw_w,l=2*screwGetPitch(screw_m),f=true,$fn=100);
-                        libThreadInternal(screw_w,l=2*screwGetPitch(screw_m),f=true,t=1,$fn=100);
-                    }
-                    cube( [100,100,0.01], center=true );
-                }
-                showName(screw_w,-0.6);
-            }
-        }
-    }
-
-    // Complex structure
-    if ( part==1 ) {
-        screw_w = libScrewDataCompletion([["Profile BSW / BSF",inch2mm(1/16),inch2mm(3/8),1]],0,prf=PROFILE_W);
-        screw_hole = libScrewDataCompletion([["B",2,6,1]],0,prf=PROFILE_W);
-
-        difference() {
-            union() {
-                libThreadExternal( screw_w, 10, f=false, $fn=100 );
-                libThreadInternal( screw_w, 10, f=false, t=1, $fn=100 );
-            }
-#            translate( [-1,0,9] )
-                rotate( [ 60, 20, -60 ] )
-                translate( [0,0,-10] )
-                libThreadExternal( screw_hole, 16, $fn=100 );
-#            rotate( [ 0, 0, -90 ] )
-                translate( [5,5,3] )
-                cylinder( r=4.5,10, $fn=100 );
-        }
-    }
-}
-*
-showParts(1);
