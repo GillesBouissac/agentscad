@@ -45,3 +45,39 @@ module showcase() {
 }
 
 showcase ($fn=50);
+
+echo("========== Metric thread data ==========");
+mxdata = [ for ( i=[0:mxGetDataLength()-1] )
+    mxData(i)
+];
+dumpScrewsData(mxdata);
+
+echo("========== Metric fine thread data ==========");
+mxfdata = [ for ( i=[0:mxfGetDataLength()-1] )
+    mxfData(i)
+];
+dumpScrewsData(mxfdata);
+
+echo("========== UNC thread data ==========");
+uncdata = [ for ( i=[0:uncGetDataLength()-1] )
+    uncData(i)
+];
+dumpScrewsData(uncdata);
+
+echo("========== UNC fine thread data ==========");
+unfdata = [ for ( i=[0:unfGetDataLength()-1] )
+    unfData(i)
+];
+dumpScrewsData(unfdata);
+
+echo("========== BSW thread data ==========");
+bswdata = [ for ( i=[0:bswGetDataLength()-1] )
+    bswData(i)
+];
+dumpScrewsData(bswdata);
+
+echo("========== BSW fine thread data ==========");
+bsfdata = [ for ( i=[0:bsfGetDataLength()-1] )
+    bsfData(i)
+];
+dumpScrewsData(bsfdata);
