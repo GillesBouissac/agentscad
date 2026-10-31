@@ -32,8 +32,8 @@ LOWPOLY = 6;
 //             wrenches in the group, the count start from first wrench in WRENCHES
 //           Set this to undef is you want a single part stand
 taswStand (
-    wrenches     = 10_WRENCHES,
-    groups       = 10_WRENCHES_GROUPS,
+    wrenches     = WRENCHES_SMAL_10,
+    groups       = WRENCHES_SMAL_10_GROUPS,
     group_num    = undef,
     numbers_only = false,
     $fn          = FAST );
@@ -44,21 +44,24 @@ taswStand (
 // ----------------------------------------
 
 // 10 Tubular Angled Socket Wrenches set
-10_WRENCHES        = [ 8,10,11,12,13,14,16,17,18,19 ];
-10_WRENCHES_GROUPS = [ 6,4 ];
+WRENCHES_10        = [ 8,10,11,12,13,14,16,17,18,19 ];
+WRENCHES_10_GROUPS = [ 6,4 ];
 
 // 14 Tubular Angled Socket Wrenches set
-14_WRENCHES        = [ 8,9,10,11,12,13,14,15,16,17,18,19,20,21 ];
-14_WRENCHES_GROUPS = [ 6,4,4 ];
+WRENCHES_14        = [ 8,9,10,11,12,13,14,15,16,17,18,19,20,21 ];
+WRENCHES_14_GROUPS = [ 6,4,4 ];
 
 // 16 Tubular Angled Socket Wrenches set
-16_WRENCHES        = [ 8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24 ];
-16_WRENCHES_GROUPS = [ 7,5,4 ];
-
+WRENCHES_16        = [ 8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24 ];
+WRENCHES_16_GROUPS = [ 7,5,4 ];
 
 // Special 12 Tubular Angled Socket Wrenches set for PL
-12_WRENCHES        = [ 8, 9, 11, 12, 13, 14, 15, 16, 17, 17, 19, 19 ];
-12_WRENCHES_GROUPS = [ 7,5 ];
+WRENCHES_12        = [ 8, 9, 11, 12, 13, 14, 15, 16, 17, 17, 19, 19 ];
+WRENCHES_12_GROUPS = [ 7,5 ];
+
+// 10 Tubular Angled Socket Wrenches set with a 5mm wrench
+WRENCHES_SMAL_10        = [ 5,6,7,8,10,11,12,13,14,16 ];
+WRENCHES_SMAL_10_GROUPS = [ 6,4 ];
 
 
 // Vertical offsets between wrenches (perpendicular to ROD axis)

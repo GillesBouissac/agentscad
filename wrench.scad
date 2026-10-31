@@ -183,12 +183,14 @@ module tasWrench ( wrench ) {
 // Tubular Angled Socket Wrench data
 //
 // Sources:
-//   https://catalogue.facom.com/ch-fr/categorie/cles-a-ouverture-fixe-et-variable/cles-a-pipe/
-//       serie-standard/produit/75-cles-a-pipe-debouchees-forgees-6-pans-x-6-pans-metriques
-//   https://catalogue.facom.com/thumb/dessintech/567x567/75.6_DTCL01.png
+//   https://facom.eu/products/76-tubular-socket-wrenches-12-x-6-points-metric
 //
+//
+//
+
 TASWDATA = [
 //| Name   |   A  |   B  |   d  |  d1  |   H  |   L  |  L1  |  de1 |  de2 |
+  [  "M5"  ,    5 ,  9.0 ,  4.0 ,  3.5 ,   13 ,   98 ,  20  ,    6 ,    8 ],
   [  "M6"  ,    6 , 10.0 ,  4.5 ,  4.5 ,   15 ,  102 ,  21  ,    7 ,    9 ],
   [  "M7"  ,    7 , 11.0 ,  4.5 ,  4.5 ,   17 ,  106 ,  22  ,    7 ,   10 ],
   [  "M8"  ,    8 , 12.5 ,  7.0 ,  6.0 ,   19 ,  114 ,  25  ,    9 ,   11 ],
